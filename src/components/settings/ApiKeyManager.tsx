@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { supabase } from "@/integrations/supabase/client";
-import { Unlink, RefreshCw } from "lucide-react";
+import { ApiKeyInput } from "./ApiKeyInput";
+import { ValidatedKeyActions } from "./ValidatedKeyActions";
 
 interface ApiKeyManagerProps {
   onApiKeyValidated: (key: string) => void;
@@ -18,7 +17,6 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
   const [hasValidKey, setHasValidKey] = useState(false);
   const { toast } = useToast();
 
-  // Fetch existing API key on component mount
   useEffect(() => {
     const fetchExistingKey = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -56,10 +54,8 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // First validate the API key by fetching models
       await fetchModels(apiKey);
       
-      // Then save or update the API key
       const { error } = await supabase
         .from('api_keys')
         .upsert({
@@ -71,9 +67,7 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
           onConflict: 'user_id,provider'
         });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       toast({
         title: "Success",
@@ -111,7 +105,6 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Prepare the models data for insertion
       const modelsData = models.map(model => ({
         model_id: model.id,
         name: model.name,
@@ -121,7 +114,6 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
         is_active: true
       }));
 
-      // Insert or update models in the database
       const { error } = await supabase
         .from('available_models')
         .upsert(modelsData, {
@@ -184,33 +176,19 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
         Enter your OpenRouter API key to access available language models.
       </p>
       <div className="flex gap-4">
-        <Input
-          type="password"
-          placeholder="Enter your API key"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-        />
         {!hasValidKey ? (
-          <Button onClick={validateApiKey} disabled={isValidating} className="bg-blue-500 hover:bg-blue-600">
-            {isValidating ? "Validating..." : "Validate"}
-          </Button>
+          <ApiKeyInput
+            apiKey={apiKey}
+            isValidating={isValidating}
+            onApiKeyChange={setApiKey}
+            onValidate={validateApiKey}
+          />
         ) : (
-          <div className="flex gap-2">
-            <Button variant="outline" className="text-green-600 border-green-600">
-              Validated
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={refreshModels} 
-              disabled={isRefreshing}
-              className="text-blue-600 border-blue-600"
-            >
-              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button variant="outline" onClick={unlinkApiKey} className="text-destructive">
-              <Unlink className="h-4 w-4" />
-            </Button>
-          </div>
+          <ValidatedKeyActions
+            isRefreshing={isRefreshing}
+            onRefresh={refreshModels}
+            onUnlink={unlinkApiKey}
+          />
         )}
       </div>
     </div>
