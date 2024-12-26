@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Settings from "@/pages/Settings";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
+import Header from "@/components/Header";
+import AuthGuard from "@/components/AuthGuard";
 import "./App.css";
 
 // Create a client
@@ -20,8 +22,28 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route
+            path="/"
+            element={
+              <AuthGuard>
+                <>
+                  <Header />
+                  <Index />
+                </>
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <AuthGuard>
+                <>
+                  <Header />
+                  <Settings />
+                </>
+              </AuthGuard>
+            }
+          />
           <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
