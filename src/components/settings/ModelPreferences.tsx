@@ -31,7 +31,8 @@ export function ModelPreferences({
   ).map(provider => ({
     id: provider,
     name: provider.charAt(0).toUpperCase() + provider.slice(1),
-    description: `Models from ${provider}`
+    description: `Models from ${provider}`,
+    provider: provider // Add provider property
   }));
 
   // Filter models by selected provider and create model objects
@@ -40,7 +41,8 @@ export function ModelPreferences({
     .map(model => ({
       id: model.id,
       name: model.name,
-      description: model.description
+      description: model.description,
+      provider: model.id.split('/')[0] // Add provider property
     }));
 
   // Save model preference mutation

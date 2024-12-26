@@ -8,8 +8,18 @@ import { Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const defaultModels = [
-  { id: "openai/gpt-3.5-turbo", name: "GPT-3.5 Turbo", description: "" },
-  { id: "anthropic/claude-2", name: "Claude 2", description: "" },
+  { 
+    id: "openai/gpt-3.5-turbo", 
+    name: "GPT-3.5 Turbo", 
+    description: "",
+    provider: "openai"
+  },
+  { 
+    id: "anthropic/claude-2", 
+    name: "Claude 2", 
+    description: "",
+    provider: "anthropic"
+  },
 ];
 
 export default function Index() {
