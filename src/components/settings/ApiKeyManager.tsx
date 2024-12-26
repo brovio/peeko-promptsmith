@@ -35,7 +35,7 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
       // First validate the API key by fetching models
       await fetchModels(apiKey);
       
-      // Then save the API key
+      // Then save or update the API key
       const { error } = await supabase
         .from('api_keys')
         .upsert({
@@ -43,6 +43,8 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
           key_value: apiKey,
           is_active: true,
           user_id: user.id
+        }, {
+          onConflict: 'user_id,provider'
         });
 
       if (error) {
