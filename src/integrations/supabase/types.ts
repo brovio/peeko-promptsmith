@@ -47,6 +47,42 @@ export type Database = {
           },
         ]
       }
+      available_models: {
+        Row: {
+          context_length: number | null
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          model_id: string
+          name: string
+          provider: string
+          updated_at: string | null
+        }
+        Insert: {
+          context_length?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          model_id: string
+          name: string
+          provider: string
+          updated_at?: string | null
+        }
+        Update: {
+          context_length?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          model_id?: string
+          name?: string
+          provider?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       model_preferences: {
         Row: {
           created_at: string | null
