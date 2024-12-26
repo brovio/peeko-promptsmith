@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Settings from "@/pages/Settings";
 import Index from "@/pages/Index";
+import Login from "@/pages/Login";
 import "./App.css";
 
 // Create a client
@@ -21,6 +22,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </Router>
     </QueryClientProvider>
