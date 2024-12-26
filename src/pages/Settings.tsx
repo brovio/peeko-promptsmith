@@ -7,6 +7,7 @@ import { Model } from "@/lib/types";
 import { ModelSelector } from "@/components/ModelSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 interface Provider {
   id: string;
@@ -21,6 +22,23 @@ export default function Settings() {
   const [selectedModel, setSelectedModel] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  // Check authentication
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/login');
+        toast({
+          title: "Authentication required",
+          description: "Please log in to access settings",
+          variant: "destructive",
+        });
+      }
+    };
+    checkAuth();
+  }, [navigate, toast]);
 
   // Fetch models from OpenRouter
   const { data: models = [], isLoading: isLoadingModels } = useQuery({
@@ -49,12 +67,16 @@ export default function Settings() {
   // Save model preference mutation
   const saveModelPreference = useMutation({
     mutationFn: async ({ modelId, provider }: { modelId: string, provider: string }) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const { error } = await supabase
         .from('model_preferences')
         .upsert({
           model_id: modelId,
           provider: provider,
           is_enabled: true,
+          user_id: user.id
         });
 
       if (error) throw error;
@@ -88,26 +110,31 @@ export default function Settings() {
 
     setIsValidating(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
       const models = await fetchModels(apiKey);
-      toast({
-        title: "Success",
-        description: "API key validated successfully",
-      });
       
-      // Save API key to Supabase
+      // Save API key to Supabase with user_id
       const { error } = await supabase
         .from('api_keys')
         .upsert({
           provider: 'openrouter',
           key_value: apiKey,
           is_active: true,
+          user_id: user.id
         });
 
       if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "API key validated and saved successfully",
+      });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Invalid API key",
+        description: "Failed to validate or save API key",
         variant: "destructive",
       });
       console.error('Error validating API key:', error);
