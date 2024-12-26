@@ -45,7 +45,7 @@ export function ModelSelector({
       />
       <Select value={selectedModel} onValueChange={onModelSelect}>
         <SelectTrigger>
-          <SelectValue placeholder="Select a model" />
+          <SelectValue placeholder={`Select a ${label?.toLowerCase() || 'model'}`} />
         </SelectTrigger>
         <SelectContent>
           {filteredModels.map((model) => (

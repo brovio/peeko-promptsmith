@@ -22,7 +22,7 @@ export function ModelPreferences({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Extract unique providers from models
+  // Extract unique providers from models and create provider objects
   const providers = Array.from(
     new Set(models.map(model => {
       const [provider] = model.id.split('/');
@@ -34,10 +34,14 @@ export function ModelPreferences({
     description: `Models from ${provider}`
   }));
 
-  // Filter models by selected provider
-  const filteredModels = models.filter(model => 
-    model.id.startsWith(selectedProvider + '/')
-  );
+  // Filter models by selected provider and create model objects
+  const filteredModels = models
+    .filter(model => model.id.startsWith(selectedProvider + '/'))
+    .map(model => ({
+      id: model.id,
+      name: model.name,
+      description: model.description
+    }));
 
   // Save model preference mutation
   const saveModelPreference = useMutation({
