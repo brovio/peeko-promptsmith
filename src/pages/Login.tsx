@@ -25,7 +25,7 @@ export default function Login() {
 
       if (error) throw error;
 
-      navigate("/settings");
+      navigate("/");  // Changed from "/settings" to "/"
       toast({
         title: "Welcome back!",
         description: "You have successfully logged in.",
