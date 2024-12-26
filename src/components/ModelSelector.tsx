@@ -14,23 +14,28 @@ interface ModelSelectorProps {
   selectedModel: string;
   onModelSelect: (modelId: string) => void;
   searchPlaceholder?: string;
+  label?: string;
 }
 
 export function ModelSelector({ 
   models, 
   selectedModel, 
   onModelSelect,
-  searchPlaceholder = "Search models..."
+  searchPlaceholder = "Search models...",
+  label
 }: ModelSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
   
   const filteredModels = models.filter(model => 
     model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    model.description.toLowerCase().includes(searchTerm.toLowerCase())
+    model.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="w-full max-w-xs space-y-2">
+    <div className="w-full space-y-2">
+      {label && (
+        <label className="block text-sm font-medium text-gray-700">{label}</label>
+      )}
       <Input
         type="search"
         placeholder={searchPlaceholder}

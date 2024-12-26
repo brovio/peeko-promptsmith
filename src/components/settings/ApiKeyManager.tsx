@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { supabase } from "@/integrations/supabase/client";
-import { Trash2 } from "lucide-react";
+import { Unlink } from "lucide-react";
 
 interface ApiKeyManagerProps {
   onApiKeyValidated: (key: string) => void;
@@ -70,7 +70,7 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
     }
   };
 
-  const deleteApiKey = async () => {
+  const unlinkApiKey = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
@@ -85,17 +85,17 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
 
       toast({
         title: "Success",
-        description: "API key deleted successfully",
+        description: "API key unlinked successfully",
       });
 
       setHasValidKey(false);
       setApiKey("");
       onApiKeyDeleted();
     } catch (error) {
-      console.error('Error deleting API key:', error);
+      console.error('Error unlinking API key:', error);
       toast({
         title: "Error",
-        description: "Failed to delete API key",
+        description: "Failed to unlink API key",
         variant: "destructive",
       });
     }
@@ -115,13 +115,18 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
           onChange={(e) => setApiKey(e.target.value)}
         />
         {!hasValidKey ? (
-          <Button onClick={validateApiKey} disabled={isValidating}>
+          <Button onClick={validateApiKey} disabled={isValidating} className="bg-blue-500 hover:bg-blue-600">
             {isValidating ? "Validating..." : "Validate"}
           </Button>
         ) : (
-          <Button variant="destructive" onClick={deleteApiKey}>
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" className="text-green-600 border-green-600">
+              Validated
+            </Button>
+            <Button variant="outline" onClick={unlinkApiKey} className="text-destructive">
+              <Unlink className="h-4 w-4" />
+            </Button>
+          </div>
         )}
       </div>
     </div>

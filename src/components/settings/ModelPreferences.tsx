@@ -3,7 +3,6 @@ import { ModelSelector } from "@/components/ModelSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 
 interface ModelPreferencesProps {
   models: any[];
@@ -22,7 +21,6 @@ export function ModelPreferences({
 }: ModelPreferencesProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [showModelSelector, setShowModelSelector] = useState(false);
 
   // Extract unique providers from models
   const providers = Array.from(
@@ -54,6 +52,8 @@ export function ModelPreferences({
           provider: provider,
           is_enabled: true,
           user_id: user.id
+        }, {
+          onConflict: 'user_id,provider'
         });
 
       if (error) throw error;
@@ -75,11 +75,6 @@ export function ModelPreferences({
     },
   });
 
-  const handleProviderSelect = (providerId: string) => {
-    onProviderSelect(providerId);
-    setShowModelSelector(true);
-  };
-
   const handleModelSelect = async (modelId: string) => {
     onModelSelect(modelId);
     const provider = modelId.split('/')[0];
@@ -90,26 +85,22 @@ export function ModelPreferences({
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Model Selection</h2>
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">Provider</label>
-          <ModelSelector
-            models={providers}
-            selectedModel={selectedProvider}
-            onModelSelect={handleProviderSelect}
-            searchPlaceholder="Search providers..."
-          />
-        </div>
+        <ModelSelector
+          label="Provider"
+          models={providers}
+          selectedModel={selectedProvider}
+          onModelSelect={onProviderSelect}
+          searchPlaceholder="Search providers..."
+        />
 
-        {showModelSelector && selectedProvider && (
-          <div>
-            <label className="block text-sm font-medium mb-2">Model</label>
-            <ModelSelector
-              models={filteredModels}
-              selectedModel={selectedModel}
-              onModelSelect={handleModelSelect}
-              searchPlaceholder="Search models..."
-            />
-          </div>
+        {selectedProvider && (
+          <ModelSelector
+            label="Model"
+            models={filteredModels}
+            selectedModel={selectedModel}
+            onModelSelect={handleModelSelect}
+            searchPlaceholder="Search models..."
+          />
         )}
       </div>
     </div>
