@@ -4,14 +4,17 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { supabase } from "@/integrations/supabase/client";
+import { Trash2 } from "lucide-react";
 
 interface ApiKeyManagerProps {
   onApiKeyValidated: (key: string) => void;
+  onApiKeyDeleted: () => void;
 }
 
-export function ApiKeyManager({ onApiKeyValidated }: ApiKeyManagerProps) {
+export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyManagerProps) {
   const [apiKey, setApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
+  const [hasValidKey, setHasValidKey] = useState(false);
   const { toast } = useToast();
 
   const validateApiKey = async () => {
@@ -51,6 +54,7 @@ export function ApiKeyManager({ onApiKeyValidated }: ApiKeyManagerProps) {
         description: "API key validated and saved successfully",
       });
       
+      setHasValidKey(true);
       onApiKeyValidated(apiKey);
     } catch (error) {
       console.error('Error validating API key:', error);
@@ -61,6 +65,37 @@ export function ApiKeyManager({ onApiKeyValidated }: ApiKeyManagerProps) {
       });
     } finally {
       setIsValidating(false);
+    }
+  };
+
+  const deleteApiKey = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { error } = await supabase
+        .from('api_keys')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('provider', 'openrouter');
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "API key deleted successfully",
+      });
+
+      setHasValidKey(false);
+      setApiKey("");
+      onApiKeyDeleted();
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete API key",
+        variant: "destructive",
+      });
     }
   };
 
@@ -77,9 +112,15 @@ export function ApiKeyManager({ onApiKeyValidated }: ApiKeyManagerProps) {
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
         />
-        <Button onClick={validateApiKey} disabled={isValidating}>
-          {isValidating ? "Validating..." : "Validate"}
-        </Button>
+        {!hasValidKey ? (
+          <Button onClick={validateApiKey} disabled={isValidating}>
+            {isValidating ? "Validating..." : "Validate"}
+          </Button>
+        ) : (
+          <Button variant="destructive" onClick={deleteApiKey}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );

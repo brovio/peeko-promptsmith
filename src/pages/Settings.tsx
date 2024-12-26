@@ -51,6 +51,18 @@ export default function Settings() {
           return;
         }
       }
+
+      // Fetch existing API key
+      const { data: apiKeyData } = await supabase
+        .from('api_keys')
+        .select('key_value')
+        .eq('user_id', session.user.id)
+        .eq('provider', 'openrouter')
+        .single();
+
+      if (apiKeyData) {
+        setApiKey(apiKeyData.key_value);
+      }
     };
     checkAuth();
   }, [navigate, toast]);
@@ -66,14 +78,23 @@ export default function Settings() {
     setApiKey(key);
   };
 
+  const handleApiKeyDeleted = () => {
+    setApiKey("");
+    setSelectedProvider("");
+    setSelectedModel("");
+  };
+
   return (
     <div className="container mx-auto max-w-2xl py-8">
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
       
       <div className="space-y-6">
-        <ApiKeyManager onApiKeyValidated={handleApiKeyValidated} />
+        <ApiKeyManager 
+          onApiKeyValidated={handleApiKeyValidated}
+          onApiKeyDeleted={handleApiKeyDeleted}
+        />
 
-        {apiKey && (
+        {apiKey && !isLoadingModels && (
           <ModelPreferences
             models={models}
             selectedProvider={selectedProvider}

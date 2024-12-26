@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { ModelSelector } from "@/components/ModelSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 interface ModelPreferencesProps {
   models: any[];
@@ -20,6 +22,7 @@ export function ModelPreferences({
 }: ModelPreferencesProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showModelSelector, setShowModelSelector] = useState(false);
 
   // Extract unique providers from models
   const providers = Array.from(
@@ -72,6 +75,11 @@ export function ModelPreferences({
     },
   });
 
+  const handleProviderSelect = (providerId: string) => {
+    onProviderSelect(providerId);
+    setShowModelSelector(true);
+  };
+
   const handleModelSelect = async (modelId: string) => {
     onModelSelect(modelId);
     const provider = modelId.split('/')[0];
@@ -87,12 +95,12 @@ export function ModelPreferences({
           <ModelSelector
             models={providers}
             selectedModel={selectedProvider}
-            onModelSelect={onProviderSelect}
+            onModelSelect={handleProviderSelect}
             searchPlaceholder="Search providers..."
           />
         </div>
 
-        {selectedProvider && (
+        {showModelSelector && selectedProvider && (
           <div>
             <label className="block text-sm font-medium mb-2">Model</label>
             <ModelSelector
