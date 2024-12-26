@@ -40,7 +40,12 @@ export default function Header() {
   return (
     <header className="border-b bg-white">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <h1 className="text-xl font-bold">PeekoPrompter</h1>
+        <h1 
+          className="text-xl font-bold cursor-pointer" 
+          onClick={() => navigate("/")}
+        >
+          Peeko Prompter
+        </h1>
         
         <div className="flex items-center space-x-2">
           <Button 
