@@ -5,6 +5,7 @@ export async function fetchModels(apiKey: string): Promise<Model[]> {
     const response = await fetch('https://openrouter.ai/api/v1/models', {
       headers: {
         Authorization: `Bearer ${apiKey}`,
+        'HTTP-Referer': window.location.href,
       },
     });
     
@@ -15,8 +16,13 @@ export async function fetchModels(apiKey: string): Promise<Model[]> {
     const data = await response.json();
     return data.data.map((model: any) => ({
       id: model.id,
-      name: model.name,
+      name: model.name || model.id,
       description: model.description || '',
+      context_length: model.context_length,
+      pricing: {
+        prompt: model.pricing?.prompt || 0,
+        completion: model.pricing?.completion || 0,
+      },
     }));
   } catch (error) {
     console.error('Error fetching models:', error);
@@ -31,6 +37,7 @@ export async function sendPrompt(apiKey: string, model: string, prompt: string):
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
+        'HTTP-Referer': window.location.href,
       },
       body: JSON.stringify({
         model,
