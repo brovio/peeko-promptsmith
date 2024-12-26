@@ -3,17 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
-import { Model } from "@/lib/types";
 import { ModelSelector } from "@/components/ModelSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-
-interface Provider {
-  id: string;
-  name: string;
-  description: string;
-}
 
 export default function Settings() {
   const [apiKey, setApiKey] = useState("");
@@ -24,7 +17,7 @@ export default function Settings() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  // Check authentication
+  // Check authentication and ensure profile exists
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -35,6 +28,31 @@ export default function Settings() {
           description: "Please log in to access settings",
           variant: "destructive",
         });
+        return;
+      }
+
+      // Check if profile exists
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', session.user.id)
+        .single();
+
+      if (profileError || !profile) {
+        // Create profile if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert([{ id: session.user.id }]);
+
+        if (insertError) {
+          console.error('Error creating profile:', insertError);
+          toast({
+            title: "Error",
+            description: "Failed to create user profile",
+            variant: "destructive",
+          });
+          return;
+        }
       }
     };
     checkAuth();
@@ -48,7 +66,7 @@ export default function Settings() {
   });
 
   // Extract unique providers from models
-  const providers: Provider[] = Array.from(
+  const providers = Array.from(
     new Set(models.map(model => {
       const [provider] = model.id.split('/');
       return provider;
@@ -113,9 +131,10 @@ export default function Settings() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const models = await fetchModels(apiKey);
+      // First validate the API key by fetching models
+      await fetchModels(apiKey);
       
-      // Save API key to Supabase with user_id
+      // Then save the API key
       const { error } = await supabase
         .from('api_keys')
         .upsert({
@@ -125,19 +144,21 @@ export default function Settings() {
           user_id: user.id
         });
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       toast({
         title: "Success",
         description: "API key validated and saved successfully",
       });
     } catch (error) {
+      console.error('Error validating API key:', error);
       toast({
         title: "Error",
         description: "Failed to validate or save API key",
         variant: "destructive",
       });
-      console.error('Error validating API key:', error);
     } finally {
       setIsValidating(false);
     }
