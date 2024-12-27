@@ -105,14 +105,17 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const modelsData = models.map(model => ({
-        model_id: model.id,
-        name: model.name,
-        provider: model.provider,
-        description: model.description,
-        context_length: model.context_length,
-        is_active: true
-      }));
+      const modelsData = models.map(model => {
+        const [provider] = model.id.split('/');
+        return {
+          model_id: model.id,
+          name: model.name || model.id,
+          provider: provider, // Ensure provider is always set
+          description: model.description || '',
+          context_length: model.context_length,
+          is_active: true
+        };
+      });
 
       const { error } = await supabase
         .from('available_models')
