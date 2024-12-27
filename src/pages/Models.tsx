@@ -3,16 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchModels } from "@/lib/openrouter";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Search, Palette, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { FilterSheet } from "@/components/models/FilterSheet";
 import { ModelCard } from "@/components/models/ModelCard";
 import { Model } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { generateColorTheme, ColorTheme } from "@/lib/colorUtils";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProvider, setSelectedProvider] = useState<string>("all");
   const [contextLength, setContextLength] = useState([0]);
+  const [currentTheme, setCurrentTheme] = useState<ColorTheme>(generateColorTheme());
+  const [isThemeLocked, setIsThemeLocked] = useState(false);
   const { toast } = useToast();
 
   // Fetch API key from Supabase
@@ -103,49 +107,102 @@ export default function Models() {
     }
   };
 
-  return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Available Models</h1>
-        <FilterSheet
-          providers={providers}
-          maxContextLength={maxContextLength}
-          selectedProvider={selectedProvider}
-          contextLength={contextLength}
-          onProviderChange={setSelectedProvider}
-          onContextLengthChange={setContextLength}
-        />
-      </div>
+  const generateNewTheme = () => {
+    if (!isThemeLocked) {
+      setCurrentTheme(generateColorTheme());
+    }
+  };
 
-      <div className="space-y-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Search models..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+  const lockCurrentTheme = () => {
+    setIsThemeLocked(true);
+    toast({
+      title: "Theme Locked! 🎨",
+      description: "This color combination has been saved as your preference.",
+    });
+  };
+
+  // Apply the dynamic theme styles
+  const themeStyle = {
+    backgroundColor: currentTheme.background,
+    color: currentTheme.foreground,
+  };
+
+  const cardStyle = {
+    backgroundColor: currentTheme.primary,
+    color: currentTheme.foreground === currentTheme.primary ? '#FFFCF2' : currentTheme.foreground,
+  };
+
+  return (
+    <div className="min-h-screen transition-colors duration-300" style={themeStyle}>
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Available Models</h1>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={generateNewTheme}
+              disabled={isThemeLocked}
+              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+            >
+              <Palette className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={lockCurrentTheme}
+              disabled={isThemeLocked}
+              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+            >
+              <Check className="h-4 w-4" />
+            </Button>
+            <FilterSheet
+              providers={providers}
+              maxContextLength={maxContextLength}
+              selectedProvider={selectedProvider}
+              contextLength={contextLength}
+              onProviderChange={setSelectedProvider}
+              onContextLengthChange={setContextLength}
+            />
+          </div>
         </div>
 
-        {isLoading ? (
-          <div className="text-center">Loading models...</div>
-        ) : !apiKeyData?.key_value ? (
-          <div className="text-center">
-            Please add your OpenRouter API key in settings to view available models.
+        <div className="space-y-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: currentTheme.foreground }} />
+            <Input
+              type="search"
+              placeholder="Search models..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+              style={{
+                backgroundColor: currentTheme.secondary,
+                color: currentTheme.foreground,
+                borderColor: currentTheme.accent,
+              }}
+            />
           </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {filteredModels.map((model) => (
-              <ModelCard
-                key={model.id}
-                model={model}
-                onAdd={addModel}
-              />
-            ))}
-          </div>
-        )}
+
+          {isLoading ? (
+            <div className="text-center">Loading models...</div>
+          ) : !apiKeyData?.key_value ? (
+            <div className="text-center">
+              Please add your OpenRouter API key in settings to view available models.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredModels.map((model) => (
+                <ModelCard
+                  key={model.id}
+                  model={model}
+                  onAdd={addModel}
+                  style={cardStyle}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
