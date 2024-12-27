@@ -4,11 +4,30 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchModels } from "@/lib/openrouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedProvider, setSelectedProvider] = useState<string>("");
+  const [contextLength, setContextLength] = useState([0]);
   const { toast } = useToast();
 
   // Fetch API key from Supabase
@@ -40,11 +59,28 @@ export default function Models() {
     enabled: !!apiKeyData?.key_value,
   });
 
-  // Filter models based on search term
-  const filteredModels = models?.filter(model => 
-    model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    model.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  // Get unique providers
+  const providers = [...new Set(models?.map(model => model.id.split('/')[0]) || [])];
+
+  // Get max context length
+  const maxContextLength = Math.max(...(models?.map(model => model.context_length || 0) || [0]));
+
+  // Filter models based on search term and filters
+  const filteredModels = models?.filter(model => {
+    const matchesSearch = 
+      model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      model.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesProvider = 
+      !selectedProvider || 
+      model.id.split('/')[0] === selectedProvider;
+    
+    const matchesContext = 
+      !contextLength[0] || 
+      (model.context_length || 0) >= contextLength[0];
+
+    return matchesSearch && matchesProvider && matchesContext;
+  }) || [];
 
   const addModel = async (model: any) => {
     try {
@@ -86,6 +122,54 @@ export default function Models() {
     <div className="container mx-auto py-8 px-4">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Available Models</h1>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon">
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent>
+            <SheetHeader>
+              <SheetTitle>Filter Models</SheetTitle>
+              <SheetDescription>
+                Customize your model view with these filters
+              </SheetDescription>
+            </SheetHeader>
+            <div className="space-y-6 py-4">
+              <div className="space-y-2">
+                <Label>Provider</Label>
+                <Select
+                  value={selectedProvider}
+                  onValueChange={setSelectedProvider}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All providers" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All providers</SelectItem>
+                    {providers.map((provider) => (
+                      <SelectItem key={provider} value={provider}>
+                        {provider}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Minimum Context Length</Label>
+                <Slider
+                  value={contextLength}
+                  onValueChange={setContextLength}
+                  max={maxContextLength}
+                  step={1000}
+                />
+                <div className="text-sm text-muted-foreground">
+                  {contextLength[0].toLocaleString()} tokens
+                </div>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="space-y-6">
@@ -127,7 +211,7 @@ export default function Models() {
                 <div className="text-xs text-gray-500">
                   <p>Provider: {model.id.split('/')[0]}</p>
                   {model.context_length && (
-                    <p>Context Length: {model.context_length}</p>
+                    <p>Context Length: {model.context_length.toLocaleString()}</p>
                   )}
                   {model.pricing && (
                     <div>
