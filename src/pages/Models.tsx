@@ -6,10 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Search, Palette, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { FilterSheet } from "@/components/models/FilterSheet";
-import { ModelCard } from "@/components/models/ModelCard";
 import { Model } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { generateColorTheme, ColorTheme } from "@/lib/colorUtils";
+import { ModelsList } from "@/components/models/ModelsList";
+import { SelectedModels } from "@/components/models/SelectedModels";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,6 +49,28 @@ export default function Models() {
     enabled: !!apiKeyData?.key_value,
   });
 
+  // Fetch selected models
+  const { data: selectedModels = [], refetch: refetchSelectedModels } = useQuery({
+    queryKey: ['selectedModels'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data } = await supabase
+        .from('model_preferences')
+        .select('model_id')
+        .eq('user_id', user.id)
+        .eq('is_enabled', true);
+
+      if (!data) return [];
+
+      return models?.filter(model => 
+        data.some(pref => pref.model_id === model.id)
+      ) || [];
+    },
+    enabled: !!models,
+  });
+
   // Get unique providers
   const providers = [...new Set(models?.map(model => model.id.split('/')[0]) || [])];
 
@@ -78,7 +101,8 @@ export default function Models() {
 
       const [provider] = model.id.split('/');
       
-      const { error } = await supabase
+      // First, ensure the model exists in available_models
+      const { error: modelError } = await supabase
         .from('available_models')
         .upsert({
           model_id: model.id,
@@ -91,8 +115,23 @@ export default function Models() {
           onConflict: 'model_id'
         });
 
-      if (error) throw error;
+      if (modelError) throw modelError;
 
+      // Then, create the user preference
+      const { error: prefError } = await supabase
+        .from('model_preferences')
+        .upsert({
+          user_id: user.id,
+          model_id: model.id,
+          provider: provider,
+          is_enabled: true
+        }, {
+          onConflict: 'user_id,model_id'
+        });
+
+      if (prefError) throw prefError;
+
+      refetchSelectedModels();
       toast({
         title: "Success",
         description: `Model ${model.name} added successfully`,
@@ -105,6 +144,10 @@ export default function Models() {
         variant: "destructive",
       });
     }
+  };
+
+  const handleRemoveModel = (modelId: string) => {
+    refetchSelectedModels();
   };
 
   const generateNewTheme = () => {
@@ -167,6 +210,11 @@ export default function Models() {
           </div>
         </div>
 
+        <SelectedModels 
+          models={selectedModels} 
+          onRemove={handleRemoveModel}
+        />
+
         <div className="space-y-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2" style={{ color: currentTheme.foreground }} />
@@ -191,16 +239,11 @@ export default function Models() {
               Please add your OpenRouter API key in settings to view available models.
             </div>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {filteredModels.map((model) => (
-                <ModelCard
-                  key={model.id}
-                  model={model}
-                  onAdd={addModel}
-                  style={cardStyle}
-                />
-              ))}
-            </div>
+            <ModelsList 
+              models={filteredModels}
+              onAdd={addModel}
+              cardStyle={cardStyle}
+            />
           )}
         </div>
       </div>
