@@ -3,6 +3,7 @@ import { ModelSelector } from "@/components/ModelSelector";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { AddModelModal } from "./AddModelModal";
 
 interface ModelPreferencesProps {
   models: any[];
@@ -32,7 +33,7 @@ export function ModelPreferences({
     id: provider,
     name: provider.charAt(0).toUpperCase() + provider.slice(1),
     description: `Models from ${provider}`,
-    provider: provider // Add provider property
+    provider: provider
   }));
 
   // Filter models by selected provider and create model objects
@@ -42,7 +43,7 @@ export function ModelPreferences({
       id: model.id,
       name: model.name,
       description: model.description,
-      provider: model.id.split('/')[0] // Add provider property
+      provider: model.id.split('/')[0]
     }));
 
   // Save model preference mutation
@@ -87,9 +88,17 @@ export function ModelPreferences({
     await saveModelPreference.mutateAsync({ modelId, provider });
   };
 
+  const handleModelAdded = () => {
+    // Refresh the models list
+    queryClient.invalidateQueries({ queryKey: ['models'] });
+  };
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Model Selection</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Model Selection</h2>
+        <AddModelModal onModelAdded={handleModelAdded} />
+      </div>
       <div className="space-y-4">
         <ModelSelector
           label="Provider"
