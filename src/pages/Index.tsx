@@ -6,27 +6,29 @@ import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { Button } from "@/components/ui/button";
 import { Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-const defaultModels = [
-  { 
-    id: "openai/gpt-3.5-turbo", 
-    name: "GPT-3.5 Turbo", 
-    description: "",
-    provider: "openai"
-  },
-  { 
-    id: "anthropic/claude-2", 
-    name: "Claude 2", 
-    description: "",
-    provider: "anthropic"
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Model } from "@/lib/types";
 
 export default function Index() {
-  const [selectedModel, setSelectedModel] = useState(defaultModels[0].id);
+  const [selectedModel, setSelectedModel] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("general");
   const [result, setResult] = useState("");
   const navigate = useNavigate();
+
+  // Fetch available models from the database
+  const { data: models = [] } = useQuery({
+    queryKey: ['available-models'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('available_models')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data as Model[];
+    },
+  });
 
   const handlePromptSubmit = async (enhancedPrompt: string) => {
     // TODO: Integrate with OpenRouter API
@@ -45,19 +47,17 @@ export default function Index() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Model & Category</h2>
-              <div className="flex gap-4 flex-col sm:flex-row">
-                <ModelSelector
-                  models={defaultModels}
-                  selectedModel={selectedModel}
-                  onModelSelect={setSelectedModel}
-                />
-                <CategorySelector
-                  selectedCategory={selectedCategory}
-                  onCategorySelect={setSelectedCategory}
-                />
-              </div>
+            <div className="flex gap-4 flex-col sm:flex-row">
+              <ModelSelector
+                models={models}
+                selectedModel={selectedModel}
+                onModelSelect={setSelectedModel}
+                label="Available Models"
+              />
+              <CategorySelector
+                selectedCategory={selectedCategory}
+                onCategorySelect={setSelectedCategory}
+              />
             </div>
 
             <div className="space-y-4">

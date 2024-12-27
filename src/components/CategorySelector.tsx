@@ -14,18 +14,6 @@ const defaultCategories: Category[] = [
     description: "For any type of prompt",
     template: "Please provide a detailed and well-structured response to the following: {prompt}",
   },
-  {
-    id: "coding",
-    name: "Coding",
-    description: "For programming related prompts",
-    template: "You are an expert programmer. Please help with the following coding task, providing clear explanations and examples: {prompt}",
-  },
-  {
-    id: "email",
-    name: "Email Responses",
-    description: "For crafting professional emails",
-    template: "Please help me write a professional email response for the following context: {prompt}",
-  },
 ];
 
 interface CategorySelectorProps {
@@ -38,7 +26,7 @@ export function CategorySelector({ selectedCategory, onCategorySelect }: Categor
     <div className="w-full max-w-xs">
       <Select value={selectedCategory} onValueChange={onCategorySelect}>
         <SelectTrigger>
-          <SelectValue placeholder="Select a category" />
+          <SelectValue placeholder="Choose Mode" />
         </SelectTrigger>
         <SelectContent>
           {defaultCategories.map((category) => (
