@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Settings from "@/pages/Settings";
+import Models from "@/pages/Models";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Header from "@/components/Header";
@@ -40,6 +41,17 @@ function App() {
                 <>
                   <Header />
                   <Settings />
+                </>
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/models"
+            element={
+              <AuthGuard>
+                <>
+                  <Header />
+                  <Models />
                 </>
               </AuthGuard>
             }
