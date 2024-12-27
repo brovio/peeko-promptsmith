@@ -3,11 +3,27 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ApiKeyManager } from "@/components/settings/ApiKeyManager";
+import { ModelPreferences } from "@/components/settings/ModelPreferences";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Settings() {
   const [apiKey, setApiKey] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Fetch available models
+  const { data: models = [] } = useQuery({
+    queryKey: ['models'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('available_models')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   // Check authentication and ensure profile exists
   useEffect(() => {
@@ -66,6 +82,14 @@ export default function Settings() {
         <ApiKeyManager 
           onApiKeyValidated={handleApiKeyValidated}
           onApiKeyDeleted={handleApiKeyDeleted}
+        />
+
+        <ModelPreferences
+          models={models}
+          selectedProvider=""
+          selectedModel=""
+          onProviderSelect={() => {}}
+          onModelSelect={() => {}}
         />
       </div>
     </div>
