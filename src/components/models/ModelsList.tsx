@@ -4,10 +4,12 @@ import { ModelCard } from "./ModelCard";
 interface ModelsListProps {
   models: Model[];
   onAdd: (model: Model) => void;
+  onRemove?: (modelId: string) => void;
+  modelsInUse?: string[];
   cardStyle?: React.CSSProperties;
 }
 
-export function ModelsList({ models, onAdd, cardStyle }: ModelsListProps) {
+export function ModelsList({ models, onAdd, onRemove, modelsInUse = [], cardStyle }: ModelsListProps) {
   if (!models?.length) {
     return <div className="text-center">No models found</div>;
   }
@@ -19,6 +21,8 @@ export function ModelsList({ models, onAdd, cardStyle }: ModelsListProps) {
           key={model.id}
           model={model}
           onAdd={onAdd}
+          onRemove={onRemove}
+          isInUse={modelsInUse.includes(model.id)}
           style={cardStyle}
         />
       ))}

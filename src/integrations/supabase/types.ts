@@ -142,6 +142,47 @@ export type Database = {
           },
         ]
       }
+      models_in_use: {
+        Row: {
+          created_at: string | null
+          endpoint: string | null
+          id: string
+          is_active: boolean | null
+          model_id: string
+          provider: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          is_active?: boolean | null
+          model_id: string
+          provider: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string | null
+          id?: string
+          is_active?: boolean | null
+          model_id?: string
+          provider?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "models_in_use_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

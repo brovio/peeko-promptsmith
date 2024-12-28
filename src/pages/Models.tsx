@@ -9,6 +9,8 @@ import { filterModels } from "@/lib/modelUtils";
 import { ErrorDisplay } from "@/components/models/ErrorDisplay";
 import { useModelsData } from "@/components/models/useModelsData";
 import { ModelOperations } from "@/components/models/ModelOperations";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,11 +30,29 @@ export default function Models() {
     refetchSelectedModels
   } = useModelsData();
 
+  // Fetch models in use
+  const { data: modelsInUse = [] } = useQuery({
+    queryKey: ['models-in-use'],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('models_in_use')
+        .select('model_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+      return data.map(m => m.model_id);
+    }
+  });
+
   const { handleAddModel, handleRemoveModel } = ModelOperations({
     onSuccess: refetchSelectedModels
   });
 
-  const providers: string[] = Array.from(
+  const providers = Array.from(
     new Set((models || []).map((model) => model.provider))
   );
 
@@ -112,6 +132,8 @@ export default function Models() {
             <ModelsList
               models={filteredModels}
               onAdd={handleAddModel}
+              onRemove={handleRemoveModel}
+              modelsInUse={modelsInUse}
               cardStyle={themeStyle}
             />
           )}

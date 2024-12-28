@@ -15,6 +15,18 @@ export function ModelOperations({ onSuccess }: ModelOperationsProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
+      // Add to models in use
+      const { error: useError } = await supabase
+        .from('models_in_use')
+        .upsert({
+          user_id: user.id,
+          model_id: model.id,
+          provider: model.provider,
+          is_active: true
+        });
+
+      if (useError) throw useError;
+
       // Add to user preferences
       const { error: prefError } = await supabase
         .from('model_preferences')
@@ -49,25 +61,35 @@ export function ModelOperations({ onSuccess }: ModelOperationsProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const { error } = await supabase
+      // Remove from models in use
+      const { error: useError } = await supabase
+        .from('models_in_use')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('model_id', modelId);
+
+      if (useError) throw useError;
+
+      // Remove from preferences
+      const { error: prefError } = await supabase
         .from('model_preferences')
         .delete()
         .eq('user_id', user.id)
         .eq('model_id', modelId);
 
-      if (error) throw error;
+      if (prefError) throw prefError;
 
       await onSuccess();
       toast({
         title: "Model Removed",
         description: "Model removed successfully"
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error removing model:', error);
       toast({
+        variant: "destructive",
         title: "Error",
-        description: "Failed to remove model",
-        variant: "destructive"
+        description: error.message || "Failed to remove model. Please try again."
       });
     }
   };

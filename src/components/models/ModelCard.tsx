@@ -8,10 +8,12 @@ import { ModelInfo } from "./ModelInfo";
 interface ModelCardProps {
   model: Model;
   onAdd: (model: Model) => void;
+  onRemove?: (modelId: string) => void;
+  isInUse?: boolean;
   style?: CSSProperties;
 }
 
-export function ModelCard({ model, onAdd, style }: ModelCardProps) {
+export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: ModelCardProps) {
   const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
   
   const getModelSubtitle = () => {
@@ -24,7 +26,12 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
   return (
     <Card style={style} className="p-[3%]">
       <CardHeader className="space-y-1 p-0">
-        <ModelCardHeader model={model} onAdd={onAdd} />
+        <ModelCardHeader 
+          model={model} 
+          onAdd={onAdd} 
+          onRemove={onRemove}
+          isInUse={isInUse}
+        />
         <div className="border-t border-border pt-2">
           <CardDescription className="text-left font-medium">
             {getModelSubtitle()}
