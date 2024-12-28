@@ -7,7 +7,6 @@ import { SelectedModels } from "@/components/models/SelectedModels";
 import { SearchModels } from "@/components/models/SearchModels";
 import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { useToast } from "@/hooks/use-toast";
-import { fetchModels } from "@/lib/openrouter";
 import { filterModels } from "@/lib/modelUtils";
 import { ErrorDisplay } from "@/components/models/ErrorDisplay";
 import { Model } from "@/lib/types";
@@ -20,55 +19,23 @@ export default function Models() {
   const [isThemeLocked, setIsThemeLocked] = useState(false);
   const { toast } = useToast();
 
+  // Fetch models directly from Supabase
   const { 
-    data: apiKeyData, 
-    error: apiKeyError,
-    refetch: refetchApiKey 
-  } = useQuery({
-    queryKey: ['apiKey'],
-    queryFn: async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("User not authenticated");
-
-        const { data: apiKeyData, error } = await supabase
-          .from('api_keys')
-          .select('key_value')
-          .eq('user_id', user.id)
-          .eq('provider', 'openrouter')
-          .eq('is_active', true)
-          .maybeSingle();
-
-        if (error) throw error;
-        return apiKeyData;
-      } catch (error: any) {
-        console.error('Error fetching API key:', error);
-        throw new Error(error.message || 'Failed to fetch API key');
-      }
-    },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-  });
-
-  const { 
-    data: models, 
+    data: models = [], 
     isLoading, 
     error: modelsError,
     refetch: refetchModels 
   } = useQuery({
-    queryKey: ['models', apiKeyData?.key_value],
+    queryKey: ['available-models'],
     queryFn: async () => {
-      if (!apiKeyData?.key_value) return [];
-      try {
-        return await fetchModels(apiKeyData.key_value);
-      } catch (error: any) {
-        console.error('Error fetching models:', error);
-        throw new Error(error.message || 'Failed to fetch models');
-      }
+      const { data, error } = await supabase
+        .from('available_models')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data as Model[];
     },
-    enabled: !!apiKeyData?.key_value,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const { 
@@ -91,21 +58,16 @@ export default function Models() {
         if (error) throw error;
         if (!preferences) return [];
 
+        // Filter models based on preferences
         return models?.filter(model => 
           preferences.some(pref => pref.model_id === model.id)
-        ).map(model => ({
-          ...model,
-          p_model: model.clean_model_name,
-          p_provider: model.provider
-        })) || [];
+        ) || [];
       } catch (error: any) {
         console.error('Error fetching selected models:', error);
         throw new Error(error.message || 'Failed to fetch selected models');
       }
     },
     enabled: !!models,
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const providers: string[] = Array.from(
@@ -121,29 +83,7 @@ export default function Models() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // First ensure the model exists in available_models
-      const { error: modelError } = await supabase
-        .from('available_models')
-        .upsert({
-          model_id: model.id,
-          name: model.name,
-          provider: model.provider,
-          description: model.description || '',
-          context_length: model.context_length,
-          input_price: model.input_price,
-          output_price: model.output_price,
-          max_tokens: model.max_tokens,
-          is_active: true,
-          clean_model_name: model.clean_model_name,
-          p_model: model.clean_model_name,
-          p_provider: model.provider
-        }, {
-          onConflict: 'model_id'
-        });
-
-      if (modelError) throw modelError;
-
-      // Then add it to user preferences
+      // Add to user preferences
       const { error: prefError } = await supabase
         .from('model_preferences')
         .upsert({
@@ -240,13 +180,6 @@ export default function Models() {
           onLockTheme={lockCurrentTheme}
         />
 
-        {apiKeyError && (
-          <ErrorDisplay 
-            error={apiKeyError} 
-            onRetry={refetchApiKey}
-          />
-        )}
-
         {modelsError && (
           <ErrorDisplay 
             error={modelsError} 
@@ -275,10 +208,6 @@ export default function Models() {
 
           {isLoading ? (
             <div className="text-center">Loading models...</div>
-          ) : !apiKeyData?.key_value ? (
-            <div className="text-center">
-              Please add your OpenRouter API key in settings to view available models.
-            </div>
           ) : (
             <ModelsList
               models={filteredModels}
