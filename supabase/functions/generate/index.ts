@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,106 +13,53 @@ serve(async (req) => {
   }
 
   try {
-    const { model, prompt } = await req.json();
-    console.log('Received request:', { model, prompt });
+    const { prompt, model = "gemini/gemini-pro" } = await req.json();
 
-    if (!model || !prompt) {
-      throw new Error('Missing required parameters: model and prompt are required');
-    }
-
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.error('Missing Supabase configuration');
-      throw new Error('Server configuration error');
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // Get the API key for the user
-    const { data: apiKeyData, error: apiKeyError } = await supabase
-      .from('api_keys')
-      .select('key_value')
-      .eq('provider', 'openrouter')
-      .eq('is_active', true)
-      .single();
-
-    if (apiKeyError) {
-      console.error('Error fetching API key:', apiKeyError);
-      throw new Error(`Failed to fetch API key: ${apiKeyError.message}`);
-    }
-
-    if (!apiKeyData || !apiKeyData.key_value) {
-      console.error('No valid API key found');
-      throw new Error('No valid OpenRouter API key found. Please add your API key in the settings.');
-    }
-
-    // Get the actual model ID from the available_models table
-    const { data: modelData, error: modelError } = await supabase
-      .from('available_models')
-      .select('model_id')
-      .eq('id', model)
-      .single();
-
-    if (modelError || !modelData) {
-      console.error('Error fetching model:', modelError);
-      throw new Error(`Failed to fetch model: ${modelError?.message || 'Model not found'}`);
-    }
-
-    console.log('Calling OpenRouter API with model:', modelData.model_id);
-
-    // Call OpenRouter API with the correct model ID
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKeyData.key_value}`,
+        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://lovable.dev',
       },
       body: JSON.stringify({
-        model: modelData.model_id,
+        model: model,
         messages: [
+          { role: 'system', content: 'You are a helpful assistant that generates content based on user prompts.' },
           { role: 'user', content: prompt }
         ],
       }),
     });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('OpenRouter API error:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorData
-      });
-      
-      const errorMessage = errorData.error?.message || errorData.error || 'Unknown error';
-      throw new Error(`OpenRouter API error: ${response.status} - ${errorMessage}`);
-    }
-
     const data = await response.json();
-    console.log('OpenRouter API response:', data);
     
-    if (!data.choices?.[0]?.message?.content) {
-      console.error('Unexpected OpenRouter API response format:', data);
-      throw new Error('Invalid response format from OpenRouter');
-    }
+    // Calculate approximate cost based on token usage
+    const usage = data.usage || { prompt_tokens: 0, completion_tokens: 0 };
+    const totalTokens = usage.prompt_tokens + usage.completion_tokens;
+    const costPerToken = 0.00001; // Adjust based on your actual cost per token
+    const totalCost = totalTokens * costPerToken;
 
-    const generatedText = data.choices[0].message.content;
-    console.log('Successfully generated response');
-
-    return new Response(JSON.stringify({ generatedText }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({
+        generatedText: data.choices[0].message.content,
+        usage: {
+          prompt_tokens: usage.prompt_tokens,
+          completion_tokens: usage.completion_tokens,
+          total_tokens: totalTokens,
+          total_cost: totalCost
+        }
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
     console.error('Error in generate function:', error);
-    return new Response(JSON.stringify({ 
-      error: error.message,
-      details: error instanceof Error ? error.stack : undefined
-    }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });

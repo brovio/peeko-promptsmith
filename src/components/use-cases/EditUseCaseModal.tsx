@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { EnhancerActions } from "./EnhancerActions";
 
 interface EditUseCaseModalProps {
   useCase: {
@@ -88,9 +89,13 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
     }
   };
 
+  const handleEnhancerUpdate = async (newEnhancer: string) => {
+    setEnhancer(newEnhancer);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Use Case</DialogTitle>
           <DialogDescription>
@@ -122,13 +127,21 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="enhancer">Enhancer</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="enhancer">Enhancer</Label>
+              <EnhancerActions
+                currentEnhancer={enhancer}
+                onEnhancerUpdate={handleEnhancerUpdate}
+                useCaseId={useCase.id}
+              />
+            </div>
             <Textarea
               id="enhancer"
               value={enhancer}
               onChange={(e) => setEnhancer(e.target.value)}
               placeholder="Enter enhancer"
               required
+              className="min-h-[200px]"
             />
           </div>
 

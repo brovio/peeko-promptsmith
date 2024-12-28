@@ -5,6 +5,9 @@ import { EditUseCaseModal } from "./EditUseCaseModal";
 import { UseUseCaseModal } from "./UseUseCaseModal";
 import { InfoUseCaseModal } from "./InfoUseCaseModal";
 import { AddUseCaseModal } from "./AddUseCaseModal";
+import { Button } from "@/components/ui/button";
+import { Wand } from "lucide-react";
+import { StatsModal } from "./StatsModal";
 
 interface UseCaseCardProps {
   useCase: {
@@ -20,6 +23,7 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
   const [useModalOpen, setUseModalOpen] = useState(false);
   const [infoModalOpen, setInfoModalOpen] = useState(false);
   const [duplicateModalOpen, setDuplicateModalOpen] = useState(false);
+  const [statsModalOpen, setStatsModalOpen] = useState(false);
 
   return (
     <>
@@ -27,12 +31,22 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
         <CardHeader>
           <div className="flex items-start justify-between">
             <CardTitle className="text-xl">{useCase.title}</CardTitle>
-            <UseCaseCardActions
-              onEdit={() => setEditModalOpen(true)}
-              onUse={() => setUseModalOpen(true)}
-              onInfo={() => setInfoModalOpen(true)}
-              onDuplicate={() => setDuplicateModalOpen(true)}
-            />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setStatsModalOpen(true)}
+                className="h-8 w-8"
+              >
+                <Wand className="h-4 w-4" />
+              </Button>
+              <UseCaseCardActions
+                onEdit={() => setEditModalOpen(true)}
+                onUse={() => setUseModalOpen(true)}
+                onInfo={() => setInfoModalOpen(true)}
+                onDuplicate={() => setDuplicateModalOpen(true)}
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -65,8 +79,16 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
             description: useCase.description,
             enhancer: useCase.enhancer,
           }}
+          open={duplicateModalOpen}
+          onOpenChange={setDuplicateModalOpen}
         />
       )}
+
+      <StatsModal
+        useCaseId={useCase.id}
+        open={statsModalOpen}
+        onOpenChange={setStatsModalOpen}
+      />
     </>
   );
 }

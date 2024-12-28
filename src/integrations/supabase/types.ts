@@ -441,6 +441,60 @@ export type Database = {
           },
         ]
       }
+      use_case_operations: {
+        Row: {
+          cost: number | null
+          created_at: string | null
+          id: string
+          modified_text: string
+          operation_type: string
+          original_text: string
+          tokens_used: number | null
+          use_case_id: string
+          user_id: string | null
+          words_changed: number | null
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string | null
+          id?: string
+          modified_text: string
+          operation_type: string
+          original_text: string
+          tokens_used?: number | null
+          use_case_id: string
+          user_id?: string | null
+          words_changed?: number | null
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string | null
+          id?: string
+          modified_text?: string
+          operation_type?: string
+          original_text?: string
+          tokens_used?: number | null
+          use_case_id?: string
+          user_id?: string | null
+          words_changed?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "use_case_operations_use_case_id_fkey"
+            columns: ["use_case_id"]
+            isOneToOne: false
+            referencedRelation: "use_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "use_case_operations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       use_cases: {
         Row: {
           created_at: string | null
