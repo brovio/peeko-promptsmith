@@ -1,0 +1,30 @@
+@keyframes scroll {
+  0% { transform: translateX(0%); }
+  45% { transform: translateX(0%); }
+  55% { transform: translateX(calc(-100% + 200px)); }
+  95% { transform: translateX(calc(-100% + 200px)); }
+  100% { transform: translateX(0%); }
+}
+
+.scroll-on-hover:hover .scrolling-text {
+  animation: scroll 8s infinite linear;
+  white-space: nowrap;
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
+}

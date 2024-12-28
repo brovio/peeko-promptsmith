@@ -1,0 +1,40 @@
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  
+  .transform-style-preserve-3d {
+    transform-style: preserve-3d;
+  }
+  
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
+}
+
+.prompt-input {
+  min-height: 200px;
+  @apply resize-none w-full rounded-lg border p-4 font-mono text-sm bg-card text-card-foreground;
+}
+
+.results-display {
+  min-height: 200px;
+  @apply rounded-lg border p-4 bg-card text-card-foreground font-mono text-sm;
+}
