@@ -13,7 +13,7 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ model, onAdd, style }: ModelCardProps) {
-  const formatNumber = (num: number) => num?.toLocaleString();
+  const formatNumber = (num: number) => num?.toLocaleString() || 'Unknown';
   const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
   
   const getModelTitle = () => {
@@ -30,12 +30,12 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
   return (
     <Card style={style} className="p-[3%]">
       <CardHeader className="space-y-1 p-0">
-        <div className="flex justify-between items-start">
-          <div className="space-y-1 max-w-[80%] scroll-on-hover overflow-hidden">
+        <div className="flex justify-between items-start gap-4">
+          <div className="flex-1 scroll-on-hover overflow-hidden">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <CardTitle className="text-[20px] text-left scrolling-text">
+                  <CardTitle className="text-[20px] text-left scrolling-text whitespace-nowrap text-ellipsis overflow-hidden">
                     {getModelTitle()}
                   </CardTitle>
                 </TooltipTrigger>
@@ -45,13 +45,15 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
               </Tooltip>
             </TooltipProvider>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onAdd(model)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+          <div className="flex-shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onAdd(model)}
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         <div className="border-t border-border pt-2">
           <CardDescription className="text-left font-medium">
@@ -67,7 +69,7 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
       <CardContent className="p-0 mt-4">
         <div className="space-y-4">
           <div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex justify-between items-center mb-2">
               <h3 className="font-medium">Extra Info</h3>
               <ModelParametersModal>
                 <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
@@ -77,24 +79,18 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
             </div>
             <table className="w-full text-sm">
               <tbody>
-                {model.context_length && (
-                  <tr>
-                    <td className="py-1 text-muted-foreground">Context Length:</td>
-                    <td className="py-1 text-right">{formatNumber(model.context_length)}</td>
-                  </tr>
-                )}
-                {model.input_price && (
-                  <tr>
-                    <td className="py-1 text-muted-foreground">Input Price:</td>
-                    <td className="py-1 text-right">${model.input_price}/1M tokens</td>
-                  </tr>
-                )}
-                {model.output_price && (
-                  <tr>
-                    <td className="py-1 text-muted-foreground">Output Price:</td>
-                    <td className="py-1 text-right">${model.output_price}/1M tokens</td>
-                  </tr>
-                )}
+                <tr>
+                  <td className="py-1 text-muted-foreground">Context Length:</td>
+                  <td className="py-1 text-left">{model.context_length ? formatNumber(model.context_length) : 'Unknown'}</td>
+                </tr>
+                <tr>
+                  <td className="py-1 text-muted-foreground">Input Price:</td>
+                  <td className="py-1 text-left">{model.input_price ? `$${model.input_price}/1M tokens` : 'Unknown'}</td>
+                </tr>
+                <tr>
+                  <td className="py-1 text-muted-foreground">Output Price:</td>
+                  <td className="py-1 text-left">{model.output_price ? `$${model.output_price}/1M tokens` : 'Unknown'}</td>
+                </tr>
               </tbody>
             </table>
           </div>
