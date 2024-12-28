@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { EnhancerActions } from "./EnhancerActions";
 
 interface AddUseCaseModalProps {
   initialData?: {
@@ -156,7 +157,7 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
           Add New Use Case
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[800px] bg-background">
         <DialogHeader>
           <DialogTitle>Add New Use Case</DialogTitle>
           <DialogDescription>
@@ -165,7 +166,7 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium">
+            <label htmlFor="title" className="text-sm font-medium text-white">
               Title
             </label>
             <Input
@@ -174,11 +175,12 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter title"
               required
+              className="text-white placeholder:text-gray-400"
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label htmlFor="description" className="text-sm font-medium">
+              <label htmlFor="description" className="text-sm font-medium text-white">
                 Description
               </label>
               <Button
@@ -199,10 +201,11 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter description"
               required
+              className="min-h-[100px] text-white placeholder:text-gray-400"
             />
           </div>
-          <div className="space-y-2">
-            <label htmlFor="enhancer" className="text-sm font-medium">
+          <div className="space-y-2 relative">
+            <label htmlFor="enhancer" className="text-sm font-medium text-white">
               Enhancer
             </label>
             <Textarea
@@ -211,6 +214,11 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
               onChange={(e) => setEnhancer(e.target.value)}
               placeholder="Enter enhancer"
               required
+              className="min-h-[150px] text-white placeholder:text-gray-400"
+            />
+            <EnhancerActions
+              currentEnhancer={enhancer}
+              onEnhancerUpdate={setEnhancer}
             />
           </div>
           <Button type="submit" className="w-full" disabled={isSubmitting}>
