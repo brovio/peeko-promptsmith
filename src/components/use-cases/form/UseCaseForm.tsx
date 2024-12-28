@@ -4,7 +4,6 @@ import { UseCaseFormField } from "./UseCaseFormField";
 import { EnhancerActions } from "../EnhancerActions";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { generateDescription } from "@/utils/descriptionGenerator";
 
 interface UseCaseFormProps {
   onSubmit: (data: { title: string; description: string; enhancer: string }) => Promise<void>;
@@ -24,7 +23,7 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: 
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
 
-  const generateDescription = async () => {
+  const handleGenerateDescription = async () => {
     if (!title) {
       toast({
         title: "Error",
@@ -36,9 +35,15 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: 
 
     setIsGenerating(true);
     try {
-      const generatedDescription = await generateDescription(title);
-      setDescription(generatedDescription);
+      const { data, error } = await supabase.functions.invoke('generate', {
+        body: {
+          prompt: `Generate a clear and concise description (max 200 characters) for a use case titled "${title}". Focus on the purpose and benefits, avoiding technical details already mentioned in the title. The description should be direct and brief.`,
+        },
+      });
+
+      if (error) throw error;
       
+      setDescription(data.generatedText.trim());
       toast({
         title: "Success",
         description: "Description generated successfully",
@@ -88,7 +93,7 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: 
             type="button"
             variant="ghost"
             size="sm"
-            onClick={generateDescription}
+            onClick={handleGenerateDescription}
             disabled={isGenerating || !title}
             className="h-8 px-2"
           >
