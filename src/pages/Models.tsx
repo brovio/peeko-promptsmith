@@ -9,6 +9,7 @@ import { SelectedModels } from "@/components/models/SelectedModels";
 import { ThemeActions } from "@/components/models/ThemeActions";
 import { SearchModels } from "@/components/models/SearchModels";
 import { useToast } from "@/hooks/use-toast";
+import { fetchModels } from "@/lib/openrouter";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,8 +69,10 @@ export default function Models() {
     enabled: !!models,
   });
 
-  // Get unique providers
-  const providers = [...new Set(models?.map(model => model.id.split('/')[0]) || [])];
+  // Get unique providers with proper typing
+  const providers: string[] = Array.from(
+    new Set((models || []).map(model => model.id.split('/')[0]))
+  );
 
   // Get max context length
   const maxContextLength = Math.max(...(models?.map(model => model.context_length || 0) || [0]));
