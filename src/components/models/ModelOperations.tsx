@@ -1,9 +1,10 @@
 import { Model } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { QueryObserverResult, RefetchOptions } from "@tanstack/react-query";
 
 interface ModelOperationsProps {
-  onSuccess: () => Promise<void>;
+  onSuccess: (options?: RefetchOptions) => Promise<QueryObserverResult<Model[], Error>>;
 }
 
 export function ModelOperations({ onSuccess }: ModelOperationsProps) {
