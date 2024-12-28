@@ -12,30 +12,18 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ model, onAdd, style }: ModelCardProps) {
-  const formatNumber = (num: number) => num.toLocaleString();
+  const formatNumber = (num: number) => num?.toLocaleString();
+  const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
   
-  const getModelInfo = () => {
-    const info = [];
-    
-    // Add context length if available
-    if (model.context_length) {
-      info.push(`${formatNumber(model.context_length)} context length`);
-    }
-    
-    // Add pricing info if available
-    if (model.input_price || model.output_price) {
-      info.push(`$${model.input_price}/M input tokens • $${model.output_price}/M output tokens`);
-    }
+  const getModelTitle = () => {
+    return model.p_model ? capitalizeFirstLetter(model.p_model) : capitalizeFirstLetter(model.clean_model_name);
+  };
 
-    // Add max tokens if available
-    if (model.max_tokens) {
-      info.push(`${formatNumber(model.max_tokens)} max output tokens`);
+  const getModelSubtitle = () => {
+    if (model.p_provider && model.p_model) {
+      return `${capitalizeFirstLetter(model.p_provider)}'s ${capitalizeFirstLetter(model.p_model)}`;
     }
-
-    // Add provider info
-    info.push(`by ${model.provider}`);
-    
-    return info;
+    return "";
   };
 
   return (
@@ -43,8 +31,8 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
       <CardHeader className="space-y-1">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <CardTitle className="text-2xl text-left">
-              {model.clean_model_name}
+            <CardTitle className="text-[20px] text-left">
+              {getModelTitle()}
             </CardTitle>
           </div>
           <div className="flex gap-2">
@@ -58,15 +46,44 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
             </Button>
           </div>
         </div>
-        <CardDescription className="text-left">
-          {model.description}
-        </CardDescription>
+        <div className="border-t border-border pt-2">
+          <CardDescription className="text-left font-medium">
+            {getModelSubtitle()}
+          </CardDescription>
+          {model.description && (
+            <CardDescription className="text-left mt-2">
+              {model.description}
+            </CardDescription>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-2 text-sm text-left text-muted-foreground">
-          {getModelInfo().map((info, index) => (
-            <p key={index}>{info}</p>
-          ))}
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-medium mb-2">Extra Info</h3>
+            <table className="w-full text-sm">
+              <tbody>
+                {model.context_length && (
+                  <tr>
+                    <td className="py-1 text-muted-foreground">Context Length:</td>
+                    <td className="py-1 text-right">{formatNumber(model.context_length)}</td>
+                  </tr>
+                )}
+                {model.input_price && (
+                  <tr>
+                    <td className="py-1 text-muted-foreground">Input Price:</td>
+                    <td className="py-1 text-right">${model.input_price}/1M tokens</td>
+                  </tr>
+                )}
+                {model.output_price && (
+                  <tr>
+                    <td className="py-1 text-muted-foreground">Output Price:</td>
+                    <td className="py-1 text-right">${model.output_price}/1M tokens</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </CardContent>
     </Card>
