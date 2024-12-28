@@ -13,9 +13,10 @@ interface UseCaseFormProps {
     enhancer: string;
   };
   isSubmitting: boolean;
+  useCaseId?: string;
 }
 
-export function UseCaseForm({ onSubmit, initialData, isSubmitting }: UseCaseFormProps) {
+export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: UseCaseFormProps) {
   const [title, setTitle] = useState(initialData?.title || "");
   const [description, setDescription] = useState(initialData?.description || "");
   const [enhancer, setEnhancer] = useState(initialData?.enhancer || "");
@@ -118,7 +119,13 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting }: UseCaseForm
         required
         hint="enhancer"
         className="min-h-[150px]"
-        actions={<EnhancerActions currentEnhancer={enhancer} onEnhancerUpdate={setEnhancer} />}
+        actions={
+          <EnhancerActions 
+            currentEnhancer={enhancer} 
+            onEnhancerUpdate={setEnhancer}
+            useCaseId={useCaseId || ''}
+          />
+        }
       />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>

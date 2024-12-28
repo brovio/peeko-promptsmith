@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Settings from "@/pages/Settings";
@@ -10,7 +11,6 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import WhatPrompting from "@/pages/WhatPrompting";
 import Header from "@/components/Header";
 import AuthGuard from "@/components/AuthGuard";
-import { useEffect } from "react";
 import "./App.css";
 
 // Create a client

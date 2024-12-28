@@ -1,18 +1,9 @@
 import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { UseCaseForm } from "./form/UseCaseForm";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { UseCaseForm } from "./form/UseCaseForm";
 
 interface AddUseCaseModalProps {
   initialData?: {
@@ -20,10 +11,11 @@ interface AddUseCaseModalProps {
     description: string;
     enhancer: string;
   };
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
-  const [open, setOpen] = useState(false);
+export function AddUseCaseModal({ initialData, open, onOpenChange }: AddUseCaseModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -32,23 +24,6 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
     setIsSubmitting(true);
 
     try {
-      const { data: existingUseCases, error: checkError } = await supabase
-        .from("use_cases")
-        .select("id")
-        .eq("title", data.title)
-        .maybeSingle();
-
-      if (checkError) throw checkError;
-
-      if (existingUseCases) {
-        toast({
-          title: "Error",
-          description: "A use case with this title already exists. Please choose a different title.",
-          variant: "destructive",
-        });
-        return;
-      }
-
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -72,7 +47,7 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
         description: "Use case added successfully",
       });
 
-      setOpen(false);
+      onOpenChange(false);
       queryClient.invalidateQueries({ queryKey: ["use-cases"] });
     } catch (error: any) {
       console.error("Error adding use case:", error);
@@ -87,14 +62,8 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="mb-6">
-          <Plus className="mr-2 h-4 w-4" />
-          Add New Use Case
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] bg-background">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>Add New Use Case</DialogTitle>
           <DialogDescription>
