@@ -4,6 +4,7 @@ import Settings from "@/pages/Settings";
 import Models from "@/pages/Models";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
+import WhatPrompting from "@/pages/WhatPrompting";
 import Header from "@/components/Header";
 import AuthGuard from "@/components/AuthGuard";
 import "./App.css";
@@ -52,6 +53,17 @@ function App() {
                 <>
                   <Header />
                   <Models />
+                </>
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/what-prompting"
+            element={
+              <AuthGuard>
+                <>
+                  <Header />
+                  <WhatPrompting />
                 </>
               </AuthGuard>
             }

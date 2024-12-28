@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Settings, Database, Home } from "lucide-react";
+import { Settings, Database, Home, MessageSquare } from "lucide-react";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -23,6 +23,10 @@ export default function Header() {
           <Link to="/models" className="font-medium flex items-center gap-2">
             <Database className="h-4 w-4" />
             Models
+          </Link>
+          <Link to="/what-prompting" className="font-medium flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            What ya prompting for?
           </Link>
           <Link to="/settings" className="font-medium flex items-center gap-2">
             <Settings className="h-4 w-4" />
