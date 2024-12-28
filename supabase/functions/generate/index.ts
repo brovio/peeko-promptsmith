@@ -19,7 +19,7 @@ serve(async (req) => {
       throw new Error('OpenRouter API key not configured in environment variables');
     }
 
-    const { prompt, model = "gemini/gemini-pro" } = await req.json();
+    const { prompt, model = "google/gemini-pro" } = await req.json();
     
     console.log('Making request to OpenRouter API with:', {
       model,
