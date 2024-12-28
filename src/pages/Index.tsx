@@ -9,19 +9,28 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Model } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("general");
   const [result, setResult] = useState("");
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Fetch models in use from the database
-  const { data: modelsInUse = [] } = useQuery({
+  const { data: modelsInUse = [], isError: isModelsInUseError } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) {
+        toast({
+          title: "Authentication required",
+          description: "Please sign in to use models",
+          variant: "destructive",
+        });
+        return [];
+      }
 
       const { data, error } = await supabase
         .from('models_in_use')
@@ -29,13 +38,17 @@ export default function Index() {
         .eq('user_id', user.id)
         .eq('is_active', true);
 
-      if (error) throw error;
-      return data;
+      if (error) {
+        console.error('Error fetching models in use:', error);
+        throw error;
+      }
+      
+      return data || [];
     },
   });
 
   // Fetch details for models in use
-  const { data: models = [] } = useQuery({
+  const { data: models = [], isError: isModelsError } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
       if (!modelsInUse?.length) return [];
@@ -46,14 +59,26 @@ export default function Index() {
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
-        .in('model_id', modelIds)
+        .in('id', modelIds)
         .eq('is_active', true);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching available models:', error);
+        throw error;
+      }
+
       return data as Model[];
     },
     enabled: !!modelsInUse?.length,
   });
+
+  if (isModelsInUseError || isModelsError) {
+    toast({
+      title: "Error loading models",
+      description: "There was an error loading your models. Please try again.",
+      variant: "destructive",
+    });
+  }
 
   const handlePromptSubmit = async (enhancedPrompt: string) => {
     // TODO: Integrate with OpenRouter API
