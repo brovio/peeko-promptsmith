@@ -67,21 +67,11 @@
 }
 
 @keyframes scroll {
-  0% {
-    transform: translateX(0%);
-  }
-  45% {
-    transform: translateX(0%);
-  }
-  55% {
-    transform: translateX(calc(-100% + 200px));
-  }
-  95% {
-    transform: translateX(calc(-100% + 200px));
-  }
-  100% {
-    transform: translateX(0%);
-  }
+  0% { transform: translateX(0%); }
+  45% { transform: translateX(0%); }
+  55% { transform: translateX(calc(-100% + 200px)); }
+  95% { transform: translateX(calc(-100% + 200px)); }
+  100% { transform: translateX(0%); }
 }
 
 .scroll-on-hover:hover .scrolling-text {
@@ -115,15 +105,13 @@
     transform: rotateY(180deg);
   }
 
-  /* Hide scrollbar for Chrome, Safari and Opera */
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
 
-  /* Hide scrollbar for IE, Edge and Firefox */
   .scrollbar-none {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
