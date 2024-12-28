@@ -17,6 +17,7 @@ export function useThemeManager() {
     // Save theme preference
     localStorage.setItem('theme', theme);
 
+    // Show toast notification
     toast({
       title: "Theme updated",
       description: `${theme.charAt(0).toUpperCase() + theme.slice(1)} theme has been applied.`,
