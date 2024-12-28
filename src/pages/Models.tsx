@@ -1,23 +1,20 @@
 import { useState } from "react";
 import { generateColorTheme } from "@/lib/colorUtils";
-import { ModelsList } from "@/components/models/ModelsList";
-import { SearchModels } from "@/components/models/SearchModels";
 import { ModelsHeader } from "@/components/models/ModelsHeader";
-import { useToast } from "@/hooks/use-toast";
 import { filterModels } from "@/lib/modelUtils";
-import { ErrorDisplay } from "@/components/models/ErrorDisplay";
 import { useModelsData } from "@/components/models/useModelsData";
 import { ModelOperations } from "@/components/models/ModelOperations";
-import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { ThemeManager } from "@/components/models/ThemeManager";
+import { ModelsErrorBoundary } from "@/components/models/ModelsErrorBoundary";
+import { ModelsContainer } from "@/components/models/ModelsContainer";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("all");
   const [contextLength, setContextLength] = useState([0]);
   const [currentTheme, setCurrentTheme] = useState(generateColorTheme());
-  const [isThemeLocked, setIsThemeLocked] = useState(false);
-  const { toast } = useToast();
 
   const {
     models,
@@ -59,31 +56,19 @@ export default function Models() {
     ...(models?.map((model) => model.context_length || 0) || [0])
   );
 
-  const generateNewTheme = () => {
-    if (!isThemeLocked) {
-      setCurrentTheme(generateColorTheme());
-    }
-  };
-
-  const lockCurrentTheme = () => {
-    setIsThemeLocked(true);
-    toast({
-      title: "Theme Locked! 🎨",
-      description: "This color combination has been saved as your preference."
-    });
-  };
-
-  const themeStyle = {
-    backgroundColor: currentTheme.background,
-    color: currentTheme.foreground
-  };
+  const themeManager = ThemeManager({
+    onThemeChange: setCurrentTheme
+  });
 
   const filteredModels = filterModels(models, searchTerm, selectedProvider, contextLength);
 
   return (
     <div 
       className="min-h-screen transition-colors duration-300"
-      style={themeStyle}
+      style={{
+        backgroundColor: currentTheme.background,
+        color: currentTheme.foreground
+      }}
     >
       <div className="container mx-auto py-8 px-4">
         <ModelsHeader
@@ -92,46 +77,30 @@ export default function Models() {
           selectedProvider={selectedProvider}
           contextLength={contextLength}
           currentTheme={currentTheme}
-          isThemeLocked={isThemeLocked}
+          isThemeLocked={themeManager.isThemeLocked}
           onProviderChange={setSelectedProvider}
           onContextLengthChange={setContextLength}
-          onGenerateNewTheme={generateNewTheme}
-          onLockTheme={lockCurrentTheme}
+          onGenerateNewTheme={themeManager.generateNewTheme}
+          onLockTheme={themeManager.lockCurrentTheme}
         />
 
-        {modelsError && (
-          <ErrorDisplay 
-            error={modelsError} 
-            onRetry={refetchModels}
-          />
-        )}
+        <ModelsErrorBoundary
+          modelsError={modelsError}
+          selectedModelsError={selectedModelsError}
+          refetchModels={refetchModels}
+          refetchSelectedModels={refetchSelectedModels}
+        />
 
-        {selectedModelsError && (
-          <ErrorDisplay 
-            error={selectedModelsError} 
-            onRetry={refetchSelectedModels}
-          />
-        )}
-
-        <div className="space-y-6">
-          <SearchModels
-            searchTerm={searchTerm}
-            onSearch={setSearchTerm}
-            currentTheme={currentTheme}
-          />
-
-          {isLoading ? (
-            <div className="text-center">Loading models...</div>
-          ) : (
-            <ModelsList
-              models={filteredModels}
-              onAdd={handleAddModel}
-              onRemove={handleRemoveModel}
-              modelsInUse={modelsInUse}
-              cardStyle={themeStyle}
-            />
-          )}
-        </div>
+        <ModelsContainer
+          searchTerm={searchTerm}
+          onSearch={setSearchTerm}
+          currentTheme={currentTheme}
+          isLoading={isLoading}
+          filteredModels={filteredModels}
+          onAdd={handleAddModel}
+          onRemove={handleRemoveModel}
+          modelsInUse={modelsInUse}
+        />
       </div>
     </div>
   );
