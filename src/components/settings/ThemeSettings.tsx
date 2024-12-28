@@ -1,32 +1,6 @@
-import { ColorTheme } from "@/lib/colorUtils";
 import { useThemeManager } from "@/hooks/use-theme-manager";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon, CircleDot } from "lucide-react";
-
-// Predefined themes with HSL values
-const lightTheme: ColorTheme = {
-  background: "0 0% 100%",
-  foreground: "220 10% 15%",
-  primary: "221 83% 53%",
-  secondary: "220 14% 96%",
-  accent: "221 83% 53%"
-};
-
-const darkTheme: ColorTheme = {
-  background: "220 10% 15%",
-  foreground: "210 40% 98%",
-  primary: "142 76% 36%",
-  secondary: "220 14% 24%",
-  accent: "142 76% 36%"
-};
-
-const blackTheme: ColorTheme = {
-  background: "0 0% 0%",
-  foreground: "0 0% 100%",
-  primary: "142 76% 36%",
-  secondary: "0 0% 10%",
-  accent: "142 76% 36%"
-};
 
 export function ThemeSettings() {
   const { applyTheme } = useThemeManager();
@@ -39,7 +13,7 @@ export function ThemeSettings() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => applyTheme(lightTheme)}
+            onClick={() => applyTheme('light')}
             className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
           >
             <Sun className="h-4 w-4" />
@@ -47,7 +21,7 @@ export function ThemeSettings() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => applyTheme(darkTheme)}
+            onClick={() => applyTheme('dark')}
             className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
           >
             <Moon className="h-4 w-4" />
@@ -55,7 +29,7 @@ export function ThemeSettings() {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => applyTheme(blackTheme)}
+            onClick={() => applyTheme('black')}
             className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
           >
             <CircleDot className="h-4 w-4" />

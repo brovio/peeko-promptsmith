@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { ColorTheme } from "@/lib/colorUtils";
 import {
   Select,
   SelectContent,
@@ -12,7 +11,6 @@ import {
 interface SearchModelsProps {
   searchTerm: string;
   onSearch: (term: string) => void;
-  currentTheme: ColorTheme;
   providers: string[];
   selectedProvider: string;
   onProviderChange: (provider: string) => void;
@@ -23,7 +21,6 @@ interface SearchModelsProps {
 export function SearchModels({ 
   searchTerm, 
   onSearch, 
-  currentTheme,
   providers,
   selectedProvider,
   onProviderChange,

@@ -1,9 +1,11 @@
 import { useToast } from "@/hooks/use-toast";
 
+export type Theme = 'light' | 'dark' | 'black';
+
 export function useThemeManager() {
   const { toast } = useToast();
 
-  const applyTheme = (theme: 'light' | 'dark' | 'black') => {
+  const applyTheme = (theme: Theme) => {
     const root = document.documentElement;
     
     // Remove all theme classes first
