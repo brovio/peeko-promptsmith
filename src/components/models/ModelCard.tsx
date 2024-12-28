@@ -16,12 +16,12 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
   const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
   
   const getModelTitle = () => {
-    return model.p_model ? capitalizeFirstLetter(model.p_model) : capitalizeFirstLetter(model.clean_model_name);
+    return model.p_model || capitalizeFirstLetter(model.clean_model_name);
   };
 
   const getModelSubtitle = () => {
     if (model.p_provider && model.p_model) {
-      return `${capitalizeFirstLetter(model.p_provider)}'s ${capitalizeFirstLetter(model.p_model)}`;
+      return `${capitalizeFirstLetter(model.p_provider)}'s ${model.p_model}`;
     }
     return "";
   };
