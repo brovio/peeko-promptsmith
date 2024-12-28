@@ -32,7 +32,7 @@ export function ModelCardHeader({ model, onAdd, onRemove, isInUse = false }: Mod
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <CardTitle className="text-[20px] text-left scrolling-text whitespace-nowrap text-ellipsis overflow-hidden">
+              <CardTitle className={`text-[20px] text-left scrolling-text whitespace-nowrap text-ellipsis overflow-hidden ${isInUse ? 'text-emerald-500' : ''}`}>
                 {getModelTitle()}
               </CardTitle>
             </TooltipTrigger>
@@ -47,6 +47,7 @@ export function ModelCardHeader({ model, onAdd, onRemove, isInUse = false }: Mod
           variant="ghost"
           size="icon"
           onClick={handleAction}
+          className={isInUse ? 'text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50' : ''}
         >
           {isInUse ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
         </Button>

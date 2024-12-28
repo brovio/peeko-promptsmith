@@ -23,8 +23,12 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
     return "";
   };
 
+  const cardClasses = `p-[3%] ${isInUse ? 'border-emerald-500 border-2' : ''}`;
+  const dividerClasses = `border-t pt-2 ${isInUse ? 'border-emerald-500' : 'border-border'}`;
+  const titleClasses = `text-[20px] text-left scrolling-text whitespace-nowrap text-ellipsis overflow-hidden ${isInUse ? 'text-emerald-500' : ''}`;
+
   return (
-    <Card style={style} className="p-[3%]">
+    <Card style={style} className={cardClasses}>
       <CardHeader className="space-y-1 p-0">
         <ModelCardHeader 
           model={model} 
@@ -32,7 +36,7 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
           onRemove={onRemove}
           isInUse={isInUse}
         />
-        <div className="border-t border-border pt-2">
+        <div className={dividerClasses}>
           <CardDescription className="text-left font-medium">
             {getModelSubtitle()}
           </CardDescription>
