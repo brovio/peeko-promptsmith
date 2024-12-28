@@ -15,11 +15,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export function AddUseCaseModal() {
+interface AddUseCaseModalProps {
+  initialData?: {
+    title: string;
+    description: string;
+    enhancer: string;
+  };
+}
+
+export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
   const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [enhancer, setEnhancer] = useState("");
+  const [title, setTitle] = useState(initialData?.title || "");
+  const [description, setDescription] = useState(initialData?.description || "");
+  const [enhancer, setEnhancer] = useState(initialData?.enhancer || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
@@ -30,6 +38,23 @@ export function AddUseCaseModal() {
     setIsSubmitting(true);
 
     try {
+      // Check if title already exists
+      const { data: existingUseCases } = await supabase
+        .from("use_cases")
+        .select("id")
+        .eq("title", title)
+        .single();
+
+      if (existingUseCases) {
+        toast({
+          title: "Error",
+          description: "A use case with this title already exists. Please choose a different title.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {

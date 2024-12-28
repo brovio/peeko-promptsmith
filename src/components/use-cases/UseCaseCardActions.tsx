@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Edit, Play, Info } from "lucide-react";
+import { Edit, Play, Info, Copy } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -11,9 +11,10 @@ interface UseCaseCardActionsProps {
   onEdit: () => void;
   onUse: () => void;
   onInfo: () => void;
+  onDuplicate: () => void;
 }
 
-export function UseCaseCardActions({ onEdit, onUse, onInfo }: UseCaseCardActionsProps) {
+export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCaseCardActionsProps) {
   return (
     <div className="flex gap-2">
       <TooltipProvider>
@@ -47,6 +48,17 @@ export function UseCaseCardActions({ onEdit, onUse, onInfo }: UseCaseCardActions
           </TooltipTrigger>
           <TooltipContent>
             <p>View details</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={onDuplicate}>
+              <Copy className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Duplicate use case</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
