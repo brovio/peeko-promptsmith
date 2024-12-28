@@ -85,8 +85,8 @@ export default function Models() {
     retry: 1,
   });
 
-  const providers = Array.from(
-    new Set((models || []).map((model) => model.provider))
+  const providers: string[] = Array.from(
+    new Set((models || []).map((model: Model) => model.provider))
   );
 
   const maxContextLength = Math.max(

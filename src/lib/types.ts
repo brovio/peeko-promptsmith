@@ -14,6 +14,7 @@ export interface Category {
   id: string;
   name: string;
   description?: string;
+  template: string;
 }
 
 export interface ChatMessage {
