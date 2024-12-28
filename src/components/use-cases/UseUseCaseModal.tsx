@@ -58,6 +58,9 @@ export function UseUseCaseModal({ useCase, open, onOpenChange }: UseUseCaseModal
     },
   });
 
+  // Find the selected model's name
+  const selectedModelName = models.find(m => m.id === selectedModel)?.name || '';
+
   const handleEnhancePrompt = async () => {
     if (!userPrompt.trim() || !selectedModel) {
       toast({
@@ -121,7 +124,14 @@ export function UseUseCaseModal({ useCase, open, onOpenChange }: UseUseCaseModal
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[900px]">
         <DialogHeader>
-          <DialogTitle>Enhance your prompt using: {useCase.title}</DialogTitle>
+          <DialogTitle>
+            Enhance your prompt using: {useCase.title}
+            {selectedModelName && (
+              <div className="text-sm text-muted-foreground mt-1">
+                {selectedModelName}
+              </div>
+            )}
+          </DialogTitle>
         </DialogHeader>
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-4">
