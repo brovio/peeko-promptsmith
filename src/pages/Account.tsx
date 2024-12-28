@@ -13,23 +13,23 @@ import { ModelsList } from "@/components/models/ModelsList";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Account() {
-  const { selectedModels, refetch } = useModelsData();
+  const { selectedModels, refetchSelectedModels } = useModelsData();
   const { toast } = useToast();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
-      await refetch();
+      await refetchSelectedModels();
       toast({
         title: "Models refreshed",
         description: "Your model list has been updated",
       });
     } catch (error) {
       toast({
+        variant: "destructive",
         title: "Error refreshing models",
         description: "Please try again later",
-        variant: "destructive",
       });
     } finally {
       setIsRefreshing(false);
