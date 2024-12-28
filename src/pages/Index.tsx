@@ -38,19 +38,21 @@ export default function Index() {
   const { data: models = [] } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
-      if (!modelsInUse.length) return [];
+      if (!modelsInUse?.length) return [];
       
       const modelIds = modelsInUse.map(m => m.model_id);
+      if (!modelIds?.length) return [];
+
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
-        .in('id', modelIds)
+        .in('model_id', modelIds)
         .eq('is_active', true);
       
       if (error) throw error;
       return data as Model[];
     },
-    enabled: modelsInUse.length > 0,
+    enabled: !!modelsInUse?.length,
   });
 
   const handlePromptSubmit = async (enhancedPrompt: string) => {
