@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Wand2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,11 +10,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { EnhancerActions } from "./EnhancerActions";
+import { UseCaseFormField } from "./form/UseCaseFormField";
 
 interface AddUseCaseModalProps {
   initialData?: {
@@ -33,69 +32,6 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      // Check if title already exists
-      const { data: existingUseCases } = await supabase
-        .from("use_cases")
-        .select("id")
-        .eq("title", title)
-        .single();
-
-      if (existingUseCases) {
-        toast({
-          title: "Error",
-          description: "A use case with this title already exists. Please choose a different title.",
-          variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
-      }
-
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        throw new Error("User not authenticated");
-      }
-
-      const { error } = await supabase
-        .from("use_cases")
-        .insert([{ 
-          title, 
-          description, 
-          enhancer,
-          user_id: user.id
-        }])
-        .single();
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Use case added successfully",
-      });
-
-      setTitle("");
-      setDescription("");
-      setEnhancer("");
-      setOpen(false);
-
-      queryClient.invalidateQueries({ queryKey: ["use-cases"] });
-    } catch (error: any) {
-      console.error("Error adding use case:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add use case. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const generateDescription = async () => {
     if (!title && !enhancer) {
@@ -149,6 +85,67 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const { data: existingUseCases } = await supabase
+        .from("use_cases")
+        .select("id")
+        .eq("title", title)
+        .single();
+
+      if (existingUseCases) {
+        toast({
+          title: "Error",
+          description: "A use case with this title already exists. Please choose a different title.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const { error } = await supabase
+        .from("use_cases")
+        .insert([{ 
+          title, 
+          description, 
+          enhancer,
+          user_id: user.id
+        }])
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Use case added successfully",
+      });
+
+      setTitle("");
+      setDescription("");
+      setEnhancer("");
+      setOpen(false);
+
+      queryClient.invalidateQueries({ queryKey: ["use-cases"] });
+    } catch (error: any) {
+      console.error("Error adding use case:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add use case. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -165,24 +162,28 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="title" className="text-sm font-medium text-white">
-              Title
-            </label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter title"
-              required
-              className="text-white placeholder:text-gray-400"
-            />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <label htmlFor="description" className="text-sm font-medium text-white">
-                Description
-              </label>
+          <UseCaseFormField
+            id="title"
+            label="Title"
+            type="input"
+            value={title}
+            onChange={setTitle}
+            placeholder="Enter title"
+            required
+            hint="title"
+          />
+
+          <UseCaseFormField
+            id="description"
+            label="Description"
+            type="textarea"
+            value={description}
+            onChange={setDescription}
+            placeholder="Enter description"
+            required
+            hint="description"
+            className="min-h-[100px]"
+            actions={
               <Button
                 type="button"
                 variant="ghost"
@@ -191,36 +192,24 @@ export function AddUseCaseModal({ initialData }: AddUseCaseModalProps) {
                 disabled={isGenerating || (!title && !enhancer)}
                 className="h-8 px-2"
               >
-                <Wand2 className="mr-2 h-4 w-4" />
                 {isGenerating ? "Generating..." : "Generate"}
               </Button>
-            </div>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter description"
-              required
-              className="min-h-[100px] text-white placeholder:text-gray-400"
-            />
-          </div>
-          <div className="space-y-2 relative">
-            <label htmlFor="enhancer" className="text-sm font-medium text-white">
-              Enhancer
-            </label>
-            <Textarea
-              id="enhancer"
-              value={enhancer}
-              onChange={(e) => setEnhancer(e.target.value)}
-              placeholder="Enter enhancer"
-              required
-              className="min-h-[150px] text-white placeholder:text-gray-400"
-            />
-            <EnhancerActions
-              currentEnhancer={enhancer}
-              onEnhancerUpdate={setEnhancer}
-            />
-          </div>
+            }
+          />
+
+          <UseCaseFormField
+            id="enhancer"
+            label="Enhancer"
+            type="textarea"
+            value={enhancer}
+            onChange={setEnhancer}
+            placeholder="Enter enhancer"
+            required
+            hint="enhancer"
+            className="min-h-[150px]"
+            actions={<EnhancerActions currentEnhancer={enhancer} onEnhancerUpdate={setEnhancer} />}
+          />
+
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Adding..." : "Add Use Case"}
           </Button>
