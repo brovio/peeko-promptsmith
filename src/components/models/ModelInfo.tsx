@@ -1,6 +1,6 @@
 import { Model } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { ModelParametersModal } from "./ModelParametersModal";
 
 interface ModelInfoProps {
@@ -8,30 +8,31 @@ interface ModelInfoProps {
 }
 
 export function ModelInfo({ model }: ModelInfoProps) {
-  const formatNumber = (num: number) => num?.toLocaleString() || 'Unknown';
+  const formatNumber = (num: number) => num?.toLocaleString() || '-';
+  const formatPrice = (price: number) => price ? `$${price}` : '-';
 
   return (
     <div>
       <div className="flex justify-between items-center mb-2">
-        <h3 className="font-medium">Extra Info</h3>
+        <h3 className="font-medium text-sm">Metrics</h3>
         <ModelParametersModal trigger={
           <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
             <Info className="h-4 w-4" />
           </Button>
         } />
       </div>
-      <div className="space-y-1 text-sm">
-        <div className="flex flex-col">
-          <span className="text-muted-foreground">Context Length:</span>
-          <span>{model.context_length ? formatNumber(model.context_length) : 'Unknown'}</span>
+      <div className="grid grid-cols-3 gap-2 text-sm">
+        <div className="text-center">
+          <div className="text-muted-foreground text-xs">Context</div>
+          <div>{formatNumber(model.context_length)}</div>
         </div>
-        <div className="flex flex-col">
-          <span className="text-muted-foreground">Input Price:</span>
-          <span>{model.input_price ? `$${model.input_price}/1M tokens` : 'Unknown'}</span>
+        <div className="text-center">
+          <div className="text-muted-foreground text-xs">Input</div>
+          <div>{formatPrice(model.input_price)}</div>
         </div>
-        <div className="flex flex-col">
-          <span className="text-muted-foreground">Output Price:</span>
-          <span>{model.output_price ? `$${model.output_price}/1M tokens` : 'Unknown'}</span>
+        <div className="text-center">
+          <div className="text-muted-foreground text-xs">Output</div>
+          <div>{formatPrice(model.output_price)}</div>
         </div>
       </div>
     </div>
