@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -28,13 +29,10 @@ export function AddUseCaseModal() {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase.from("use_cases").insert([
-        {
-          title,
-          description,
-          enhancer,
-        },
-      ]);
+      const { error } = await supabase
+        .from("use_cases")
+        .insert([{ title, description, enhancer }])
+        .single();
 
       if (error) throw error;
 
@@ -51,7 +49,7 @@ export function AddUseCaseModal() {
 
       // Invalidate and refetch use cases
       queryClient.invalidateQueries({ queryKey: ["use-cases"] });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding use case:", error);
       toast({
         title: "Error",
@@ -74,6 +72,9 @@ export function AddUseCaseModal() {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Use Case</DialogTitle>
+          <DialogDescription>
+            Add a new use case for prompting. Fill in all the fields below.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -104,7 +105,7 @@ export function AddUseCaseModal() {
             <label htmlFor="enhancer" className="text-sm font-medium">
               Enhancer
             </label>
-            <Input
+            <Textarea
               id="enhancer"
               value={enhancer}
               onChange={(e) => setEnhancer(e.target.value)}
