@@ -18,16 +18,19 @@ export function ModelSelector({
   selectedModel, 
   onModelSelect,
 }: ModelSelectorProps) {
-  const filteredModels = models;
+  // Find the selected model to display just its name in the trigger
+  const selectedModelName = models.find(m => m.id === selectedModel)?.name || '';
 
   return (
     <div className="w-full">
       <Select value={selectedModel} onValueChange={onModelSelect}>
         <SelectTrigger>
-          <SelectValue placeholder="Choose a model from the list" />
+          <SelectValue>
+            {selectedModelName || "Choose a model from the list"}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {filteredModels.map((model) => (
+          {models.map((model) => (
             <SelectItem key={model.id} value={model.id}>
               <div className="flex flex-col">
                 <span className="font-medium">{model.name}</span>
