@@ -6,10 +6,12 @@ import { ModelsList } from "@/components/models/ModelsList";
 import { SelectedModels } from "@/components/models/SelectedModels";
 import { SearchModels } from "@/components/models/SearchModels";
 import { ModelsHeader } from "@/components/models/ModelsHeader";
-import { ErrorDisplay } from "@/components/models/ErrorDisplay";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { filterModels } from "@/lib/modelUtils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RotateCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Model } from "@/lib/types";
 
 export default function Models() {
@@ -88,7 +90,7 @@ export default function Models() {
   );
 
   const maxContextLength = Math.max(
-    ...(models || []).map((model) => model.context_length || 0)
+    ...(models?.map((model) => model.context_length || 0) || [0])
   );
 
   const handleAddModel = async (model: Model) => {
@@ -139,7 +141,7 @@ export default function Models() {
     }
   };
 
-  const handleRemoveModel = async (model: Model) => {
+  const handleRemoveModel = async (modelId: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
@@ -148,21 +150,21 @@ export default function Models() {
         .from('model_preferences')
         .delete()
         .eq('user_id', user.id)
-        .eq('model_id', model.id);
+        .eq('model_id', modelId);
 
       if (error) throw error;
 
       await refetchSelectedModels();
       toast({
         title: "Model Removed",
-        description: `${model.name} has been removed from your selected models.`
+        description: "Model removed successfully"
       });
     } catch (error) {
       console.error('Error removing model:', error);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: "Failed to remove model. Please try again."
+        description: "Failed to remove model",
+        variant: "destructive"
       });
     }
   };
@@ -188,8 +190,26 @@ export default function Models() {
 
   const filteredModels = filterModels(models, searchTerm, selectedProvider, contextLength);
 
+  const renderError = (error: Error | null) => {
+    if (!error) return null;
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertDescription className="flex items-center justify-between">
+          <span>Error: {error.message}</span>
+          <Button variant="outline" size="sm" onClick={() => refetchModels()}>
+            <RotateCw className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  };
+
   return (
-    <div className="min-h-screen transition-colors duration-300" style={themeStyle}>
+    <div 
+      className="min-h-screen transition-colors duration-300"
+      style={themeStyle}
+    >
       <div className="container mx-auto py-8 px-4">
         <ModelsHeader
           providers={providers}
@@ -204,15 +224,11 @@ export default function Models() {
           onLockTheme={lockCurrentTheme}
         />
 
-        <ErrorDisplay 
-          error={apiKeyError || modelsError || selectedModelsError} 
-          onRetry={refetchModels}
-        />
+        {renderError(apiKeyError || modelsError || selectedModelsError)}
 
         <SelectedModels 
-          models={selectedModels} 
+          models={selectedModels}
           onRemove={handleRemoveModel}
-          style={themeStyle}
         />
 
         <div className="space-y-6">
