@@ -8,6 +8,7 @@ import ForgotPassword from "@/pages/ForgotPassword";
 import WhatPrompting from "@/pages/WhatPrompting";
 import Header from "@/components/Header";
 import AuthGuard from "@/components/AuthGuard";
+import { useEffect } from "react";
 import "./App.css";
 
 // Create a client
@@ -21,6 +22,18 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Initialize theme from localStorage on app load
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      document.documentElement.classList.add(savedTheme);
+    } else {
+      // Default to light theme
+      document.documentElement.classList.add('light');
+      localStorage.setItem('theme', 'light');
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
