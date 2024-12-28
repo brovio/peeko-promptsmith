@@ -1,23 +1,22 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { SearchModels } from "@/components/models/SearchModels";
+import { generateColorTheme } from "@/lib/colorUtils";
 import { ModelsList } from "@/components/models/ModelsList";
-import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { SelectedModels } from "@/components/models/SelectedModels";
-import { Model } from "@/lib/types";
+import { SearchModels } from "@/components/models/SearchModels";
+import { ModelsHeader } from "@/components/models/ModelsHeader";
+import { ErrorDisplay } from "@/components/models/ErrorDisplay";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { filterModels } from "@/lib/modelUtils";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { RotateCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Model } from "@/lib/types";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("all");
   const [contextLength, setContextLength] = useState([0]);
-  const [currentTheme, setCurrentTheme] = useState({ background: "#ffffff", foreground: "#000000", accent: "#0066cc" });
+  const [currentTheme, setCurrentTheme] = useState(generateColorTheme());
   const [isThemeLocked, setIsThemeLocked] = useState(false);
   const { toast } = useToast();
 
@@ -41,7 +40,6 @@ export default function Models() {
     },
   });
 
-  // Fetch models with error handling
   const { 
     data: models, 
     isLoading, 
@@ -93,7 +91,7 @@ export default function Models() {
     ...(models || []).map((model) => model.context_length || 0)
   );
 
-  const handleModelAdd = async (model: Model) => {
+  const handleAddModel = async (model: Model) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
@@ -141,7 +139,7 @@ export default function Models() {
     }
   };
 
-  const handleModelRemove = async (model: Model) => {
+  const handleRemoveModel = async (model: Model) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
@@ -179,40 +177,16 @@ export default function Models() {
     setIsThemeLocked(true);
     toast({
       title: "Theme Locked! 🎨",
-      description: "This color combination has been saved as your preference.",
+      description: "This color combination has been saved as your preference."
     });
   };
 
   const themeStyle = {
     backgroundColor: currentTheme.background,
-    color: currentTheme.foreground,
-  };
-
-  const cardStyle = {
-    backgroundColor: currentTheme.primary,
-    color: currentTheme.foreground === currentTheme.primary ? '#FFFCF2' : currentTheme.foreground,
+    color: currentTheme.foreground
   };
 
   const filteredModels = filterModels(models, searchTerm, selectedProvider, contextLength);
-
-  const renderError = (error: Error | null) => {
-    if (!error) return null;
-    return (
-      <Alert variant="destructive" className="mb-4">
-        <AlertDescription className="flex items-center justify-between">
-          <span>Error: {error.message}</span>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={() => refetchModels()}
-          >
-            <RotateCw className="mr-2 h-4 w-4" />
-            Retry
-          </Button>
-        </AlertDescription>
-      </Alert>
-    );
-  };
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={themeStyle}>
@@ -230,11 +204,14 @@ export default function Models() {
           onLockTheme={lockCurrentTheme}
         />
 
-        {renderError(apiKeyError || modelsError || selectedModelsError)}
+        <ErrorDisplay 
+          error={apiKeyError || modelsError || selectedModelsError} 
+          onRetry={refetchModels}
+        />
 
         <SelectedModels 
           models={selectedModels} 
-          onRemove={handleModelRemove}
+          onRemove={handleRemoveModel}
           style={themeStyle}
         />
 
@@ -247,10 +224,14 @@ export default function Models() {
 
           {isLoading ? (
             <div className="text-center">Loading models...</div>
+          ) : !apiKeyData?.key_value ? (
+            <div className="text-center">
+              Please add your OpenRouter API key in settings to view available models.
+            </div>
           ) : (
             <ModelsList
               models={filteredModels}
-              onAdd={handleModelAdd}
+              onAdd={handleAddModel}
               cardStyle={themeStyle}
             />
           )}

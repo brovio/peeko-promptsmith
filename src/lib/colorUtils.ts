@@ -6,24 +6,24 @@ export interface ColorTheme {
   accent: string;
 }
 
-const baseColors = {
-  offWhite: '#FFFCF2',
-  lightGray: '#CCC5B9',
-  darkGray: '#403D39',
-  nearBlack: '#252422',
-  orange: '#EB5E28'
-};
-
-function shuffleArray<T>(array: T[]): T[] {
-  const newArray = [...array];
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-  }
-  return newArray;
-}
-
 export function generateColorTheme(): ColorTheme {
+  const baseColors = {
+    offWhite: '#FFFCF2',
+    lightGray: '#CCC5B9',
+    darkGray: '#403D39',
+    nearBlack: '#252422',
+    orange: '#EB5E28'
+  };
+
+  function shuffleArray<T>(array: T[]): T[] {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  }
+
   const colorPool = [
     baseColors.offWhite,
     baseColors.lightGray,
