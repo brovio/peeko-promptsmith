@@ -10,7 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("general");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedEnhancer, setSelectedEnhancer] = useState("");
   const [result, setResult] = useState("");
   const { toast } = useToast();
 
@@ -100,8 +101,7 @@ export default function Index() {
   }
 
   const handlePromptSubmit = async (enhancedPrompt: string) => {
-    // TODO: Integrate with OpenRouter API
-    setResult("This is a placeholder response. Please configure your OpenRouter API key in settings.");
+    setResult(enhancedPrompt);
   };
 
   return (
@@ -124,6 +124,7 @@ export default function Index() {
               <CategorySelector
                 selectedCategory={selectedCategory}
                 onCategorySelect={setSelectedCategory}
+                onEnhancerUpdate={setSelectedEnhancer}
               />
             </div>
 
@@ -131,6 +132,7 @@ export default function Index() {
               <h2 className="text-xl font-semibold">Your Prompt</h2>
               <PromptInput
                 selectedCategory={selectedCategory}
+                selectedEnhancer={selectedEnhancer}
                 onSubmit={handlePromptSubmit}
               />
             </div>

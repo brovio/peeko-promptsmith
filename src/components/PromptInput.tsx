@@ -8,10 +8,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface PromptInputProps {
   selectedCategory: string;
+  selectedEnhancer: string;
   onSubmit: (enhancedPrompt: string) => void;
 }
 
-export function PromptInput({ selectedCategory, onSubmit }: PromptInputProps) {
+export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [currentModel, setCurrentModel] = useState("");
@@ -25,7 +26,7 @@ export function PromptInput({ selectedCategory, onSubmit }: PromptInputProps) {
     setAttemptCount(1);
     
     try {
-      const template = getTemplateForCategory(selectedCategory);
+      const template = getTemplateForCategory(selectedCategory, selectedEnhancer);
       const enhancedPrompt = template.replace("{prompt}", prompt.trim());
       
       const { data, error } = await supabase.functions.invoke('generate', {
