@@ -10,6 +10,9 @@ import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { filterModels } from "@/lib/modelUtils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,48 +22,60 @@ export default function Models() {
   const [isThemeLocked, setIsThemeLocked] = useState(false);
   const { toast } = useToast();
 
-  // Fetch API key
-  const { data: apiKeyData } = useQuery({
+  // Fetch API key with error handling
+  const { data: apiKeyData, error: apiKeyError } = useQuery({
     queryKey: ['apiKey'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const { data: apiKeyData } = await supabase
+      const { data: apiKeyData, error } = await supabase
         .from('api_keys')
         .select('key_value')
         .eq('user_id', user.id)
         .eq('provider', 'openrouter')
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
+      if (error) throw error;
       return apiKeyData;
     },
   });
 
-  // Fetch models
-  const { data: models, isLoading } = useQuery({
+  // Fetch models with error handling
+  const { 
+    data: models, 
+    isLoading, 
+    error: modelsError,
+    refetch: refetchModels 
+  } = useQuery({
     queryKey: ['models', apiKeyData?.key_value],
     queryFn: async () => {
       if (!apiKeyData?.key_value) return [];
       return fetchModels(apiKeyData.key_value);
     },
     enabled: !!apiKeyData?.key_value,
+    retry: 1,
   });
 
-  // Fetch selected models
-  const { data: selectedModels = [], refetch: refetchSelectedModels } = useQuery({
+  // Fetch selected models with error handling
+  const { 
+    data: selectedModels = [], 
+    error: selectedModelsError,
+    refetch: refetchSelectedModels 
+  } = useQuery({
     queryKey: ['selectedModels'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('model_preferences')
         .select('model_id')
         .eq('user_id', user.id)
         .eq('is_enabled', true);
 
+      if (error) throw error;
       if (!data) return [];
 
       return models?.filter(model => 
@@ -68,6 +83,7 @@ export default function Models() {
       ) || [];
     },
     enabled: !!models,
+    retry: 1,
   });
 
   const providers = Array.from(
@@ -92,7 +108,7 @@ export default function Models() {
           description: model.description || '',
           context_length: model.context_length,
           is_active: true,
-          clean_model_name: model.name.replace(`${model.provider}/`, '').trim()
+          clean_model_name: model.clean_model_name
         }, {
           onConflict: 'model_id'
         });
@@ -157,6 +173,25 @@ export default function Models() {
 
   const filteredModels = filterModels(models, searchTerm, selectedProvider, contextLength);
 
+  const renderError = (error: Error | null) => {
+    if (!error) return null;
+    return (
+      <Alert variant="destructive" className="mb-4">
+        <AlertDescription className="flex items-center justify-between">
+          <span>Error: {error.message}</span>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => refetchModels()}
+          >
+            <ReloadIcon className="mr-2 h-4 w-4" />
+            Retry
+          </Button>
+        </AlertDescription>
+      </Alert>
+    );
+  };
+
   return (
     <div className="min-h-screen transition-colors duration-300" style={themeStyle}>
       <div className="container mx-auto py-8 px-4">
@@ -172,6 +207,8 @@ export default function Models() {
           onGenerateNewTheme={generateNewTheme}
           onLockTheme={lockCurrentTheme}
         />
+
+        {renderError(apiKeyError || modelsError || selectedModelsError)}
 
         <SelectedModels 
           models={selectedModels} 
