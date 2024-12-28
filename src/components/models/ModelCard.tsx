@@ -1,7 +1,7 @@
 import { Model } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Edit2, Play, Clock } from "lucide-react";
 import { CSSProperties } from "react";
 
 interface ModelCardProps {
@@ -17,14 +17,16 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
     
     // Add context length if available
     if (model.context_length) {
-      points.push(`Context Length: ${model.context_length.toLocaleString()}`);
+      points.push(`Maximum context length: ${model.context_length.toLocaleString()} tokens`);
     }
     
     // Add pricing info if available
     if (model.pricing) {
-      points.push(`Prompt: $${model.pricing.prompt}/1K tokens`);
-      points.push(`Completion: $${model.pricing.completion}/1K tokens`);
+      points.push(`Cost per 1K tokens: $${model.pricing.prompt} (input) / $${model.pricing.completion} (output)`);
     }
+
+    // Add a point about the model's capabilities
+    points.push("Structure and refine your prompts specifically for this model's capabilities");
     
     return points;
   };
@@ -36,17 +38,20 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
       <CardHeader className="relative pb-0">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <CardTitle className="text-left text-xl">{model.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">Provider: {model.provider}</p>
+            <CardTitle className="text-xl font-semibold">
+              {model.clean_model_name}
+            </CardTitle>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onAdd(model)}
-            className="hover:bg-white/10"
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onAdd(model)}
+              className="hover:bg-white/10"
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
 
@@ -54,15 +59,15 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
 
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground text-left">Description</h4>
-          <CardDescription className="text-sm text-foreground text-left">
+          <h4 className="text-sm font-medium text-muted-foreground">Info on {model.provider}'s model:</h4>
+          <CardDescription className="text-sm text-foreground">
             {model.description}
           </CardDescription>
         </div>
 
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground text-left">Model Details</h4>
-          <ul className="space-y-3 list-disc list-inside text-left">
+          <h4 className="text-sm font-medium text-muted-foreground">Hints & Tips</h4>
+          <ul className="space-y-3 list-disc list-inside">
             {bulletPoints.map((point, index) => (
               <li 
                 key={index} 

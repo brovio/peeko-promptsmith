@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { FilterSheet } from "@/components/models/FilterSheet";
 import { Model } from "@/lib/types";
 import { generateColorTheme, ColorTheme } from "@/lib/colorUtils";
 import { ModelsList } from "@/components/models/ModelsList";
 import { SelectedModels } from "@/components/models/SelectedModels";
-import { ThemeActions } from "@/components/models/ThemeActions";
 import { SearchModels } from "@/components/models/SearchModels";
+import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
+import { filterModels } from "@/lib/modelUtils";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,6 +19,7 @@ export default function Models() {
   const [isThemeLocked, setIsThemeLocked] = useState(false);
   const { toast } = useToast();
 
+  // Fetch API key
   const { data: apiKeyData } = useQuery({
     queryKey: ['apiKey'],
     queryFn: async () => {
@@ -37,7 +38,7 @@ export default function Models() {
     },
   });
 
-  // Fetch models from OpenRouter
+  // Fetch models
   const { data: models, isLoading } = useQuery({
     queryKey: ['models', apiKeyData?.key_value],
     queryFn: async () => {
@@ -69,31 +70,29 @@ export default function Models() {
     enabled: !!models,
   });
 
-  // Get unique providers with proper typing
-  const providers: string[] = Array.from(
-    new Set((models || []).map(model => model.id.split('/')[0]))
+  const providers = Array.from(
+    new Set((models || []).map(model => model.provider))
   );
 
-  // Get max context length
-  const maxContextLength = Math.max(...(models?.map(model => model.context_length || 0) || [0]));
+  const maxContextLength = Math.max(
+    ...(models?.map(model => model.context_length || 0) || [0])
+  );
 
   const addModel = async (model: Model) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const [provider] = model.id.split('/');
-      
       const { error: modelError } = await supabase
         .from('available_models')
         .upsert({
           model_id: model.id,
           name: model.name,
-          provider: provider,
+          provider: model.provider,
           description: model.description || '',
           context_length: model.context_length,
           is_active: true,
-          clean_model_name: model.name.replace(`${provider}/`, '').trim()
+          clean_model_name: model.name.replace(`${model.provider}/`, '').trim()
         }, {
           onConflict: 'model_id'
         });
@@ -105,7 +104,7 @@ export default function Models() {
         .upsert({
           user_id: user.id,
           model_id: model.id,
-          provider: provider,
+          provider: model.provider,
           is_enabled: true
         }, {
           onConflict: 'user_id,model_id'
@@ -128,7 +127,7 @@ export default function Models() {
     }
   };
 
-  const handleRemoveModel = (modelId: string) => {
+  const handleRemoveModel = () => {
     refetchSelectedModels();
   };
 
@@ -146,7 +145,6 @@ export default function Models() {
     });
   };
 
-  // Apply the dynamic theme styles
   const themeStyle = {
     backgroundColor: currentTheme.background,
     color: currentTheme.foreground,
@@ -157,45 +155,23 @@ export default function Models() {
     color: currentTheme.foreground === currentTheme.primary ? '#FFFCF2' : currentTheme.foreground,
   };
 
-  // Filter models based on search term and filters
-  const filteredModels = models?.filter(model => {
-    const matchesSearch = 
-      model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      model.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesProvider = 
-      selectedProvider === "all" || 
-      model.id.split('/')[0] === selectedProvider;
-    
-    const matchesContext = 
-      !contextLength[0] || 
-      (model.context_length || 0) >= contextLength[0];
-
-    return matchesSearch && matchesProvider && matchesContext;
-  }) || [];
+  const filteredModels = filterModels(models, searchTerm, selectedProvider, contextLength);
 
   return (
     <div className="min-h-screen transition-colors duration-300" style={themeStyle}>
       <div className="container mx-auto py-8 px-4">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Available Models</h1>
-          <div className="flex gap-2">
-            <ThemeActions
-              currentTheme={currentTheme}
-              isThemeLocked={isThemeLocked}
-              onGenerateNewTheme={generateNewTheme}
-              onLockTheme={lockCurrentTheme}
-            />
-            <FilterSheet
-              providers={providers}
-              maxContextLength={maxContextLength}
-              selectedProvider={selectedProvider}
-              contextLength={contextLength}
-              onProviderChange={setSelectedProvider}
-              onContextLengthChange={setContextLength}
-            />
-          </div>
-        </div>
+        <ModelsHeader
+          providers={providers}
+          maxContextLength={maxContextLength}
+          selectedProvider={selectedProvider}
+          contextLength={contextLength}
+          currentTheme={currentTheme}
+          isThemeLocked={isThemeLocked}
+          onProviderChange={setSelectedProvider}
+          onContextLengthChange={setContextLength}
+          onGenerateNewTheme={generateNewTheme}
+          onLockTheme={lockCurrentTheme}
+        />
 
         <SelectedModels 
           models={selectedModels} 

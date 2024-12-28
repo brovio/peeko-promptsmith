@@ -3,6 +3,7 @@ export interface Model {
   name: string;
   provider: string;
   description: string;
+  clean_model_name: string;
   context_length?: number;
   pricing?: {
     prompt: number;
