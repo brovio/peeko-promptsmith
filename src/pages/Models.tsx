@@ -20,7 +20,6 @@ export default function Models() {
   const [isThemeLocked, setIsThemeLocked] = useState(false);
   const { toast } = useToast();
 
-  // Fetch API key with error handling
   const { 
     data: apiKeyData, 
     error: apiKeyError,
@@ -72,7 +71,6 @@ export default function Models() {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  // Fetch selected models with error handling
   const { 
     data: selectedModels = [], 
     error: selectedModelsError,
@@ -84,7 +82,7 @@ export default function Models() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return [];
 
-        const { data, error } = await supabase
+        const { data: preferences, error } = await supabase
           .from('model_preferences')
           .select('model_id')
           .eq('user_id', user.id)
@@ -94,8 +92,12 @@ export default function Models() {
         if (!data) return [];
 
         return models?.filter(model => 
-          data.some(preference => preference.model_id === model.id)
-        ) || [];
+          preferences.some(pref => pref.model_id === model.id)
+        ).map(model => ({
+          ...model,
+          p_model: model.clean_model_name,
+          p_provider: model.provider
+        })) || [];
       } catch (error: any) {
         console.error('Error fetching selected models:', error);
         throw new Error(error.message || 'Failed to fetch selected models');
@@ -119,7 +121,6 @@ export default function Models() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // First ensure the model exists in available_models
       await supabase
         .from('available_models')
         .upsert({
@@ -138,7 +139,6 @@ export default function Models() {
           onConflict: 'model_id'
         });
 
-      // Then add it to user preferences
       const { error } = await supabase
         .from('model_preferences')
         .upsert({
