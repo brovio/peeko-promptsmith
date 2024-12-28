@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { generateColorTheme } from "@/lib/colorUtils";
 import { ModelsList } from "@/components/models/ModelsList";
-import { SelectedModels } from "@/components/models/SelectedModels";
 import { SearchModels } from "@/components/models/SearchModels";
 import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { useToast } from "@/hooks/use-toast";
@@ -113,11 +112,6 @@ export default function Models() {
             onRetry={refetchSelectedModels}
           />
         )}
-
-        <SelectedModels 
-          models={selectedModels}
-          onRemove={handleRemoveModel}
-        />
 
         <div className="space-y-6">
           <SearchModels
