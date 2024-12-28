@@ -22,7 +22,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model,
+        model: "gpt-4o-mini",
         messages: [
           { role: 'system', content: 'You are a helpful assistant that generates content based on user prompts.' },
           { role: 'user', content: prompt }
@@ -30,8 +30,16 @@ serve(async (req) => {
       }),
     });
 
+    if (!response.ok) {
+      throw new Error(`OpenAI API returned ${response.status}`);
+    }
+
     const data = await response.json();
     
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      throw new Error('Invalid response format from OpenAI');
+    }
+
     // Calculate approximate cost based on token usage
     const usage = data.usage || { prompt_tokens: 0, completion_tokens: 0 };
     const totalTokens = usage.prompt_tokens + usage.completion_tokens;
