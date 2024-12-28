@@ -32,27 +32,28 @@ export function UseUseCaseModal({ useCase, open, onOpenChange }: UseUseCaseModal
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const { data, error } = await supabase
+      // First get the user's model preferences
+      const { data: preferences, error: preferencesError } = await supabase
         .from('model_preferences')
-        .select(`
-          model_id,
-          available_models (
-            id,
-            name,
-            description,
-            provider
-          )
-        `)
+        .select('model_id')
         .eq('user_id', user.id)
         .eq('is_enabled', true);
 
-      if (error) throw error;
+      if (preferencesError) throw preferencesError;
 
-      return data.map(pref => ({
-        id: pref.model_id,
-        name: pref.available_models.name,
-        description: pref.available_models.description,
-        provider: pref.available_models.provider
+      // Then fetch the corresponding model details
+      const { data: modelDetails, error: modelsError } = await supabase
+        .from('available_models')
+        .select('id, name, description, provider')
+        .in('model_id', preferences.map(p => p.model_id));
+
+      if (modelsError) throw modelsError;
+
+      return modelDetails.map(model => ({
+        id: model.id,
+        name: model.name,
+        description: model.description,
+        provider: model.provider
       })) as Model[];
     },
   });
