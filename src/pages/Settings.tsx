@@ -3,6 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ApiKeyManager } from "@/components/settings/ApiKeyManager";
+import { ThemeSettings } from "@/components/settings/ThemeSettings";
 
 export default function Settings() {
   const [apiKey, setApiKey] = useState("");
@@ -59,14 +60,20 @@ export default function Settings() {
   };
 
   return (
-    <div className="container mx-auto max-w-2xl py-8">
+    <div className="container mx-auto max-w-6xl py-8">
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
       
-      <div className="space-y-6">
-        <ApiKeyManager 
-          onApiKeyValidated={handleApiKeyValidated}
-          onApiKeyDeleted={handleApiKeyDeleted}
-        />
+      <div className="space-y-12">
+        <section>
+          <ApiKeyManager 
+            onApiKeyValidated={handleApiKeyValidated}
+            onApiKeyDeleted={handleApiKeyDeleted}
+          />
+        </section>
+
+        <section>
+          <ThemeSettings />
+        </section>
       </div>
     </div>
   );
