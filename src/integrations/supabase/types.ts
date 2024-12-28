@@ -317,6 +317,56 @@ export type Database = {
           },
         ]
       }
+      themes: {
+        Row: {
+          accent_color: string
+          background_color: string
+          created_at: string | null
+          foreground_color: string
+          id: string
+          is_active: boolean | null
+          name: string
+          primary_color: string
+          secondary_color: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          accent_color: string
+          background_color: string
+          created_at?: string | null
+          foreground_color: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          primary_color: string
+          secondary_color: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          accent_color?: string
+          background_color?: string
+          created_at?: string | null
+          foreground_color?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          primary_color?: string
+          secondary_color?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "themes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       waitlist: {
         Row: {
           created_at: string | null
