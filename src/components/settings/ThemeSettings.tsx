@@ -1,29 +1,31 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ColorTheme, generateColorTheme } from "@/lib/colorUtils";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { ThemeCard } from "./ThemeCard";
+import { CreateThemeDialog } from "./CreateThemeDialog";
+
+// Predefined themes
+const lightTheme: ColorTheme = {
+  background: "#FFFFFF",
+  foreground: "#000000",
+  primary: "#F1F1F1",
+  secondary: "#F8F8F8",
+  accent: "#F2FCE2"
+};
+
+const darkTheme: ColorTheme = {
+  background: "#221F26",
+  foreground: "#FFFFFF",
+  primary: "#333333",
+  secondary: "#2A2A2A",
+  accent: "#C8C8C9"
+};
 
 export function ThemeSettings() {
   const [isOpen, setIsOpen] = useState(false);
-  const [themeName, setThemeName] = useState("");
   const [currentTheme, setCurrentTheme] = useState<ColorTheme>(generateColorTheme());
   const { toast } = useToast();
 
@@ -47,7 +49,7 @@ export function ThemeSettings() {
     setCurrentTheme(generateColorTheme());
   };
 
-  const handleSaveTheme = async () => {
+  const handleSaveTheme = async (themeName: string) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
@@ -71,7 +73,6 @@ export function ThemeSettings() {
         description: `Your theme "${themeName}" has been saved successfully.`,
       });
       setIsOpen(false);
-      setThemeName("");
       refetchThemes();
     } catch (error) {
       console.error('Error saving theme:', error);
@@ -107,127 +108,61 @@ export function ThemeSettings() {
     }
   };
 
+  const applyTheme = (theme: ColorTheme) => {
+    // Apply theme to CSS variables
+    document.documentElement.style.setProperty('--background', theme.background);
+    document.documentElement.style.setProperty('--foreground', theme.foreground);
+    document.documentElement.style.setProperty('--primary', theme.primary);
+    document.documentElement.style.setProperty('--secondary', theme.secondary);
+    document.documentElement.style.setProperty('--accent', theme.accent);
+
+    toast({
+      title: "Theme applied!",
+      description: "The selected theme has been applied to the application.",
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Themes</h2>
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-          <DialogTrigger asChild>
-            <Button>Create New Theme</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Theme</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label>Theme Name</Label>
-                <Input
-                  placeholder="Enter theme name"
-                  value={themeName}
-                  onChange={(e) => setThemeName(e.target.value)}
-                />
-              </div>
-              <div 
-                className="p-4 rounded"
-                style={{ backgroundColor: currentTheme.background }}
-              >
-                <div className="space-y-2">
-                  <div 
-                    className="p-2 rounded"
-                    style={{ 
-                      backgroundColor: currentTheme.primary,
-                      color: currentTheme.foreground 
-                    }}
-                  >
-                    Primary Color
-                  </div>
-                  <div 
-                    className="p-2 rounded"
-                    style={{ 
-                      backgroundColor: currentTheme.secondary,
-                      color: currentTheme.foreground 
-                    }}
-                  >
-                    Secondary Color
-                  </div>
-                  <div 
-                    className="p-2 rounded"
-                    style={{ 
-                      backgroundColor: currentTheme.accent,
-                      color: currentTheme.foreground 
-                    }}
-                  >
-                    Accent Color
-                  </div>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleGenerateNewTheme} variant="outline">
-                  Generate New Colors
-                </Button>
-                <Button
-                  onClick={handleSaveTheme}
-                  disabled={!themeName.trim()}
-                >
-                  Save Theme
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button onClick={() => applyTheme(lightTheme)}>Light Theme</Button>
+          <Button onClick={() => applyTheme(darkTheme)} variant="secondary">Dark Theme</Button>
+          <Button onClick={() => setIsOpen(true)}>Create New Theme</Button>
+        </div>
       </div>
+
+      <CreateThemeDialog
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        currentTheme={currentTheme}
+        onGenerateNew={handleGenerateNewTheme}
+        onSave={handleSaveTheme}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {themes?.map((theme) => (
-          <Card key={theme.id}>
-            <CardHeader>
-              <CardTitle>{theme.name}</CardTitle>
-              <CardDescription>Custom Theme</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div 
-                className="p-4 rounded space-y-2"
-                style={{ backgroundColor: theme.background_color }}
-              >
-                <div 
-                  className="p-2 rounded"
-                  style={{ 
-                    backgroundColor: theme.primary_color,
-                    color: theme.foreground_color 
-                  }}
-                >
-                  Primary Color
-                </div>
-                <div 
-                  className="p-2 rounded"
-                  style={{ 
-                    backgroundColor: theme.secondary_color,
-                    color: theme.foreground_color 
-                  }}
-                >
-                  Secondary Color
-                </div>
-                <div 
-                  className="p-2 rounded"
-                  style={{ 
-                    backgroundColor: theme.accent_color,
-                    color: theme.foreground_color 
-                  }}
-                >
-                  Accent Color
-                </div>
-              </div>
-              <div className="mt-4">
-                <Button 
-                  variant="destructive" 
-                  onClick={() => handleDeleteTheme(theme.id)}
-                >
-                  Delete Theme
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          <ThemeCard
+            key={theme.id}
+            id={theme.id}
+            name={theme.name}
+            colors={{
+              background: theme.background_color,
+              foreground: theme.foreground_color,
+              primary: theme.primary_color,
+              secondary: theme.secondary_color,
+              accent: theme.accent_color,
+            }}
+            onDelete={handleDeleteTheme}
+            onApply={() => applyTheme({
+              background: theme.background_color,
+              foreground: theme.foreground_color,
+              primary: theme.primary_color,
+              secondary: theme.secondary_color,
+              accent: theme.accent_color,
+            })}
+          />
         ))}
       </div>
     </div>
