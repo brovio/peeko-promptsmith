@@ -1,6 +1,6 @@
 import { Model } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
-import { CSSProperties } from "react";
+import { CSSProperties, useState, useEffect } from "react";
 import { ModelCardHeader } from "./ModelCardHeader";
 import { ModelDescription } from "./ModelDescription";
 import { ModelInfo } from "./ModelInfo";
@@ -14,6 +14,7 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: ModelCardProps) {
+  const [isHighlighted, setIsHighlighted] = useState(false);
   const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
   
   const getModelSubtitle = () => {
@@ -23,7 +24,17 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
     return "";
   };
 
-  const cardClasses = `p-[3%] ${isInUse ? 'border-emerald-500 border-2' : ''}`;
+  const handleAdd = async (model: Model) => {
+    setIsHighlighted(true);
+    await onAdd(model);
+    // Reset the highlight after 1 second
+    setTimeout(() => setIsHighlighted(false), 1000);
+  };
+
+  const cardClasses = `p-[3%] transition-colors duration-300 ${
+    isInUse ? 'border-emerald-500 border-2' : ''
+  } ${isHighlighted ? 'bg-emerald-50' : ''}`;
+  
   const dividerClasses = `border-t pt-2 ${isInUse ? 'border-emerald-500' : 'border-border'}`;
   const titleClasses = `text-[20px] text-left scrolling-text whitespace-nowrap text-ellipsis overflow-hidden ${isInUse ? 'text-emerald-500' : ''}`;
 
@@ -32,7 +43,7 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
       <CardHeader className="space-y-1 p-0">
         <ModelCardHeader 
           model={model} 
-          onAdd={onAdd} 
+          onAdd={handleAdd} 
           onRemove={onRemove}
           isInUse={isInUse}
         />
