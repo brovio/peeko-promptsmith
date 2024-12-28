@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus } from "lucide-react";
 import { ModelParametersModal } from "./ModelParametersModal";
 import { CSSProperties } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ModelCardProps {
   model: Model;
@@ -30,10 +31,19 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
     <Card style={style}>
       <CardHeader className="space-y-1">
         <div className="flex justify-between items-start">
-          <div className="space-y-1">
-            <CardTitle className="text-[20px] text-left">
-              {getModelTitle()}
-            </CardTitle>
+          <div className="space-y-1 max-w-[200px]">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <CardTitle className="text-[20px] text-left whitespace-nowrap overflow-x-auto scrollbar-none hover:cursor-help">
+                    {getModelTitle()}
+                  </CardTitle>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{getModelTitle()}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <div className="flex gap-2">
             <ModelParametersModal />
