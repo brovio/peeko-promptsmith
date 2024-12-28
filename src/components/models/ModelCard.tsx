@@ -1,9 +1,9 @@
 import { Model } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Info } from "lucide-react";
+import { Plus, Info, ChevronDown, ChevronUp } from "lucide-react";
 import { ModelParametersModal } from "./ModelParametersModal";
-import { CSSProperties } from "react";
+import { CSSProperties, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ModelCardProps {
@@ -13,6 +13,7 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ model, onAdd, style }: ModelCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const formatNumber = (num: number) => num?.toLocaleString() || 'Unknown';
   const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
   
@@ -25,6 +26,13 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
       return `${capitalizeFirstLetter(model.p_provider)}'s ${model.p_model}`;
     }
     return "";
+  };
+
+  const truncateText = (text: string, wordLimit: number) => {
+    if (!text) return "";
+    const words = text.split(' ');
+    if (words.length <= wordLimit) return text;
+    return `${words.slice(0, wordLimit).join(' ')}...`;
   };
 
   return (
@@ -60,9 +68,29 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
             {getModelSubtitle()}
           </CardDescription>
           {model.description && (
-            <CardDescription className="text-left mt-2">
-              {model.description}
-            </CardDescription>
+            <div>
+              <CardDescription className="text-left mt-2">
+                {isExpanded ? model.description : truncateText(model.description, 180)}
+              </CardDescription>
+              {model.description.split(' ').length > 180 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-1 h-6 px-0 text-muted-foreground hover:text-foreground"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                >
+                  {isExpanded ? (
+                    <div className="flex items-center gap-1">
+                      Show less <ChevronUp className="h-3 w-3" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1">
+                      Read more <ChevronDown className="h-3 w-3" />
+                    </div>
+                  )}
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </CardHeader>
