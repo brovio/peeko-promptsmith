@@ -17,6 +17,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+interface ModelParametersModalProps {
+  trigger: React.ReactNode;
+}
+
 const parameters = [
   {
     name: "Context Length",
@@ -40,13 +44,11 @@ const parameters = [
   }
 ];
 
-export function ModelParametersModal() {
+export function ModelParametersModal({ trigger }: ModelParametersModalProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Info className="h-4 w-4" />
-        </Button>
+        {trigger}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[625px]">
         <DialogHeader>
