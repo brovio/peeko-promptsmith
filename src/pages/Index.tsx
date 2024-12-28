@@ -51,24 +51,33 @@ export default function Index() {
   const { data: models = [], isError: isModelsError } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
-      // If no models in use, return empty array
-      const modelIds = modelsInUse?.map(m => m.model_id);
-      if (!modelIds?.length) return [];
-
-      const { data, error } = await supabase
-        .from('available_models')
-        .select('*')
-        .in('id', modelIds)
-        .eq('is_active', true);
+      // Extract model IDs, ensuring we have valid data
+      const modelIds = modelsInUse?.map(m => m.model_id).filter(Boolean);
       
-      if (error) {
-        console.error('Error fetching available models:', error);
-        throw error;
+      // If no valid model IDs, return empty array
+      if (!modelIds?.length) {
+        return [];
       }
 
-      return data as Model[];
+      try {
+        const { data, error } = await supabase
+          .from('available_models')
+          .select('*')
+          .in('id', modelIds)
+          .eq('is_active', true);
+        
+        if (error) {
+          console.error('Error fetching available models:', error);
+          throw error;
+        }
+
+        return (data || []) as Model[];
+      } catch (error) {
+        console.error('Failed to fetch models:', error);
+        throw error;
+      }
     },
-    enabled: !!modelsInUse?.length, // Only run query if there are models in use
+    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0, // Only run query if we have valid models in use
   });
 
   if (isModelsInUseError || isModelsError) {
