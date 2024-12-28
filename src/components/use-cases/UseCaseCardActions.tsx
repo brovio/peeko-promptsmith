@@ -16,11 +16,11 @@ interface UseCaseCardActionsProps {
 
 export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCaseCardActionsProps) {
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-1"> {/* Reduced from gap-2 to gap-1 */}
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={onEdit}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
               <Edit className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
@@ -31,7 +31,7 @@ export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCa
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={onUse}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onUse}>
               <Play className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
@@ -42,7 +42,7 @@ export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCa
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={onInfo}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onInfo}>
               <Info className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
@@ -53,7 +53,7 @@ export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCa
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={onDuplicate}>
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onDuplicate}>
               <Copy className="h-4 w-4" />
             </Button>
           </TooltipTrigger>

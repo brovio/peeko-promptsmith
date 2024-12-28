@@ -32,6 +32,13 @@
   .text-medium-contrast {
     @apply text-muted-foreground;
   }
+
+  /* Ensure tooltips stay within modal */
+  [role="dialog"] {
+    .TooltipContent {
+      max-width: calc(100vw - 4rem);
+    }
+  }
 }
 
 .gradient-bg {

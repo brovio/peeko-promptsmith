@@ -26,9 +26,38 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
   const [enhancer, setEnhancer] = useState(useCase.enhancer);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const handleGenerateDescription = async () => {
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate', {
+        body: {
+          prompt: `Generate a clear and concise description for a use case titled "${title}". The description should explain the purpose and benefits of this use case.`,
+        },
+      });
+
+      if (error) throw error;
+      
+      setDescription(data.generatedText || '');
+      toast({
+        title: "Success",
+        description: "Description generated successfully",
+      });
+    } catch (error) {
+      console.error('Error generating description:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate description",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,17 +141,30 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Enter title"
               required
+              className="text-white bg-background"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="description">Description</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateDescription}
+                disabled={isGenerating || !title}
+              >
+                {isGenerating ? "Generating..." : "Generate"}
+              </Button>
+            </div>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Enter description"
               required
+              className="text-white bg-background"
             />
           </div>
 
@@ -141,7 +183,7 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
               onChange={(e) => setEnhancer(e.target.value)}
               placeholder="Enter enhancer"
               required
-              className="min-h-[200px]"
+              className="min-h-[200px] text-white bg-background"
             />
           </div>
 

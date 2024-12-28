@@ -25,12 +25,16 @@ export default function WhatPrompting() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8">What ya prompting for? 🤔</h1>
-      
-      <Button onClick={() => setIsAddModalOpen(true)} className="mb-6">
-        <Plus className="mr-2 h-4 w-4" />
-        Add New Use Case
-      </Button>
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-bold">What ya prompting for? 🤔</h1>
+        <Button 
+          onClick={() => setIsAddModalOpen(true)} 
+          className="bg-[#98c5f2] hover:bg-[#7ab0e8] text-white"
+        >
+          <Plus className="mr-2 h-4 w-4" />
+          New Use Case
+        </Button>
+      </div>
       
       <AddUseCaseModal 
         open={isAddModalOpen}
