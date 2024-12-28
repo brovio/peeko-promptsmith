@@ -39,25 +39,13 @@ function generateBulletPoints(description: string, enhancer: string): string[] {
       phrase.toLowerCase().includes("help") ||
       phrase.toLowerCase().includes("improve")
     )
-    .map(phrase => {
-      // Take only the first part of the phrase up to a comma or conjunction
-      const shortened = phrase.split(/,|\sand\s|\sor\s|\sbut\s/)[0];
-      // Limit to 60 characters and add ellipsis if needed
-      return shortened.length > 60 ? `${shortened.substring(0, 57)}...` : shortened;
-    })
     .slice(0, 3);
 
-  // If we don't have enough relevant phrases, add other short phrases
+  // If we don't have enough relevant phrases, add other phrases
   while (relevantPhrases.length < 3 && phrases.length > relevantPhrases.length) {
-    const nextPhrase = phrases
-      .find(p => !relevantPhrases.includes(p))
-      ?.split(/,|\sand\s|\sor\s|\sbut\s/)[0];
-    
+    const nextPhrase = phrases.find(p => !relevantPhrases.includes(p));
     if (nextPhrase) {
-      const shortened = nextPhrase.length > 60 ? 
-        `${nextPhrase.substring(0, 57)}...` : 
-        nextPhrase;
-      relevantPhrases.push(shortened);
+      relevantPhrases.push(nextPhrase);
     } else {
       break;
     }
@@ -101,14 +89,17 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
             </Button>
           </div>
           <CardTitle>{useCase.title}</CardTitle>
-          <CardDescription className="line-clamp-1">
+          <CardDescription className="text-sm text-muted-foreground mt-2">
             {useCase.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="list-disc list-inside space-y-1">
+          <ul className="space-y-3 list-disc list-inside">
             {bulletPoints.map((point, index) => (
-              <li key={index} className="text-sm text-muted-foreground">
+              <li 
+                key={index} 
+                className="text-sm text-muted-foreground leading-relaxed"
+              >
                 {point}
               </li>
             ))}
