@@ -50,9 +50,21 @@ serve(async (req) => {
       throw new Error('No valid OpenRouter API key found. Please add your API key in the settings.');
     }
 
-    console.log('Calling OpenRouter API with model:', model);
+    // Get the actual model ID from the available_models table
+    const { data: modelData, error: modelError } = await supabase
+      .from('available_models')
+      .select('model_id')
+      .eq('id', model)
+      .single();
 
-    // Call OpenRouter API
+    if (modelError || !modelData) {
+      console.error('Error fetching model:', modelError);
+      throw new Error(`Failed to fetch model: ${modelError?.message || 'Model not found'}`);
+    }
+
+    console.log('Calling OpenRouter API with model:', modelData.model_id);
+
+    // Call OpenRouter API with the correct model ID
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -61,7 +73,7 @@ serve(async (req) => {
         'HTTP-Referer': 'https://lovable.dev',
       },
       body: JSON.stringify({
-        model: model,
+        model: modelData.model_id,
         messages: [
           { role: 'user', content: prompt }
         ],
@@ -76,7 +88,6 @@ serve(async (req) => {
         error: errorData
       });
       
-      // Extract error message from the OpenRouter response
       const errorMessage = errorData.error?.message || errorData.error || 'Unknown error';
       throw new Error(`OpenRouter API error: ${response.status} - ${errorMessage}`);
     }
