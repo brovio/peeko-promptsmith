@@ -16,40 +16,54 @@ interface UseCaseCardProps {
 }
 
 function generateBulletPoints(description: string, enhancer: string): string[] {
-  // Extract key points from the description and enhancer
+  // Extract key phrases from the description and enhancer
   const combinedText = `${description} ${enhancer}`;
   
-  // Split into sentences and filter out empty ones
-  const sentences = combinedText
+  // Split into phrases and clean them up
+  const phrases = combinedText
     .split(/[.!?]/)
     .map(s => s.trim())
-    .filter(s => s.length > 0);
+    .filter(s => s.length > 0)
+    .map(s => {
+      // Remove common filler words at the start
+      return s.replace(/^(this|the|it|there|these|those|a|an)\s+/i, '')
+        // Capitalize first letter
+        .replace(/^\w/, c => c.toUpperCase());
+    });
   
-  // Select up to 3 most relevant sentences as bullet points
-  // Prioritize sentences that mention prompts, enhancement, or key features
-  const relevantPoints = sentences
-    .filter(sentence => 
-      sentence.toLowerCase().includes("prompt") ||
-      sentence.toLowerCase().includes("enhance") ||
-      sentence.toLowerCase().includes("help") ||
-      sentence.toLowerCase().includes("improve")
+  // Prioritize key phrases about prompts and enhancements
+  const relevantPhrases = phrases
+    .filter(phrase => 
+      phrase.toLowerCase().includes("prompt") ||
+      phrase.toLowerCase().includes("enhance") ||
+      phrase.toLowerCase().includes("help") ||
+      phrase.toLowerCase().includes("improve")
     )
+    .map(phrase => {
+      // Take only the first part of the phrase up to a comma or conjunction
+      const shortened = phrase.split(/,|\sand\s|\sor\s|\sbut\s/)[0];
+      // Limit to 60 characters and add ellipsis if needed
+      return shortened.length > 60 ? `${shortened.substring(0, 57)}...` : shortened;
+    })
     .slice(0, 3);
 
-  // If we don't have enough relevant points, add other sentences
-  while (relevantPoints.length < 3 && sentences.length > relevantPoints.length) {
-    const nextSentence = sentences.find(s => !relevantPoints.includes(s));
-    if (nextSentence) {
-      relevantPoints.push(nextSentence);
+  // If we don't have enough relevant phrases, add other short phrases
+  while (relevantPhrases.length < 3 && phrases.length > relevantPhrases.length) {
+    const nextPhrase = phrases
+      .find(p => !relevantPhrases.includes(p))
+      ?.split(/,|\sand\s|\sor\s|\sbut\s/)[0];
+    
+    if (nextPhrase) {
+      const shortened = nextPhrase.length > 60 ? 
+        `${nextPhrase.substring(0, 57)}...` : 
+        nextPhrase;
+      relevantPhrases.push(shortened);
     } else {
       break;
     }
   }
 
-  // Format the points to be more concise
-  return relevantPoints.map(point => 
-    point.length > 100 ? `${point.substring(0, 97)}...` : point
-  );
+  return relevantPhrases;
 }
 
 export function UseCaseCard({ useCase }: UseCaseCardProps) {
