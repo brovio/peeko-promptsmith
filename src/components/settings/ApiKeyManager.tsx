@@ -120,7 +120,7 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
         p_provider: model.provider
       }));
 
-      // Update the upsert operation to use model_id in the conflict clause
+      // Update models one by one to handle potential errors
       for (const modelData of modelsData) {
         const { error } = await supabase
           .from('available_models')
