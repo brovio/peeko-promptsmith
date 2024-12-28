@@ -71,11 +71,11 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
           <div>
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-medium">Extra Info</h3>
-              <ModelParametersModal>
+              <ModelParametersModal trigger={
                 <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
                   <Info className="h-4 w-4" />
                 </Button>
-              </ModelParametersModal>
+              } />
             </div>
             <table className="w-full text-sm">
               <tbody>
