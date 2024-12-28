@@ -206,7 +206,9 @@ Return ONLY the enhanced version, nothing else.`,
       </div>
 
       <LoadingModal 
-        open={isProcessing} 
+        open={isProcessing}
+        currentModel={currentModel}
+        attemptCount={attemptCount}
         title="Processing Enhancer"
         description={
           currentModel ? 
