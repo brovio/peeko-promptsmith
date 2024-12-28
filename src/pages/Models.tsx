@@ -1,24 +1,23 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Model } from "@/lib/types";
-import { generateColorTheme, ColorTheme } from "@/lib/colorUtils";
-import { ModelsList } from "@/components/models/ModelsList";
-import { SelectedModels } from "@/components/models/SelectedModels";
 import { SearchModels } from "@/components/models/SearchModels";
+import { ModelsList } from "@/components/models/ModelsList";
 import { ModelsHeader } from "@/components/models/ModelsHeader";
+import { SelectedModels } from "@/components/models/SelectedModels";
+import { Model } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { filterModels } from "@/lib/modelUtils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedProvider, setSelectedProvider] = useState<string>("all");
+  const [selectedProvider, setSelectedProvider] = useState("all");
   const [contextLength, setContextLength] = useState([0]);
-  const [currentTheme, setCurrentTheme] = useState<ColorTheme>(generateColorTheme());
+  const [currentTheme, setCurrentTheme] = useState({ background: "#ffffff", foreground: "#000000", accent: "#0066cc" });
   const [isThemeLocked, setIsThemeLocked] = useState(false);
   const { toast } = useToast();
 
@@ -79,7 +78,7 @@ export default function Models() {
       if (!data) return [];
 
       return models?.filter(model => 
-        data.some(pref => pref.model_id === model.id)
+        data.some(preference => preference.model_id === model.id)
       ) || [];
     },
     enabled: !!models,
@@ -87,21 +86,23 @@ export default function Models() {
   });
 
   const providers = Array.from(
-    new Set((models || []).map(model => model.provider))
+    new Set((models || []).map((model) => model.provider))
   );
 
   const maxContextLength = Math.max(
-    ...(models?.map(model => model.context_length || 0) || [0])
+    ...(models || []).map((model) => model.context_length || 0)
   );
 
-  const addModel = async (model: Model) => {
+  const handleModelAdd = async (model: Model) => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      const { error: modelError } = await supabase
+      // First ensure the model exists in available_models
+      await supabase
         .from('available_models')
         .upsert({
+          id: model.id,
           model_id: model.id,
           name: model.name,
           provider: model.provider,
@@ -113,38 +114,59 @@ export default function Models() {
           onConflict: 'model_id'
         });
 
-      if (modelError) throw modelError;
-
-      const { error: prefError } = await supabase
+      // Then add it to user preferences
+      const { error } = await supabase
         .from('model_preferences')
         .upsert({
           user_id: user.id,
           model_id: model.id,
           provider: model.provider,
           is_enabled: true
-        }, {
-          onConflict: 'user_id,model_id'
         });
 
-      if (prefError) throw prefError;
+      if (error) throw error;
 
-      refetchSelectedModels();
+      await refetchSelectedModels();
       toast({
-        title: "Success",
-        description: `Model ${model.name} added successfully`,
+        title: "Model Added",
+        description: `${model.name} has been added to your selected models.`
       });
     } catch (error) {
       console.error('Error adding model:', error);
       toast({
-        title: "Error",
-        description: "Failed to add model",
         variant: "destructive",
+        title: "Error",
+        description: "Failed to add model. Please try again."
       });
     }
   };
 
-  const handleRemoveModel = () => {
-    refetchSelectedModels();
+  const handleModelRemove = async (model: Model) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User not authenticated");
+
+      const { error } = await supabase
+        .from('model_preferences')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('model_id', model.id);
+
+      if (error) throw error;
+
+      await refetchSelectedModels();
+      toast({
+        title: "Model Removed",
+        description: `${model.name} has been removed from your selected models.`
+      });
+    } catch (error) {
+      console.error('Error removing model:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to remove model. Please try again."
+      });
+    }
   };
 
   const generateNewTheme = () => {
@@ -184,7 +206,7 @@ export default function Models() {
             size="sm"
             onClick={() => refetchModels()}
           >
-            <ReloadIcon className="mr-2 h-4 w-4" />
+            <RotateCw className="mr-2 h-4 w-4" />
             Retry
           </Button>
         </AlertDescription>
@@ -212,7 +234,8 @@ export default function Models() {
 
         <SelectedModels 
           models={selectedModels} 
-          onRemove={handleRemoveModel}
+          onRemove={handleModelRemove}
+          style={themeStyle}
         />
 
         <div className="space-y-6">
@@ -224,15 +247,11 @@ export default function Models() {
 
           {isLoading ? (
             <div className="text-center">Loading models...</div>
-          ) : !apiKeyData?.key_value ? (
-            <div className="text-center">
-              Please add your OpenRouter API key in settings to view available models.
-            </div>
           ) : (
-            <ModelsList 
+            <ModelsList
               models={filteredModels}
-              onAdd={addModel}
-              cardStyle={cardStyle}
+              onAdd={handleModelAdd}
+              cardStyle={themeStyle}
             />
           )}
         </div>
