@@ -1,7 +1,7 @@
 import { Model } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, Info } from "lucide-react";
 import { ModelParametersModal } from "./ModelParametersModal";
 import { CSSProperties } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -28,10 +28,10 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
   };
 
   return (
-    <Card style={style}>
-      <CardHeader className="space-y-1">
+    <Card style={style} className="p-[3%]">
+      <CardHeader className="space-y-1 p-0">
         <div className="flex justify-between items-start">
-          <div className="space-y-1 max-w-[200px] scroll-on-hover overflow-hidden">
+          <div className="space-y-1 max-w-[80%] scroll-on-hover overflow-hidden">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -45,16 +45,13 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
               </Tooltip>
             </TooltipProvider>
           </div>
-          <div className="flex gap-2">
-            <ModelParametersModal />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onAdd(model)}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onAdd(model)}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
         </div>
         <div className="border-t border-border pt-2">
           <CardDescription className="text-left font-medium">
@@ -67,10 +64,17 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
           )}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0 mt-4">
         <div className="space-y-4">
           <div>
-            <h3 className="font-medium mb-2">Extra Info</h3>
+            <div className="flex items-center gap-2 mb-2">
+              <h3 className="font-medium">Extra Info</h3>
+              <ModelParametersModal>
+                <Button variant="ghost" size="icon" className="h-4 w-4 p-0">
+                  <Info className="h-4 w-4" />
+                </Button>
+              </ModelParametersModal>
+            </div>
             <table className="w-full text-sm">
               <tbody>
                 {model.context_length && (
