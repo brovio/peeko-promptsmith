@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock } from "lucide-react";
+import { LoginFormFields } from "./LoginFormFields";
+import { LoginFormActions } from "./LoginFormActions";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +48,13 @@ export default function LoginForm() {
       }
 
       if (data.user) {
+        // Invalidate and refetch queries to ensure fresh data
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['models-in-use'] }),
+          queryClient.invalidateQueries({ queryKey: ['available-models'] }),
+          queryClient.invalidateQueries({ queryKey: ['selectedModels'] })
+        ]);
+        
         navigate("/");
         toast({
           title: "Welcome back!",
@@ -65,53 +74,13 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={handleLogin} className="space-y-6">
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-900 flex items-center gap-2">
-          <Mail className="h-4 w-4" />
-          Email
-        </label>
-        <Input
-          type="email"
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full h-11 text-base"
-        />
-      </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-gray-900 flex items-center gap-2">
-          <Lock className="h-4 w-4" />
-          Password
-        </label>
-        <Input
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full h-11 text-base"
-        />
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="remember"
-            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-          />
-          <label htmlFor="remember" className="text-sm text-gray-900">
-            Remember me
-          </label>
-        </div>
-        <button
-          type="button"
-          className="text-sm text-blue-600 hover:text-blue-700"
-          onClick={() => navigate("/forgot-password")}
-        >
-          Forgot Password?
-        </button>
-      </div>
+      <LoginFormFields
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+      />
+      <LoginFormActions loading={loading} />
       <Button
         type="submit"
         className="w-full h-11 text-base bg-blue-600 hover:bg-blue-700"

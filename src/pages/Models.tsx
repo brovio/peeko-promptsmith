@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateColorTheme } from "@/lib/colorUtils";
 import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { filterModels } from "@/lib/modelUtils";
 import { useModelsData } from "@/components/models/useModelsData";
 import { ModelOperations } from "@/components/models/ModelOperations";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ThemeManager } from "@/components/models/ThemeManager";
 import { ModelsErrorBoundary } from "@/components/models/ModelsErrorBoundary";
@@ -15,6 +15,23 @@ export default function Models() {
   const [selectedProvider, setSelectedProvider] = useState("all");
   const [contextLength, setContextLength] = useState([0]);
   const [currentTheme, setCurrentTheme] = useState(generateColorTheme());
+  const queryClient = useQueryClient();
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        // Refetch all relevant queries when auth state changes
+        queryClient.invalidateQueries({ queryKey: ['models-in-use'] });
+        queryClient.invalidateQueries({ queryKey: ['available-models'] });
+        queryClient.invalidateQueries({ queryKey: ['selectedModels'] });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [queryClient]);
 
   const {
     models,
