@@ -44,7 +44,7 @@ html {
 }
 
 body {
-  @apply min-h-screen bg-background text-foreground transition-colors duration-200;
+  @apply min-h-screen bg-background text-foreground;
 }
 
 .dark body {

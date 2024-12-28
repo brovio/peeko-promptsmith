@@ -33,19 +33,19 @@
 
   .dark {
     --background: 220 10% 15%;
-    --foreground: 220 33% 98%;
+    --foreground: 210 40% 98%;
 
     --card: 220 10% 15%;
-    --card-foreground: 220 33% 98%;
+    --card-foreground: 210 40% 98%;
 
     --popover: 220 10% 15%;
-    --popover-foreground: 220 33% 98%;
+    --popover-foreground: 210 40% 98%;
 
     --primary: 221 83% 53%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 220 14% 24%;
-    --secondary-foreground: 220 33% 98%;
+    --secondary-foreground: 210 40% 98%;
 
     --muted: 220 14% 24%;
     --muted-foreground: 220 8% 65%;
@@ -67,7 +67,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-200;
+    @apply bg-background text-foreground;
   }
   html {
     @apply dark;
