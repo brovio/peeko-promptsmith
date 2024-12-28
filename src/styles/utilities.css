@@ -37,15 +37,15 @@
 
 /* Ensure full height and proper dark theme application */
 #root {
-  @apply min-h-screen bg-background text-foreground;
+  @apply min-h-screen bg-background text-foreground transition-colors duration-300;
 }
 
 html {
-  @apply min-h-screen dark;
+  @apply min-h-screen dark transition-colors duration-300;
 }
 
 body {
-  @apply min-h-screen bg-background text-foreground;
+  @apply min-h-screen bg-background text-foreground transition-colors duration-300;
 }
 
 .dark body {

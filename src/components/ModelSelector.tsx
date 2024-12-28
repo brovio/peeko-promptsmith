@@ -18,30 +18,29 @@ export function ModelSelector({
   selectedModel, 
   onModelSelect,
 }: ModelSelectorProps) {
-  // Find the selected model to display just its name in the trigger
-  const selectedModelName = models.find(m => m.id === selectedModel)?.name || '';
-
   return (
     <div className="w-full">
       <Select value={selectedModel} onValueChange={onModelSelect}>
-        <SelectTrigger>
-          <SelectValue placeholder="Choose Model">
-            {selectedModelName}
-          </SelectValue>
+        <SelectTrigger className="w-full bg-background text-foreground border-input">
+          <SelectValue placeholder="Choose Model" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-background border-input">
           {models.map((model) => (
-            <SelectItem key={model.id} value={model.id}>
-              <div className="flex flex-col">
-                <span className="font-medium">{model.name}</span>
-                {model.description && (
-                  <span className="text-xs text-muted-foreground">{model.description}</span>
-                )}
-              </div>
+            <SelectItem 
+              key={model.id} 
+              value={model.id}
+              className="text-foreground hover:bg-muted"
+            >
+              {model.clean_model_name || model.name}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
     </div>
   );
+}
+
+export function getTemplateForCategory(categoryId: string): string {
+  const category = defaultCategories.find((c) => c.id === categoryId);
+  return category?.template || "{prompt}";
 }
