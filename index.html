@@ -13,7 +13,16 @@
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script>
+      // Add error handling for GPT Engineer script
+      window.onerror = function(msg, url, lineNo, columnNo, error) {
+        if (msg.includes('Failed to fetch') && url.includes('gptengineer.js')) {
+          console.warn('GPT Engineer script failed to load, continuing with app initialization');
+        }
+        return false;
+      };
+    </script>
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module" onerror="console.warn('Failed to load GPT Engineer script')"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
