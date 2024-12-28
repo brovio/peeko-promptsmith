@@ -24,6 +24,7 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
   const [description, setDescription] = useState(useCase.description);
   const [enhancer, setEnhancer] = useState(useCase.enhancer);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -55,6 +56,35 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+
+    try {
+      const { error } = await supabase
+        .from("use_cases")
+        .delete()
+        .eq("id", useCase.id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ["use-cases"] });
+      toast({
+        title: "Success",
+        description: "Use case deleted successfully",
+      });
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error deleting use case:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete use case",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -102,17 +132,27 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
             />
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-between">
             <Button
               type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting || isSubmitting}
             >
-              Cancel
+              {isDeleting ? "Deleting..." : "Delete"}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : "Save changes"}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save changes"}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
