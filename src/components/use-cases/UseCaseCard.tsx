@@ -19,11 +19,15 @@ function generateBulletPoints(description: string, enhancer: string): string[] {
   // Generate helpful tips based on the use case content
   const tips = [];
   
-  // First tip is always about the primary purpose
-  tips.push(`Use this template for ${description.split('.')[0].toLowerCase()}`);
+  // First tip about the primary purpose
+  tips.push(`Use this template to ${description.split('.')[0].toLowerCase()}`);
   
-  // Second tip about how it helps
-  tips.push(`This use case will help you structure and refine your prompts specifically for ${description.toLowerCase().includes('coding') ? 'programming tasks' : 'your needs'}`);
+  // Second tip about specific benefits
+  if (description.toLowerCase().includes('coding')) {
+    tips.push("Structure and refine your prompts specifically for programming tasks and code generation");
+  } else {
+    tips.push("Enhance your prompts with improved clarity, specificity, and logical structure");
+  }
   
   // Third tip about the enhancement process
   const enhancementTip = enhancer
@@ -33,7 +37,7 @@ function generateBulletPoints(description: string, enhancer: string): string[] {
   if (enhancementTip) {
     tips.push(enhancementTip.trim());
   } else {
-    tips.push("Follow the provided template to make your prompts more effective and focused");
+    tips.push("The template will guide you through creating more effective and focused prompts");
   }
   
   return tips;
@@ -48,10 +52,10 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
 
   return (
     <>
-      <Card className="w-full">
-        <CardHeader className="relative pb-2">
-          <div className="flex items-center justify-between mb-2">
-            <CardTitle className="text-left">{useCase.title}</CardTitle>
+      <Card className="w-full hover:shadow-md transition-shadow duration-200">
+        <CardHeader className="relative pb-0">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-left text-xl">{useCase.title}</CardTitle>
             <div className="flex gap-2">
               <Button
                 variant="ghost"
@@ -76,21 +80,31 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
               </Button>
             </div>
           </div>
-          <CardDescription className="text-sm text-muted-foreground text-left">
-            {useCase.description}
-          </CardDescription>
         </CardHeader>
-        <CardContent>
-          <ul className="space-y-3 list-disc list-inside text-left">
-            {bulletPoints.map((point, index) => (
-              <li 
-                key={index} 
-                className="text-sm text-muted-foreground leading-relaxed pl-2"
-              >
-                {point}
-              </li>
-            ))}
-          </ul>
+
+        <div className="h-px bg-border mx-6 my-4" />
+
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-muted-foreground">Description</h4>
+            <CardDescription className="text-sm text-foreground text-left">
+              {useCase.description}
+            </CardDescription>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-muted-foreground">Hints & Tips</h4>
+            <ul className="space-y-3 list-disc list-inside text-left">
+              {bulletPoints.map((point, index) => (
+                <li 
+                  key={index} 
+                  className="text-sm text-foreground leading-relaxed pl-2"
+                >
+                  {point}
+                </li>
+              ))}
+            </ul>
+          </div>
         </CardContent>
       </Card>
 
