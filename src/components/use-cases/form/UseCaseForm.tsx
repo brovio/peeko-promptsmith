@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { EnhancerActions } from "../EnhancerActions";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { generateDescriptionPrompt } from "@/utils/descriptionGenerator";
 
 interface UseCaseFormProps {
   onSubmit: (data: { title: string; description: string; enhancer: string }) => Promise<void>;
@@ -39,7 +40,7 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: 
     try {
       const { data, error } = await supabase.functions.invoke('generate', {
         body: {
-          prompt: `Generate a clear and concise description (max 200 characters) for a use case titled "${title}". Focus on the purpose and benefits, avoiding technical details already mentioned in the title. The description should be direct and brief.`,
+          prompt: generateDescriptionPrompt(title),
         },
       });
 

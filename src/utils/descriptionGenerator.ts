@@ -1,18 +1,29 @@
-import { supabase } from "@/integrations/supabase/client";
+const openingPhrases = [
+  "Apply this to",
+  "Leverage this for",
+  "Enhance with this",
+  "Build on this for",
+  "Try this for",
+  "Utilize this to",
+  "Start with this for",
+  "Improve with this",
+  "Boost using this",
+  "Refine with this"
+];
 
-export async function generateDescription(title: string): Promise<string> {
-  try {
-    const { data, error } = await supabase.functions.invoke('generate', {
-      body: {
-        prompt: `Generate a clear and concise description (max 200 characters) for a use case titled "${title}". Focus on the purpose and benefits, avoiding technical details already mentioned in the title. The description should be direct and brief.`,
-      },
-    });
+export function getRandomOpeningPhrase(): string {
+  const randomIndex = Math.floor(Math.random() * openingPhrases.length);
+  return openingPhrases[randomIndex];
+}
 
-    if (error) throw error;
-    
-    return data.generatedText.trim();
-  } catch (error) {
-    console.error('Error generating description:', error);
-    throw error;
-  }
+export function generateDescriptionPrompt(title: string): string {
+  return `Generate a clear and concise description (max 200 characters) for a use case titled "${title}".
+Rules:
+1. Start with "${getRandomOpeningPhrase()}"
+2. Focus on purpose and benefits
+3. Avoid repeating technical details from the title
+4. Keep it direct and brief
+5. No markup, just plain text
+6. Must be under 200 characters
+7. Focus on what it helps achieve`;
 }
