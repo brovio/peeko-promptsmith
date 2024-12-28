@@ -32,7 +32,7 @@
   }
 
   .dark {
-    --background: 220 10% 10%;
+    --background: 220 10% 15%;
     --foreground: 220 10% 98%;
 
     --card: 220 10% 15%;
@@ -67,6 +67,9 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground min-h-screen;
+    @apply bg-background text-foreground min-h-screen dark:bg-background dark:text-foreground;
+  }
+  html {
+    @apply dark;
   }
 }
