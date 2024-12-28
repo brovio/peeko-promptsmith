@@ -4,6 +4,8 @@ import { fetchModels } from "@/lib/openrouter";
 import { supabase } from "@/integrations/supabase/client";
 import { ApiKeyInput } from "./ApiKeyInput";
 import { ValidatedKeyActions } from "./ValidatedKeyActions";
+import { ModelRefreshManager } from "./ModelRefreshManager";
+import { refreshModelsInDatabase } from "@/utils/modelUtils";
 
 interface ApiKeyManagerProps {
   onApiKeyValidated: (key: string) => void;
@@ -13,7 +15,6 @@ interface ApiKeyManagerProps {
 export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyManagerProps) {
   const [apiKey, setApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasValidKey, setHasValidKey] = useState(false);
   const { toast } = useToast();
 
@@ -54,7 +55,8 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      await fetchModels(apiKey);
+      const models = await fetchModels(apiKey);
+      await refreshModelsInDatabase(models);
       
       const { error } = await supabase
         .from('api_keys')
@@ -85,65 +87,6 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
       });
     } finally {
       setIsValidating(false);
-    }
-  };
-
-  const refreshModels = async () => {
-    if (!hasValidKey) {
-      toast({
-        title: "Error",
-        description: "Please validate your API key first",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsRefreshing(true);
-    try {
-      const models = await fetchModels(apiKey);
-      
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const modelsData = models.map(model => ({
-        model_id: model.id,
-        name: model.name || model.id,
-        provider: model.provider,
-        description: model.description || '',
-        context_length: model.context_length,
-        input_price: model.input_price,
-        output_price: model.output_price,
-        max_tokens: model.max_tokens,
-        is_active: true,
-        clean_model_name: model.clean_model_name,
-        p_model: model.clean_model_name,
-        p_provider: model.provider
-      }));
-
-      // Update models one by one to handle potential errors
-      for (const modelData of modelsData) {
-        const { error } = await supabase
-          .from('available_models')
-          .upsert(modelData, {
-            onConflict: 'model_id'
-          });
-
-        if (error) throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: "Models refreshed successfully",
-      });
-    } catch (error) {
-      console.error('Error refreshing models:', error);
-      toast({
-        title: "Error",
-        description: "Failed to refresh models",
-        variant: "destructive",
-      });
-    } finally {
-      setIsRefreshing(false);
     }
   };
 
@@ -193,11 +136,12 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
             onValidate={validateApiKey}
           />
         ) : (
-          <ValidatedKeyActions
-            isRefreshing={isRefreshing}
-            onRefresh={refreshModels}
-            onUnlink={unlinkApiKey}
-          />
+          <div className="space-y-4 w-full">
+            <ValidatedKeyActions
+              onUnlink={unlinkApiKey}
+            />
+            <ModelRefreshManager apiKey={apiKey} />
+          </div>
         )}
       </div>
     </div>
