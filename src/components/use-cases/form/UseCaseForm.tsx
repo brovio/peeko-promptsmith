@@ -4,6 +4,7 @@ import { UseCaseFormField } from "./UseCaseFormField";
 import { EnhancerActions } from "../EnhancerActions";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { generateDescription } from "@/utils/descriptionGenerator";
 
 interface UseCaseFormProps {
   onSubmit: (data: { title: string; description: string; enhancer: string }) => Promise<void>;
@@ -24,10 +25,10 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: 
   const { toast } = useToast();
 
   const generateDescription = async () => {
-    if (!title && !enhancer) {
+    if (!title) {
       toast({
         title: "Error",
-        description: "Please fill out either the title or enhancer field first.",
+        description: "Please fill out the title field first.",
         variant: "destructive",
       });
       return;
@@ -35,21 +36,8 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: 
 
     setIsGenerating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('generate', {
-        body: {
-          model: "gemini/gemini-pro",
-          prompt: `Based on the following information about a prompt enhancement use case, generate a clear and concise description (max 200 characters) that explains its purpose and benefits:
-          
-          Title: ${title || "Not provided"}
-          Enhancer: ${enhancer || "Not provided"}
-          
-          The description should help users understand when and why they would use this prompt enhancement.`
-        },
-      });
-
-      if (error) throw error;
-      
-      setDescription(data.generatedText.trim());
+      const generatedDescription = await generateDescription(title);
+      setDescription(generatedDescription);
       
       toast({
         title: "Success",
@@ -101,7 +89,7 @@ export function UseCaseForm({ onSubmit, initialData, isSubmitting, useCaseId }: 
             variant="ghost"
             size="sm"
             onClick={generateDescription}
-            disabled={isGenerating || (!title && !enhancer)}
+            disabled={isGenerating || !title}
             className="h-8 px-2"
           >
             {isGenerating ? "Generating..." : "Generate"}
