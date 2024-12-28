@@ -29,9 +29,21 @@ export function AddUseCaseModal() {
     setIsSubmitting(true);
 
     try {
+      // Get the current user's ID
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const { error } = await supabase
         .from("use_cases")
-        .insert([{ title, description, enhancer }])
+        .insert([{ 
+          title, 
+          description, 
+          enhancer,
+          user_id: user.id // Add the user_id to the insert
+        }])
         .single();
 
       if (error) throw error;
