@@ -25,8 +25,8 @@ export function ModelSelector({
     <div className="w-full">
       <Select value={selectedModel} onValueChange={onModelSelect}>
         <SelectTrigger>
-          <SelectValue>
-            {selectedModelName || "Choose a model from the list"}
+          <SelectValue placeholder="Choose Model">
+            {selectedModelName}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
