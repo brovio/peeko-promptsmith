@@ -16,42 +16,27 @@ interface UseCaseCardProps {
 }
 
 function generateBulletPoints(description: string, enhancer: string): string[] {
-  // Extract key phrases from the description and enhancer
-  const combinedText = `${description} ${enhancer}`;
+  // Generate helpful tips based on the use case content
+  const tips = [];
   
-  // Split into phrases and clean them up
-  const phrases = combinedText
-    .split(/[.!?]/)
-    .map(s => s.trim())
-    .filter(s => s.length > 0)
-    .map(s => {
-      // Remove common filler words at the start
-      return s.replace(/^(this|the|it|there|these|those|a|an)\s+/i, '')
-        // Capitalize first letter
-        .replace(/^\w/, c => c.toUpperCase());
-    });
+  // First tip is always about the primary purpose
+  tips.push(`Use this template for ${description.split('.')[0].toLowerCase()}`);
   
-  // Prioritize key phrases about prompts and enhancements
-  const relevantPhrases = phrases
-    .filter(phrase => 
-      phrase.toLowerCase().includes("prompt") ||
-      phrase.toLowerCase().includes("enhance") ||
-      phrase.toLowerCase().includes("help") ||
-      phrase.toLowerCase().includes("improve")
-    )
-    .slice(0, 3);
-
-  // If we don't have enough relevant phrases, add other phrases
-  while (relevantPhrases.length < 3 && phrases.length > relevantPhrases.length) {
-    const nextPhrase = phrases.find(p => !relevantPhrases.includes(p));
-    if (nextPhrase) {
-      relevantPhrases.push(nextPhrase);
-    } else {
-      break;
-    }
+  // Second tip about how it helps
+  tips.push(`This use case will help you structure and refine your prompts specifically for ${description.toLowerCase().includes('coding') ? 'programming tasks' : 'your needs'}`);
+  
+  // Third tip about the enhancement process
+  const enhancementTip = enhancer
+    .split('.')
+    .find(s => s.toLowerCase().includes('help') || s.toLowerCase().includes('improve'));
+    
+  if (enhancementTip) {
+    tips.push(enhancementTip.trim());
+  } else {
+    tips.push("Follow the provided template to make your prompts more effective and focused");
   }
-
-  return relevantPhrases;
+  
+  return tips;
 }
 
 export function UseCaseCard({ useCase }: UseCaseCardProps) {
@@ -64,41 +49,43 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
   return (
     <>
       <Card className="w-full">
-        <CardHeader className="relative">
-          <div className="absolute right-4 top-4 flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsEditModalOpen(true)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsUseModalOpen(true)}
-            >
-              <Play className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsInfoModalOpen(true)}
-            >
-              <Info className="h-4 w-4" />
-            </Button>
+        <CardHeader className="relative pb-2">
+          <div className="flex items-center justify-between mb-2">
+            <CardTitle className="text-left">{useCase.title}</CardTitle>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsEditModalOpen(true)}
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsUseModalOpen(true)}
+              >
+                <Play className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsInfoModalOpen(true)}
+              >
+                <Info className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
-          <CardTitle>{useCase.title}</CardTitle>
-          <CardDescription className="text-sm text-muted-foreground mt-2">
+          <CardDescription className="text-sm text-muted-foreground text-left">
             {useCase.description}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ul className="space-y-3 list-disc list-inside">
+          <ul className="space-y-3 list-disc list-inside text-left">
             {bulletPoints.map((point, index) => (
               <li 
                 key={index} 
-                className="text-sm text-muted-foreground leading-relaxed"
+                className="text-sm text-muted-foreground leading-relaxed pl-2"
               >
                 {point}
               </li>
