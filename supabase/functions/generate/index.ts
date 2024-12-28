@@ -6,8 +6,74 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const MODEL_SEQUENCE = [
+  "google/gemini-2.0-flash-thinking-exp:free",
+  "google/gemini-2.0-flash-exp:free",
+  "google/gemini-exp-1206:free",
+  "meta-llama/llama-3.1-405b-instruct",
+  "openai/o1-mini"
+];
+
+async function tryModelSequence(prompt: string, openRouterKey: string) {
+  let lastError = null;
+  
+  for (const model of MODEL_SEQUENCE) {
+    try {
+      console.log(`Attempting to use model: ${model}`);
+      
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${openRouterKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://lovable.dev',
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          max_tokens: 1000,
+          temperature: 0.7,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Error with model ${model}:`, {
+          status: response.status,
+          error: errorText
+        });
+        lastError = `${model} failed: ${errorText}`;
+        continue;
+      }
+
+      const data = await response.json();
+      if (!data.choices?.[0]?.message?.content) {
+        console.error(`Invalid response from ${model}:`, data);
+        lastError = `Invalid response from ${model}`;
+        continue;
+      }
+
+      console.log(`Successfully generated with model: ${model}`);
+      return {
+        generatedText: data.choices[0].message.content,
+        model: model,
+        usage: data.usage || { prompt_tokens: 0, completion_tokens: 0 }
+      };
+    } catch (error) {
+      console.error(`Error with model ${model}:`, error);
+      lastError = error.message;
+    }
+  }
+  
+  throw new Error(`All models failed. Last error: ${lastError}`);
+}
+
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -15,73 +81,23 @@ serve(async (req) => {
   try {
     const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
     if (!openRouterKey) {
-      console.error('OpenRouter API key not configured');
-      throw new Error('OpenRouter API key not configured in environment variables');
+      throw new Error('OpenRouter API key not configured');
     }
 
-    const { prompt, model = "google/gemini-pro" } = await req.json();
-    
-    console.log('Making request to OpenRouter API with:', {
-      model,
-      promptLength: prompt?.length || 0
-    });
+    const { prompt } = await req.json();
+    console.log('Received prompt request:', { promptLength: prompt?.length || 0 });
 
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openRouterKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://lovable.dev',
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenRouter API error:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: errorText
-      });
-      throw new Error(`OpenRouter API returned ${response.status}: ${errorText}`);
-    }
-
-    const data = await response.json();
-    console.log('OpenRouter API response structure:', {
-      hasChoices: !!data.choices,
-      firstChoice: !!data.choices?.[0],
-      hasMessage: !!data.choices?.[0]?.message
-    });
-
-    if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid OpenRouter response:', data);
-      throw new Error('Invalid response format from OpenRouter');
-    }
-
-    // Calculate approximate cost based on token usage
-    const usage = data.usage || { prompt_tokens: 0, completion_tokens: 0 };
-    const totalTokens = usage.prompt_tokens + usage.completion_tokens;
-    const costPerToken = 0.00001; // Adjust based on your actual cost per token
-    const totalCost = totalTokens * costPerToken;
+    const result = await tryModelSequence(prompt, openRouterKey);
 
     return new Response(
       JSON.stringify({
-        generatedText: data.choices[0].message.content,
+        generatedText: result.generatedText,
+        model: result.model,
         usage: {
-          prompt_tokens: usage.prompt_tokens,
-          completion_tokens: usage.completion_tokens,
-          total_tokens: totalTokens,
-          total_cost: totalCost
+          prompt_tokens: result.usage.prompt_tokens,
+          completion_tokens: result.usage.completion_tokens,
+          total_tokens: (result.usage.prompt_tokens + result.usage.completion_tokens),
+          total_cost: (result.usage.prompt_tokens + result.usage.completion_tokens) * 0.00001
         }
       }),
       {
