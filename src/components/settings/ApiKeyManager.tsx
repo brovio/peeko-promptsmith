@@ -15,6 +15,7 @@ interface ApiKeyManagerProps {
 export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyManagerProps) {
   const [apiKey, setApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasValidKey, setHasValidKey] = useState(false);
   const { toast } = useToast();
 
@@ -90,6 +91,37 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
     }
   };
 
+  const refreshModels = async () => {
+    if (!apiKey) {
+      toast({
+        title: "Error",
+        description: "Please validate your API key first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      const models = await fetchModels(apiKey);
+      await refreshModelsInDatabase(models);
+      
+      toast({
+        title: "Success",
+        description: "Models refreshed successfully",
+      });
+    } catch (error: any) {
+      console.error('Error refreshing models:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh models",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const unlinkApiKey = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -138,6 +170,8 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
         ) : (
           <div className="space-y-4 w-full">
             <ValidatedKeyActions
+              isRefreshing={isRefreshing}
+              onRefresh={refreshModels}
               onUnlink={unlinkApiKey}
             />
             <ModelRefreshManager apiKey={apiKey} />
