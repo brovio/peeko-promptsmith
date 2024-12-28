@@ -24,15 +24,15 @@ export function ModelInfo({ model }: ModelInfoProps) {
       <div className="grid grid-cols-3 gap-2 text-sm">
         <div className="text-center">
           <div className="text-muted-foreground text-xs">Context</div>
-          <div className="text-emerald-600">{formatNumber(model.context_length)}</div>
+          <div>{formatNumber(model.context_length)}</div>
         </div>
         <div className="text-center">
           <div className="text-muted-foreground text-xs">Input</div>
-          <div className="text-emerald-600">{formatPrice(model.input_price)}</div>
+          <div>{formatPrice(model.input_price)}</div>
         </div>
         <div className="text-center">
           <div className="text-muted-foreground text-xs">Output</div>
-          <div className="text-emerald-600">{formatPrice(model.output_price)}</div>
+          <div>{formatPrice(model.output_price)}</div>
         </div>
       </div>
     </div>
