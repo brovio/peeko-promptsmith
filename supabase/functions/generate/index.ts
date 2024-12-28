@@ -17,9 +17,19 @@ serve(async (req) => {
     const { model, prompt } = await req.json();
     console.log('Received request:', { model, prompt });
 
+    if (!model || !prompt) {
+      throw new Error('Missing required parameters: model and prompt are required');
+    }
+
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase configuration');
+      throw new Error('Server configuration error');
+    }
+
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Get the API key for the user
@@ -30,10 +40,17 @@ serve(async (req) => {
       .eq('is_active', true)
       .single();
 
-    if (apiKeyError || !apiKeyData) {
+    if (apiKeyError) {
       console.error('Error fetching API key:', apiKeyError);
-      throw new Error('No valid API key found');
+      throw new Error(`Failed to fetch API key: ${apiKeyError.message}`);
     }
+
+    if (!apiKeyData || !apiKeyData.key_value) {
+      console.error('No valid API key found');
+      throw new Error('No valid OpenRouter API key found. Please add your API key in the settings.');
+    }
+
+    console.log('Calling OpenRouter API with model:', model);
 
     // Call OpenRouter API
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -53,19 +70,33 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('OpenRouter API error:', errorData);
-      throw new Error('Failed to generate response from OpenRouter');
+      console.error('OpenRouter API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      });
+      throw new Error(`OpenRouter API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
     }
 
     const data = await response.json();
+    
+    if (!data.choices?.[0]?.message?.content) {
+      console.error('Unexpected OpenRouter API response format:', data);
+      throw new Error('Invalid response format from OpenRouter');
+    }
+
     const generatedText = data.choices[0].message.content;
+    console.log('Successfully generated response');
 
     return new Response(JSON.stringify({ generatedText }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Error in generate function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      details: error instanceof Error ? error.stack : undefined
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
