@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ModelSelector } from "@/components/ModelSelector";
 import { CategorySelector } from "@/components/CategorySelector";
 import { PromptInput } from "@/components/PromptInput";
@@ -15,7 +15,23 @@ export default function Index() {
   const [result, setResult] = useState("");
   const { toast } = useToast();
 
-  // Fetch models in use from the database
+  // Check auth state on component mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Error checking auth state:', error);
+        toast({
+          title: "Authentication Error",
+          description: "Please try refreshing the page",
+          variant: "destructive",
+        });
+      }
+    };
+
+    checkAuth();
+  }, [toast]);
+
   const { 
     data: modelsInUse = [], 
     isError: isModelsInUseError,
@@ -101,7 +117,16 @@ export default function Index() {
   }
 
   const handlePromptSubmit = async (enhancedPrompt: string) => {
-    setResult(enhancedPrompt);
+    try {
+      setResult(enhancedPrompt);
+    } catch (error) {
+      console.error('Error submitting prompt:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process prompt. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
