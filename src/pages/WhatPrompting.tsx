@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { AddUseCaseModal } from "@/components/use-cases/AddUseCaseModal";
+import { UseCaseCard } from "@/components/use-cases/UseCaseCard";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function WhatPrompting() {
@@ -25,15 +26,7 @@ export default function WhatPrompting() {
       
       <div className="grid gap-6 md:grid-cols-2">
         {useCases?.map((useCase) => (
-          <Card key={useCase.id}>
-            <CardHeader>
-              <CardTitle>{useCase.title}</CardTitle>
-              <CardDescription>{useCase.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">{useCase.enhancer}</p>
-            </CardContent>
-          </Card>
+          <UseCaseCard key={useCase.id} useCase={useCase} />
         ))}
 
         {!useCases?.length && (
