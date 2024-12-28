@@ -34,6 +34,36 @@
 
     --radius: 0.5rem;
   }
+
+  .dark {
+    --background: 220 10% 10%;
+    --foreground: 220 10% 98%;
+
+    --card: 220 10% 15%;
+    --card-foreground: 220 10% 98%;
+
+    --popover: 220 10% 15%;
+    --popover-foreground: 220 10% 98%;
+
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 220 14% 20%;
+    --secondary-foreground: 220 10% 98%;
+
+    --muted: 220 14% 20%;
+    --muted-foreground: 220 8% 65%;
+
+    --accent: 221 83% 53%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 13% 25%;
+    --input: 220 13% 25%;
+    --ring: 221 83% 53%;
+  }
 }
 
 @keyframes scroll {
@@ -103,10 +133,10 @@
 
 .prompt-input {
   min-height: 200px;
-  @apply resize-none w-full rounded-lg border p-4 font-mono text-sm;
+  @apply resize-none w-full rounded-lg border p-4 font-mono text-sm bg-card text-card-foreground;
 }
 
 .results-display {
   min-height: 200px;
-  @apply rounded-lg border p-4 bg-white font-mono text-sm;
+  @apply rounded-lg border p-4 bg-card text-card-foreground font-mono text-sm;
 }

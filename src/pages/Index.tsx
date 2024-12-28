@@ -9,42 +9,49 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Model } from "@/lib/types";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("general");
-  const [selectedProvider, setSelectedProvider] = useState("all");
   const [result, setResult] = useState("");
   const navigate = useNavigate();
 
-  // Fetch available models from the database
-  const { data: models = [] } = useQuery({
-    queryKey: ['available-models'],
+  // Fetch models in use from the database
+  const { data: modelsInUse = [] } = useQuery({
+    queryKey: ['models-in-use'],
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('models_in_use')
+        .select('model_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch details for models in use
+  const { data: models = [] } = useQuery({
+    queryKey: ['available-models', modelsInUse],
+    queryFn: async () => {
+      if (!modelsInUse.length) return [];
+      
+      const modelIds = modelsInUse.map(m => m.model_id);
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
+        .in('model_id', modelIds)
         .eq('is_active', true);
       
       if (error) throw error;
       return data as Model[];
     },
+    enabled: modelsInUse.length > 0,
   });
-
-  // Get unique providers
-  const providers = [...new Set(models.map(model => model.provider))];
-
-  // Filter models based on selected provider
-  const filteredModels = selectedProvider === 'all' 
-    ? models 
-    : models.filter(model => model.provider === selectedProvider);
 
   const handlePromptSubmit = async (enhancedPrompt: string) => {
     // TODO: Integrate with OpenRouter API
@@ -63,32 +70,16 @@ export default function Index() {
 
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-6">
-            <div className="flex gap-4 flex-col">
-              <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an AI provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All providers</SelectItem>
-                  {providers.map((provider) => (
-                    <SelectItem key={provider} value={provider}>
-                      {provider}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <div className="flex gap-4 flex-col sm:flex-row">
-                <ModelSelector
-                  models={filteredModels}
-                  selectedModel={selectedModel}
-                  onModelSelect={setSelectedModel}
-                />
-                <CategorySelector
-                  selectedCategory={selectedCategory}
-                  onCategorySelect={setSelectedCategory}
-                />
-              </div>
+            <div className="flex gap-4 flex-col sm:flex-row">
+              <ModelSelector
+                models={models}
+                selectedModel={selectedModel}
+                onModelSelect={setSelectedModel}
+              />
+              <CategorySelector
+                selectedCategory={selectedCategory}
+                onCategorySelect={setSelectedCategory}
+              />
             </div>
 
             <div className="space-y-4">
