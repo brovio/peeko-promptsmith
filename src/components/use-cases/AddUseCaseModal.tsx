@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Plus, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +21,7 @@ export function AddUseCaseModal() {
   const [description, setDescription] = useState("");
   const [enhancer, setEnhancer] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -29,7 +30,6 @@ export function AddUseCaseModal() {
     setIsSubmitting(true);
 
     try {
-      // Get the current user's ID
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
@@ -42,7 +42,7 @@ export function AddUseCaseModal() {
           title, 
           description, 
           enhancer,
-          user_id: user.id // Add the user_id to the insert
+          user_id: user.id
         }])
         .single();
 
@@ -53,13 +53,11 @@ export function AddUseCaseModal() {
         description: "Use case added successfully",
       });
 
-      // Reset form and close modal
       setTitle("");
       setDescription("");
       setEnhancer("");
       setOpen(false);
 
-      // Invalidate and refetch use cases
       queryClient.invalidateQueries({ queryKey: ["use-cases"] });
     } catch (error: any) {
       console.error("Error adding use case:", error);
@@ -70,6 +68,58 @@ export function AddUseCaseModal() {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const generateDescription = async () => {
+    if (!title && !enhancer) {
+      toast({
+        title: "Error",
+        description: "Please fill out either the title or enhancer field first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gemini/gemini-pro",
+          prompt: `Based on the following information about a prompt enhancement use case, generate a clear and concise description (max 200 characters) that explains its purpose and benefits:
+          
+          Title: ${title || "Not provided"}
+          Enhancer: ${enhancer || "Not provided"}
+          
+          The description should help users understand when and why they would use this prompt enhancement.`
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate description");
+      }
+
+      const data = await response.json();
+      setDescription(data.generatedText.trim());
+      
+      toast({
+        title: "Success",
+        description: "Description generated successfully",
+      });
+    } catch (error) {
+      console.error("Error generating description:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate description. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -102,9 +152,22 @@ export function AddUseCaseModal() {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">
-              Description
-            </label>
+            <div className="flex items-center justify-between">
+              <label htmlFor="description" className="text-sm font-medium">
+                Description
+              </label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={generateDescription}
+                disabled={isGenerating || (!title && !enhancer)}
+                className="h-8 px-2"
+              >
+                <Wand2 className="mr-2 h-4 w-4" />
+                {isGenerating ? "Generating..." : "Generate"}
+              </Button>
+            </div>
             <Textarea
               id="description"
               value={description}
