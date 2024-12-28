@@ -107,6 +107,7 @@ export default function LoginForm() {
         <button
           type="button"
           className="text-sm text-blue-600 hover:text-blue-700"
+          onClick={() => navigate("/forgot-password")}
         >
           Forgot Password?
         </button>

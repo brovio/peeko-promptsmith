@@ -4,6 +4,7 @@ import Settings from "@/pages/Settings";
 import Models from "@/pages/Models";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
+import ForgotPassword from "@/pages/ForgotPassword";
 import WhatPrompting from "@/pages/WhatPrompting";
 import Header from "@/components/Header";
 import AuthGuard from "@/components/AuthGuard";
@@ -69,6 +70,7 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
       </Router>
     </QueryClientProvider>
