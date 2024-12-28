@@ -34,13 +34,13 @@
     --secondary: 220 14% 24%;
     --secondary-foreground: 210 40% 98%;
     --muted: 220 14% 24%;
-    --muted-foreground: 220 8% 45%;
+    --muted-foreground: 215 20.2% 75.1%;
     --accent: 142 76% 36%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 220 13% 91%;
-    --input: 220 13% 91%;
+    --input: 220 14% 24%;
     --ring: 142 76% 36%;
   }
 
@@ -56,13 +56,13 @@
     --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 70%;
+    --muted-foreground: 0 0% 80%;
     --accent: 142 76% 36%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 20%;
-    --input: 0 0% 20%;
+    --input: 0 0% 15%;
     --ring: 142 76% 36%;
   }
 }
@@ -73,5 +73,15 @@
   }
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+  }
+
+  /* Improve input field text legibility */
+  input, textarea, select {
+    @apply bg-background text-foreground placeholder:text-muted-foreground;
+  }
+
+  /* Ensure dialog content is legible */
+  [role="dialog"] {
+    @apply bg-background text-foreground;
   }
 }
