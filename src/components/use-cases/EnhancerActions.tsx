@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/tooltip";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface EnhancerActionsProps {
   currentEnhancer: string;
@@ -30,12 +31,8 @@ export function EnhancerActions({ currentEnhancer, onEnhancerUpdate }: EnhancerA
 
     setIsProcessing(true);
     try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('generate', {
+        body: {
           model: "gemini/gemini-pro",
           prompt: `As a creative prompt engineer, analyze and remix this prompt enhancer to generate new ideas and improvements while maintaining its core purpose. Consider different approaches and add innovative elements:
 
@@ -49,12 +46,11 @@ Provide a remixed version that:
 4. Suggests alternative approaches
 
 Return ONLY the remixed enhancer text, nothing else.`,
-        }),
+        },
       });
 
-      if (!response.ok) throw new Error("Failed to remix enhancer");
+      if (error) throw error;
       
-      const data = await response.json();
       onEnhancerUpdate(data.generatedText.trim());
       
       toast({
@@ -85,12 +81,8 @@ Return ONLY the remixed enhancer text, nothing else.`,
 
     setIsProcessing(true);
     try {
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('generate', {
+        body: {
           model: "gemini/gemini-pro",
           prompt: `As an expert prompt engineer, enhance this prompt enhancer to improve its quality, clarity, and effectiveness:
 
@@ -104,12 +96,11 @@ Improve the enhancer by:
 4. Ensuring it follows best practices
 
 Return ONLY the enhanced version, nothing else.`,
-        }),
+        },
       });
 
-      if (!response.ok) throw new Error("Failed to enhance prompt");
+      if (error) throw error;
       
-      const data = await response.json();
       onEnhancerUpdate(data.generatedText.trim());
       
       toast({
