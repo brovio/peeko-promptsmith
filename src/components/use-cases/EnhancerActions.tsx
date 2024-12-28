@@ -8,8 +8,9 @@ import {
 } from "@/components/ui/tooltip";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { LoadingModal } from "@/components/LoadingModal";
+import { enhanceOperation } from "./utils/enhanceOperation";
+import { remixOperation } from "./utils/remixOperation";
 
 interface EnhancerActionsProps {
   currentEnhancer: string;
@@ -23,72 +24,23 @@ export function EnhancerActions({ currentEnhancer, onEnhancerUpdate, useCaseId }
   const [attemptCount, setAttemptCount] = useState(0);
   const { toast } = useToast();
 
-  const trackOperation = async (operationType: string, originalText: string, modifiedText: string, tokensUsed: number, cost: number) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
-
-      const { error } = await supabase
-        .from('use_case_operations')
-        .insert({
-          use_case_id: useCaseId,
-          user_id: user.id,
-          operation_type: operationType,
-          original_text: originalText,
-          modified_text: modifiedText,
-          tokens_used: tokensUsed,
-          cost: cost,
-          words_changed: Math.abs(modifiedText.split(/\s+/).length - originalText.split(/\s+/).length)
-        });
-
-      if (error) {
-        console.error(`Error tracking ${operationType} operation:`, error);
-        throw error;
-      }
-    } catch (error) {
-      console.error(`Error tracking ${operationType} operation:`, error);
-      throw error;
-    }
-  };
-
   const handleRemix = async () => {
-    if (!currentEnhancer.trim()) {
+    if (!useCaseId) {
       toast({
         title: "Error",
-        description: "Please enter some content to remix",
+        description: "Invalid use case ID",
         variant: "destructive",
       });
       return;
     }
 
     setIsProcessing(true);
-    setAttemptCount(0);
+    setAttemptCount(1);
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate', {
-        body: {
-          model: "google/gemini-2.0-flash-thinking-exp:free",
-          prompt: `As a creative prompt engineer, analyze and remix this prompt enhancer to generate new ideas and improvements while maintaining its core purpose. Consider different approaches and add innovative elements:
-
-Original enhancer:
-${currentEnhancer}
-
-Provide a remixed version that:
-1. Maintains the original intent
-2. Adds creative new perspectives
-3. Improves clarity and effectiveness
-4. Suggests alternative approaches
-
-Return ONLY the remixed enhancer text, nothing else.`,
-        },
-      });
-
-      if (error) throw error;
-      
-      const newEnhancer = data.generatedText.trim();
+      const { newEnhancer, model } = await remixOperation(currentEnhancer, useCaseId);
       onEnhancerUpdate(newEnhancer);
-      
-      await trackOperation('remix', currentEnhancer, newEnhancer, data.usage?.total_tokens || 0, data.usage?.total_cost || 0);
+      setCurrentModel(model || "Unknown model");
       
       toast({
         title: "Success",
@@ -109,43 +61,22 @@ Return ONLY the remixed enhancer text, nothing else.`,
   };
 
   const handleEnhance = async () => {
-    if (!currentEnhancer.trim()) {
+    if (!useCaseId) {
       toast({
         title: "Error",
-        description: "Please enter some content to enhance",
+        description: "Invalid use case ID",
         variant: "destructive",
       });
       return;
     }
 
     setIsProcessing(true);
-    setAttemptCount(0);
+    setAttemptCount(1);
     
     try {
-      const { data, error } = await supabase.functions.invoke('generate', {
-        body: {
-          model: "google/gemini-2.0-flash-thinking-exp:free",
-          prompt: `As an expert prompt engineer, enhance this prompt enhancer to improve its quality, clarity, and effectiveness:
-
-Original enhancer:
-${currentEnhancer}
-
-Improve the enhancer by:
-1. Making it more precise and clear
-2. Optimizing its structure and flow
-3. Adding any missing important elements
-4. Ensuring it follows best practices
-
-Return ONLY the enhanced version, nothing else.`,
-        },
-      });
-
-      if (error) throw error;
-      
-      const newEnhancer = data.generatedText.trim();
+      const { newEnhancer, model } = await enhanceOperation(currentEnhancer, useCaseId);
       onEnhancerUpdate(newEnhancer);
-      
-      await trackOperation('enhance', currentEnhancer, newEnhancer, data.usage?.total_tokens || 0, data.usage?.total_cost || 0);
+      setCurrentModel(model || "Unknown model");
       
       toast({
         title: "Success",
