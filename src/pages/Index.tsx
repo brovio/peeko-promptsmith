@@ -3,9 +3,6 @@ import { ModelSelector } from "@/components/ModelSelector";
 import { CategorySelector } from "@/components/CategorySelector";
 import { PromptInput } from "@/components/PromptInput";
 import { ResultsDisplay } from "@/components/ResultsDisplay";
-import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Model } from "@/lib/types";
@@ -15,11 +12,15 @@ export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("general");
   const [result, setResult] = useState("");
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   // Fetch models in use from the database
-  const { data: modelsInUse = [], isError: isModelsInUseError } = useQuery({
+  const { 
+    data: modelsInUse = [], 
+    isError: isModelsInUseError,
+    isLoading: isModelsInUseLoading,
+    refetch: refetchModelsInUse
+  } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -48,7 +49,12 @@ export default function Index() {
   });
 
   // Fetch details for models in use
-  const { data: models = [], isError: isModelsError } = useQuery({
+  const { 
+    data: models = [], 
+    isError: isModelsError,
+    isLoading: isModelsLoading,
+    refetch: refetchModels
+  } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
       // Extract model IDs, ensuring we have valid data
@@ -77,8 +83,13 @@ export default function Index() {
         throw error;
       }
     },
-    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0, // Only run query if we have valid models in use
+    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0,
   });
+
+  const handleRefreshModels = () => {
+    refetchModelsInUse();
+    refetchModels();
+  };
 
   if (isModelsInUseError || isModelsError) {
     toast({
@@ -96,11 +107,8 @@ export default function Index() {
   return (
     <div className="min-h-screen gradient-bg">
       <div className="container mx-auto py-8 px-4">
-        <div className="flex justify-between items-center mb-8">
+        <div className="mb-8">
           <h1 className="text-3xl font-bold">PeekoPrompter</h1>
-          <Button variant="ghost" onClick={() => navigate("/settings")}>
-            <Settings className="h-5 w-5" />
-          </Button>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">
@@ -110,6 +118,8 @@ export default function Index() {
                 models={models}
                 selectedModel={selectedModel}
                 onModelSelect={setSelectedModel}
+                isLoading={isModelsInUseLoading || isModelsLoading}
+                onRefresh={handleRefreshModels}
               />
               <CategorySelector
                 selectedCategory={selectedCategory}
