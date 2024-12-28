@@ -89,7 +89,7 @@ export default function Models() {
           .eq('is_enabled', true);
 
         if (error) throw error;
-        if (!data) return [];
+        if (!preferences) return [];
 
         return models?.filter(model => 
           preferences.some(pref => pref.model_id === model.id)
@@ -121,10 +121,10 @@ export default function Models() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      await supabase
+      // First ensure the model exists in available_models
+      const { error: modelError } = await supabase
         .from('available_models')
         .upsert({
-          id: model.id,
           model_id: model.id,
           name: model.name,
           provider: model.provider,
@@ -134,21 +134,28 @@ export default function Models() {
           output_price: model.output_price,
           max_tokens: model.max_tokens,
           is_active: true,
-          clean_model_name: model.clean_model_name
+          clean_model_name: model.clean_model_name,
+          p_model: model.clean_model_name,
+          p_provider: model.provider
         }, {
           onConflict: 'model_id'
         });
 
-      const { error } = await supabase
+      if (modelError) throw modelError;
+
+      // Then add it to user preferences
+      const { error: prefError } = await supabase
         .from('model_preferences')
         .upsert({
           user_id: user.id,
           model_id: model.id,
           provider: model.provider,
           is_enabled: true
+        }, {
+          onConflict: 'user_id,model_id'
         });
 
-      if (error) throw error;
+      if (prefError) throw prefError;
 
       await refetchSelectedModels();
       toast({
