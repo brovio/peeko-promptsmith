@@ -12,28 +12,30 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ model, onAdd, style }: ModelCardProps) {
-  const getModelPoints = () => {
-    const points = [];
+  const formatNumber = (num: number) => num.toLocaleString();
+  
+  const getModelInfo = () => {
+    const info = [];
     
     // Add context length if available
     if (model.context_length) {
-      points.push(`Context length: ${model.context_length.toLocaleString()} tokens`);
+      info.push(`${formatNumber(model.context_length)} context length`);
     }
     
     // Add pricing info if available
     if (model.input_price || model.output_price) {
-      points.push(`Cost per 1M tokens: $${model.input_price} (input) / $${model.output_price} (output)`);
+      info.push(`$${model.input_price}/M input tokens • $${model.output_price}/M output tokens`);
     }
 
     // Add max tokens if available
     if (model.max_tokens) {
-      points.push(`Maximum output tokens: ${model.max_tokens.toLocaleString()}`);
+      info.push(`${formatNumber(model.max_tokens)} max output tokens`);
     }
 
-    // Add a point about the model's capabilities
-    points.push(`Provider: ${model.provider}`);
+    // Add provider info
+    info.push(`by ${model.provider}`);
     
-    return points;
+    return info;
   };
 
   return (
@@ -41,7 +43,7 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
       <CardHeader className="space-y-1">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <CardTitle className="text-2xl">
+            <CardTitle className="text-2xl text-left">
               {model.clean_model_name}
             </CardTitle>
           </div>
@@ -56,16 +58,16 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
             </Button>
           </div>
         </div>
-        <CardDescription>
+        <CardDescription className="text-left">
           {model.description}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ul className="list-disc list-inside space-y-1">
-          {getModelPoints().map((point, index) => (
-            <li key={index} className="text-sm">{point}</li>
+        <div className="space-y-2 text-sm text-left text-muted-foreground">
+          {getModelInfo().map((info, index) => (
+            <p key={index}>{info}</p>
           ))}
-        </ul>
+        </div>
       </CardContent>
     </Card>
   );
