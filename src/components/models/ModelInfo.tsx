@@ -9,7 +9,11 @@ interface ModelInfoProps {
 
 export function ModelInfo({ model }: ModelInfoProps) {
   const formatNumber = (num: number) => num?.toLocaleString() || '-';
-  const formatPrice = (price: number) => price ? `$${price}` : '-';
+  
+  const formatPrice = (price: number | null) => {
+    if (!price) return '-';
+    return `$${price.toFixed(7)}`.replace(/\.?0+$/, '');
+  };
 
   return (
     <div>
@@ -24,15 +28,15 @@ export function ModelInfo({ model }: ModelInfoProps) {
       <div className="grid grid-cols-3 gap-2 text-sm">
         <div className="text-center">
           <div className="text-muted-foreground text-xs">Context</div>
-          <div>{formatNumber(model.context_length)}</div>
+          <div className="text-emerald-600">{formatNumber(model.context_length)}</div>
         </div>
         <div className="text-center">
           <div className="text-muted-foreground text-xs">Input</div>
-          <div>{formatPrice(model.input_price)}</div>
+          <div className="text-emerald-600">{formatPrice(model.input_price)}</div>
         </div>
         <div className="text-center">
           <div className="text-muted-foreground text-xs">Output</div>
-          <div>{formatPrice(model.output_price)}</div>
+          <div className="text-emerald-600">{formatPrice(model.output_price)}</div>
         </div>
       </div>
     </div>
