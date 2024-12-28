@@ -115,16 +115,21 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
         output_price: model.output_price,
         max_tokens: model.max_tokens,
         is_active: true,
-        clean_model_name: model.clean_model_name
+        clean_model_name: model.clean_model_name,
+        p_model: model.clean_model_name,
+        p_provider: model.provider
       }));
 
-      const { error } = await supabase
-        .from('available_models')
-        .upsert(modelsData, {
-          onConflict: 'model_id'
-        });
+      // Update the upsert operation to use model_id in the conflict clause
+      for (const modelData of modelsData) {
+        const { error } = await supabase
+          .from('available_models')
+          .upsert(modelData, {
+            onConflict: 'model_id'
+          });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
 
       toast({
         title: "Success",
