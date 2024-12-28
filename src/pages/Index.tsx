@@ -44,7 +44,7 @@ export default function Index() {
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
-        .in('model_id', modelIds)
+        .in('id', modelIds)
         .eq('is_active', true);
       
       if (error) throw error;

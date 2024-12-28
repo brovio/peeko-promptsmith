@@ -35,7 +35,6 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
   } ${isHighlighted ? 'bg-emerald-50 dark:bg-emerald-900' : ''}`;
   
   const dividerClasses = `border-t pt-2 ${isInUse ? 'border-emerald-500' : 'border-border'}`;
-  const titleClasses = `text-[20px] text-left scrolling-text whitespace-nowrap text-ellipsis overflow-hidden ${isInUse ? 'text-emerald-500' : ''}`;
 
   return (
     <Card style={style} className={cardClasses}>
