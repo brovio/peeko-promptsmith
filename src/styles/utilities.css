@@ -44,9 +44,17 @@
   background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
 }
 
-/* Ensure full height for dark theme */
-html, body {
+/* Ensure full height and proper dark theme application */
+#root {
+  @apply min-h-screen bg-background;
+}
+
+html {
   @apply min-h-screen;
+}
+
+body {
+  @apply min-h-screen bg-background text-foreground;
 }
 
 .dark body {
