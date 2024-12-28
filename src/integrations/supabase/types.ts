@@ -165,7 +165,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           full_name?: string | null
-          id: string
+          id?: string
           is_superadmin?: boolean | null
           updated_at?: string | null
           username?: string | null
@@ -320,7 +320,7 @@ export type Database = {
           id?: string
           is_enabled?: boolean | null
           is_public?: boolean | null
-          name: string
+          name?: string
           system_prompt?: string | null
           updated_at?: string | null
           user_id?: string | null
@@ -399,7 +399,7 @@ export type Database = {
           created_at?: string | null
           description: string
           enhancer: string
-          id: string
+          id?: string
           title: string
           updated_at?: string | null
           user_id?: string | null
@@ -408,7 +408,7 @@ export type Database = {
           created_at?: string | null
           description?: string
           enhancer?: string
-          id: string
+          id?: string
           title?: string
           updated_at?: string | null
           user_id?: string | null
@@ -481,7 +481,7 @@ export type Tables<
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never,
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -493,10 +493,10 @@ export type Tables<
         PublicSchema["Views"])
     ? (PublicSchema["Tables"] &
         PublicSchema["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
-    : never
+        Row: infer R
+      }
+      ? R
+      : never
     : never
 
 export type TablesInsert<

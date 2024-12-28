@@ -23,10 +23,10 @@ export async function fetchModels(apiKey: string) {
         name: model.name,
         provider: provider,
         description: model.description || '',
-        context_length: model.context_length,
-        input_price: model.pricing?.prompt || 0,
-        output_price: model.pricing?.completion || 0,
-        max_tokens: model.max_tokens,
+        context_length: model.context_length || null,
+        input_price: model.pricing?.prompt || null,
+        output_price: model.pricing?.completion || null,
+        max_tokens: model.max_tokens || null,
         clean_model_name: cleanModelName,
       };
     });
