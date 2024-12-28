@@ -64,28 +64,25 @@ export default function Index() {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="space-y-6">
             <div className="flex gap-4 flex-col">
-              <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
-                <Select value={selectedProvider} onValueChange={setSelectedProvider}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a provider" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All providers</SelectItem>
-                    {providers.map((provider) => (
-                      <SelectItem key={provider} value={provider}>
-                        {provider}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an AI provider" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All providers</SelectItem>
+                  {providers.map((provider) => (
+                    <SelectItem key={provider} value={provider}>
+                      {provider}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              
               <div className="flex gap-4 flex-col sm:flex-row">
                 <ModelSelector
                   models={filteredModels}
                   selectedModel={selectedModel}
                   onModelSelect={setSelectedModel}
-                  label="Available Models"
                 />
                 <CategorySelector
                   selectedCategory={selectedCategory}

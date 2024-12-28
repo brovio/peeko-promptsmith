@@ -14,15 +14,13 @@ interface ModelSelectorProps {
   selectedModel: string;
   onModelSelect: (modelId: string) => void;
   searchPlaceholder?: string;
-  label?: string;
 }
 
 export function ModelSelector({ 
   models, 
   selectedModel, 
   onModelSelect,
-  searchPlaceholder = "Search models...",
-  label
+  searchPlaceholder = "Type to search available models..."
 }: ModelSelectorProps) {
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -33,9 +31,6 @@ export function ModelSelector({
 
   return (
     <div className="w-full space-y-2">
-      {label && (
-        <label className="block text-sm font-medium text-gray-700">{label}</label>
-      )}
       <Input
         type="search"
         placeholder={searchPlaceholder}
@@ -45,7 +40,7 @@ export function ModelSelector({
       />
       <Select value={selectedModel} onValueChange={onModelSelect}>
         <SelectTrigger>
-          <SelectValue placeholder={`Select a ${label?.toLowerCase() || 'model'}`} />
+          <SelectValue placeholder="Choose a model from the list" />
         </SelectTrigger>
         <SelectContent>
           {filteredModels.map((model) => (
