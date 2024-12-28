@@ -8,6 +8,8 @@ export interface Model {
   input_price?: number;
   output_price?: number;
   max_tokens?: number;
+  p_model?: string;
+  p_provider?: string;
 }
 
 export interface Category {
