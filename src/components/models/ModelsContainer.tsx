@@ -1,13 +1,11 @@
 import { Model } from "@/lib/types";
 import { SearchModels } from "@/components/models/SearchModels";
 import { ModelsList } from "@/components/models/ModelsList";
-import { ColorTheme } from "@/lib/colorUtils";
 import { useState } from "react";
 
 interface ModelsContainerProps {
   searchTerm: string;
   onSearch: (term: string) => void;
-  currentTheme: ColorTheme;
   isLoading: boolean;
   filteredModels: Model[];
   onAdd: (model: Model) => void;
@@ -18,7 +16,6 @@ interface ModelsContainerProps {
 export function ModelsContainer({
   searchTerm,
   onSearch,
-  currentTheme,
   isLoading,
   filteredModels,
   onAdd,
@@ -48,7 +45,6 @@ export function ModelsContainer({
       <SearchModels
         searchTerm={searchTerm}
         onSearch={onSearch}
-        currentTheme={currentTheme}
         providers={providers}
         selectedProvider={selectedProvider}
         onProviderChange={setSelectedProvider}
@@ -64,10 +60,6 @@ export function ModelsContainer({
           onAdd={onAdd}
           onRemove={onRemove}
           modelsInUse={modelsInUse}
-          cardStyle={{
-            backgroundColor: currentTheme.background,
-            color: currentTheme.foreground
-          }}
         />
       )}
     </div>
