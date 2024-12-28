@@ -9,9 +9,7 @@ import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { useToast } from "@/hooks/use-toast";
 import { fetchModels } from "@/lib/openrouter";
 import { filterModels } from "@/lib/modelUtils";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { RotateCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ErrorDisplay } from "@/components/models/ErrorDisplay";
 import { Model } from "@/lib/types";
 
 export default function Models() {
@@ -23,23 +21,34 @@ export default function Models() {
   const { toast } = useToast();
 
   // Fetch API key with error handling
-  const { data: apiKeyData, error: apiKeyError } = useQuery({
+  const { 
+    data: apiKeyData, 
+    error: apiKeyError,
+    refetch: refetchApiKey 
+  } = useQuery({
     queryKey: ['apiKey'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("User not authenticated");
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("User not authenticated");
 
-      const { data: apiKeyData, error } = await supabase
-        .from('api_keys')
-        .select('key_value')
-        .eq('user_id', user.id)
-        .eq('provider', 'openrouter')
-        .eq('is_active', true)
-        .maybeSingle();
+        const { data: apiKeyData, error } = await supabase
+          .from('api_keys')
+          .select('key_value')
+          .eq('user_id', user.id)
+          .eq('provider', 'openrouter')
+          .eq('is_active', true)
+          .maybeSingle();
 
-      if (error) throw error;
-      return apiKeyData;
+        if (error) throw error;
+        return apiKeyData;
+      } catch (error: any) {
+        console.error('Error fetching API key:', error);
+        throw new Error(error.message || 'Failed to fetch API key');
+      }
     },
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const { 
@@ -51,10 +60,16 @@ export default function Models() {
     queryKey: ['models', apiKeyData?.key_value],
     queryFn: async () => {
       if (!apiKeyData?.key_value) return [];
-      return fetchModels(apiKeyData.key_value);
+      try {
+        return await fetchModels(apiKeyData.key_value);
+      } catch (error: any) {
+        console.error('Error fetching models:', error);
+        throw new Error(error.message || 'Failed to fetch models');
+      }
     },
     enabled: !!apiKeyData?.key_value,
-    retry: 1,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   // Fetch selected models with error handling
@@ -65,24 +80,30 @@ export default function Models() {
   } = useQuery({
     queryKey: ['selectedModels'],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
 
-      const { data, error } = await supabase
-        .from('model_preferences')
-        .select('model_id')
-        .eq('user_id', user.id)
-        .eq('is_enabled', true);
+        const { data, error } = await supabase
+          .from('model_preferences')
+          .select('model_id')
+          .eq('user_id', user.id)
+          .eq('is_enabled', true);
 
-      if (error) throw error;
-      if (!data) return [];
+        if (error) throw error;
+        if (!data) return [];
 
-      return models?.filter(model => 
-        data.some(preference => preference.model_id === model.id)
-      ) || [];
+        return models?.filter(model => 
+          data.some(preference => preference.model_id === model.id)
+        ) || [];
+      } catch (error: any) {
+        console.error('Error fetching selected models:', error);
+        throw new Error(error.message || 'Failed to fetch selected models');
+      }
     },
     enabled: !!models,
-    retry: 1,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
   const providers: string[] = Array.from(
@@ -108,6 +129,9 @@ export default function Models() {
           provider: model.provider,
           description: model.description || '',
           context_length: model.context_length,
+          input_price: model.input_price,
+          output_price: model.output_price,
+          max_tokens: model.max_tokens,
           is_active: true,
           clean_model_name: model.clean_model_name
         }, {
@@ -131,12 +155,12 @@ export default function Models() {
         title: "Model Added",
         description: `${model.name} has been added to your selected models.`
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding model:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to add model. Please try again."
+        description: error.message || "Failed to add model. Please try again."
       });
     }
   };
@@ -190,21 +214,6 @@ export default function Models() {
 
   const filteredModels = filterModels(models, searchTerm, selectedProvider, contextLength);
 
-  const renderError = (error: Error | null) => {
-    if (!error) return null;
-    return (
-      <Alert variant="destructive" className="mb-4">
-        <AlertDescription className="flex items-center justify-between">
-          <span>Error: {error.message}</span>
-          <Button variant="outline" size="sm" onClick={() => refetchModels()}>
-            <RotateCw className="mr-2 h-4 w-4" />
-            Retry
-          </Button>
-        </AlertDescription>
-      </Alert>
-    );
-  };
-
   return (
     <div 
       className="min-h-screen transition-colors duration-300"
@@ -224,7 +233,26 @@ export default function Models() {
           onLockTheme={lockCurrentTheme}
         />
 
-        {renderError(apiKeyError || modelsError || selectedModelsError)}
+        {apiKeyError && (
+          <ErrorDisplay 
+            error={apiKeyError} 
+            onRetry={refetchApiKey}
+          />
+        )}
+
+        {modelsError && (
+          <ErrorDisplay 
+            error={modelsError} 
+            onRetry={refetchModels}
+          />
+        )}
+
+        {selectedModelsError && (
+          <ErrorDisplay 
+            error={selectedModelsError} 
+            onRetry={refetchSelectedModels}
+          />
+        )}
 
         <SelectedModels 
           models={selectedModels}
