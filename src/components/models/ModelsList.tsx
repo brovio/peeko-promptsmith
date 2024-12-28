@@ -14,9 +14,18 @@ export function ModelsList({ models, onAdd, onRemove, modelsInUse = [], cardStyl
     return <div className="text-center">No models found</div>;
   }
 
+  // Sort models to show selected ones at the top
+  const sortedModels = [...models].sort((a, b) => {
+    const aInUse = modelsInUse.includes(a.id);
+    const bInUse = modelsInUse.includes(b.id);
+    if (aInUse && !bInUse) return -1;
+    if (!aInUse && bInUse) return 1;
+    return 0;
+  });
+
   return (
     <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-      {models.map((model) => (
+      {sortedModels.map((model) => (
         <ModelCard
           key={model.id}
           model={model}
