@@ -13,12 +13,13 @@ export interface Model {
 export interface Category {
   id: string;
   name: string;
-  description: string;
-  template: string;
+  description?: string;
 }
 
-export interface PromptResult {
-  prompt: string;
+export interface ChatMessage {
+  id: string;
+  content: string;
+  role: string;
   response: string;
   model: string;
   timestamp: Date;

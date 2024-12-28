@@ -54,9 +54,12 @@ export type Database = {
           created_at: string | null
           description: string | null
           id: string
+          input_price: number | null
           is_active: boolean | null
+          max_tokens: number | null
           model_id: string
           name: string
+          output_price: number | null
           provider: string
           updated_at: string | null
         }
@@ -66,9 +69,12 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          input_price?: number | null
           is_active?: boolean | null
+          max_tokens?: number | null
           model_id: string
           name: string
+          output_price?: number | null
           provider: string
           updated_at?: string | null
         }
@@ -78,9 +84,12 @@ export type Database = {
           created_at?: string | null
           description?: string | null
           id?: string
+          input_price?: number | null
           is_active?: boolean | null
+          max_tokens?: number | null
           model_id?: string
           name?: string
+          output_price?: number | null
           provider?: string
           updated_at?: string | null
         }

@@ -12,13 +12,12 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ model, onAdd, style }: ModelCardProps) {
-  // Generate bullet points for model information
-  const generateBulletPoints = () => {
+  const getModelPoints = () => {
     const points = [];
     
     // Add context length if available
     if (model.context_length) {
-      points.push(`Maximum context length: ${model.context_length.toLocaleString()} tokens`);
+      points.push(`Context length: ${model.context_length.toLocaleString()} tokens`);
     }
     
     // Add pricing info if available
@@ -32,19 +31,17 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
     }
 
     // Add a point about the model's capabilities
-    points.push("Structure and refine your prompts specifically for this model's capabilities");
+    points.push(`Provider: ${model.provider}`);
     
     return points;
   };
 
-  const bulletPoints = generateBulletPoints();
-
   return (
-    <Card className="w-full hover:shadow-md transition-shadow duration-200" style={style}>
-      <CardHeader className="relative pb-0">
-        <div className="flex items-center justify-between">
+    <Card style={style}>
+      <CardHeader className="space-y-1">
+        <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <CardTitle className="text-xl font-semibold">
+            <CardTitle className="text-2xl">
               {model.clean_model_name}
             </CardTitle>
           </div>
@@ -54,37 +51,21 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
               variant="ghost"
               size="icon"
               onClick={() => onAdd(model)}
-              className="hover:bg-white/10"
             >
               <Plus className="h-4 w-4" />
             </Button>
           </div>
         </div>
+        <CardDescription>
+          {model.description}
+        </CardDescription>
       </CardHeader>
-
-      <div className="h-px bg-border mx-6 my-4" />
-
-      <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground">Info on {model.provider}'s model:</h4>
-          <CardDescription className="text-sm text-foreground">
-            {model.description}
-          </CardDescription>
-        </div>
-
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-muted-foreground">Hints & Tips</h4>
-          <ul className="space-y-3 list-disc list-inside">
-            {bulletPoints.map((point, index) => (
-              <li 
-                key={index} 
-                className="text-sm text-foreground leading-relaxed pl-2"
-              >
-                {point}
-              </li>
-            ))}
-          </ul>
-        </div>
+      <CardContent>
+        <ul className="list-disc list-inside space-y-1">
+          {getModelPoints().map((point, index) => (
+            <li key={index} className="text-sm">{point}</li>
+          ))}
+        </ul>
       </CardContent>
     </Card>
   );
