@@ -6,38 +6,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
 
 interface ModelSelectorProps {
   models: Model[];
   selectedModel: string;
   onModelSelect: (modelId: string) => void;
-  searchPlaceholder?: string;
 }
 
 export function ModelSelector({ 
   models, 
   selectedModel, 
   onModelSelect,
-  searchPlaceholder = "Type to search available models..."
 }: ModelSelectorProps) {
-  const [searchTerm, setSearchTerm] = useState("");
-  
-  const filteredModels = models.filter(model => 
-    model.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    model.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredModels = models;
 
   return (
-    <div className="w-full space-y-2">
-      <Input
-        type="search"
-        placeholder={searchPlaceholder}
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-full"
-      />
+    <div className="w-full">
       <Select value={selectedModel} onValueChange={onModelSelect}>
         <SelectTrigger>
           <SelectValue placeholder="Choose a model from the list" />

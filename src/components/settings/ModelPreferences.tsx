@@ -32,7 +32,7 @@ export function ModelPreferences({
     id: provider,
     name: provider.charAt(0).toUpperCase() + provider.slice(1),
     description: `Models from ${provider}`,
-    provider: provider // Add provider property
+    provider: provider
   }));
 
   // Filter models by selected provider and create model objects
@@ -42,7 +42,7 @@ export function ModelPreferences({
       id: model.id,
       name: model.name,
       description: model.description,
-      provider: model.id.split('/')[0] // Add provider property
+      provider: model.id.split('/')[0]
     }));
 
   // Save model preference mutation
@@ -92,20 +92,16 @@ export function ModelPreferences({
       <h2 className="text-xl font-semibold">Model Selection</h2>
       <div className="space-y-4">
         <ModelSelector
-          label="Provider"
           models={providers}
           selectedModel={selectedProvider}
           onModelSelect={onProviderSelect}
-          searchPlaceholder="Search providers..."
         />
 
         {selectedProvider && (
           <ModelSelector
-            label="Model"
             models={filteredModels}
             selectedModel={selectedModel}
             onModelSelect={handleModelSelect}
-            searchPlaceholder="Search models..."
           />
         )}
       </div>
