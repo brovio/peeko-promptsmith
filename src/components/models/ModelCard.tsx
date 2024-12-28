@@ -1,6 +1,6 @@
 import { Model } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
-import { CSSProperties, useState, useEffect } from "react";
+import { CSSProperties, useState } from "react";
 import { ModelCardHeader } from "./ModelCardHeader";
 import { ModelDescription } from "./ModelDescription";
 import { ModelInfo } from "./ModelInfo";
@@ -27,11 +27,10 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
   const handleAdd = async (model: Model) => {
     setIsHighlighted(true);
     await onAdd(model);
-    // Reset the highlight after 1 second
     setTimeout(() => setIsHighlighted(false), 1000);
   };
 
-  const cardClasses = `p-[3%] transition-colors duration-300 ${
+  const cardClasses = `p-[3%] transition-colors duration-300 flex flex-col h-full ${
     isInUse ? 'border-emerald-500 border-2' : ''
   } ${isHighlighted ? 'bg-emerald-50' : ''}`;
   
@@ -54,10 +53,9 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
           <ModelDescription description={model.description} />
         </div>
       </CardHeader>
-      <CardContent className="p-0 mt-4">
-        <div className="space-y-4">
-          <ModelInfo model={model} />
-        </div>
+      <CardContent className="p-0 mt-4 flex-grow flex flex-col">
+        <div className="flex-grow" />
+        <ModelInfo model={model} />
       </CardContent>
     </Card>
   );
