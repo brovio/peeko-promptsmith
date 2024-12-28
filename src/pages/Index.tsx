@@ -51,9 +51,8 @@ export default function Index() {
   const { data: models = [], isError: isModelsError } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
-      if (!modelsInUse?.length) return [];
-      
-      const modelIds = modelsInUse.map(m => m.model_id);
+      // If no models in use, return empty array
+      const modelIds = modelsInUse?.map(m => m.model_id);
       if (!modelIds?.length) return [];
 
       const { data, error } = await supabase
@@ -69,7 +68,7 @@ export default function Index() {
 
       return data as Model[];
     },
-    enabled: !!modelsInUse?.length,
+    enabled: !!modelsInUse?.length, // Only run query if there are models in use
   });
 
   if (isModelsInUseError || isModelsError) {
