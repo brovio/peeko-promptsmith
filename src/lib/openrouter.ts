@@ -25,10 +25,10 @@ export async function fetchModels(apiKey: string): Promise<Model[]> {
         provider: provider,
         description: model.description || '',
         context_length: model.context_length,
-        pricing: {
-          prompt: model.pricing?.prompt || 0,
-          completion: model.pricing?.completion || 0,
-        },
+        input_price: model.pricing?.prompt || 0,
+        output_price: model.pricing?.completion || 0,
+        max_tokens: model.max_tokens,
+        clean_model_name: cleanModelName,
       };
     });
   } catch (error) {

@@ -1,7 +1,8 @@
 import { Model } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Edit2, Play, Clock } from "lucide-react";
+import { Plus } from "lucide-react";
+import { ModelParametersModal } from "./ModelParametersModal";
 import { CSSProperties } from "react";
 
 interface ModelCardProps {
@@ -21,8 +22,13 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
     }
     
     // Add pricing info if available
-    if (model.pricing) {
-      points.push(`Cost per 1K tokens: $${model.pricing.prompt} (input) / $${model.pricing.completion} (output)`);
+    if (model.input_price || model.output_price) {
+      points.push(`Cost per 1M tokens: $${model.input_price} (input) / $${model.output_price} (output)`);
+    }
+
+    // Add max tokens if available
+    if (model.max_tokens) {
+      points.push(`Maximum output tokens: ${model.max_tokens.toLocaleString()}`);
     }
 
     // Add a point about the model's capabilities
@@ -43,6 +49,7 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
             </CardTitle>
           </div>
           <div className="flex gap-2">
+            <ModelParametersModal />
             <Button
               variant="ghost"
               size="icon"

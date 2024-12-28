@@ -5,10 +5,9 @@ export interface Model {
   description: string;
   clean_model_name: string;
   context_length?: number;
-  pricing?: {
-    prompt: number;
-    completion: number;
-  };
+  input_price?: number;
+  output_price?: number;
+  max_tokens?: number;
 }
 
 export interface Category {
