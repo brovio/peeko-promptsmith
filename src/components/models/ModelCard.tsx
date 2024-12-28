@@ -15,9 +15,6 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
   const generateBulletPoints = () => {
     const points = [];
     
-    // Add provider info
-    points.push(`Provider: ${model.id.split('/')[0]}`);
-    
     // Add context length if available
     if (model.context_length) {
       points.push(`Context Length: ${model.context_length.toLocaleString()}`);
@@ -38,7 +35,10 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
     <Card className="w-full hover:shadow-md transition-shadow duration-200" style={style}>
       <CardHeader className="relative pb-0">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-left text-xl">{model.name}</CardTitle>
+          <div className="space-y-1">
+            <CardTitle className="text-left text-xl">{model.name}</CardTitle>
+            <p className="text-sm text-muted-foreground">Provider: {model.provider}</p>
+          </div>
           <Button
             variant="ghost"
             size="icon"

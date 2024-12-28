@@ -49,6 +49,7 @@ export type Database = {
       }
       available_models: {
         Row: {
+          clean_model_name: string
           context_length: number | null
           created_at: string | null
           description: string | null
@@ -60,6 +61,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          clean_model_name: string
           context_length?: number | null
           created_at?: string | null
           description?: string | null
@@ -71,6 +73,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          clean_model_name?: string
           context_length?: number | null
           created_at?: string | null
           description?: string | null

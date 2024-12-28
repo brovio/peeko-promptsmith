@@ -14,16 +14,23 @@ export async function fetchModels(apiKey: string): Promise<Model[]> {
     }
     
     const data = await response.json();
-    return data.data.map((model: any) => ({
-      id: model.id,
-      name: model.name || model.id,
-      description: model.description || '',
-      context_length: model.context_length,
-      pricing: {
-        prompt: model.pricing?.prompt || 0,
-        completion: model.pricing?.completion || 0,
-      },
-    }));
+    return data.data.map((model: any) => {
+      // Split the provider and model name from the ID
+      const [provider] = model.id.split('/');
+      const cleanModelName = model.name.replace(`${provider}/`, '').trim();
+      
+      return {
+        id: model.id,
+        name: cleanModelName,
+        provider: provider,
+        description: model.description || '',
+        context_length: model.context_length,
+        pricing: {
+          prompt: model.pricing?.prompt || 0,
+          completion: model.pricing?.completion || 0,
+        },
+      };
+    });
   } catch (error) {
     console.error('Error fetching models:', error);
     throw error;
