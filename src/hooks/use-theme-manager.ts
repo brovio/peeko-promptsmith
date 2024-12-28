@@ -1,43 +1,54 @@
 import { useToast } from "@/hooks/use-toast";
-import { ColorTheme } from "@/lib/colorUtils";
 
 export function useThemeManager() {
   const { toast } = useToast();
 
-  const applyTheme = (theme: ColorTheme) => {
+  const applyTheme = (theme: 'light' | 'dark' | 'black') => {
     const root = document.documentElement;
-    root.style.setProperty('--background', theme.background);
-    root.style.setProperty('--foreground', theme.foreground);
-    root.style.setProperty('--primary', theme.primary);
-    root.style.setProperty('--secondary', theme.secondary);
-    root.style.setProperty('--accent', theme.accent);
+    
+    // Remove all theme classes first
+    root.classList.remove('light', 'dark', 'black');
+    
+    // Add the new theme class
+    root.classList.add(theme);
 
-    // Update other related variables to maintain consistency
-    root.style.setProperty('--card', theme.background);
-    root.style.setProperty('--card-foreground', theme.foreground);
-    root.style.setProperty('--popover', theme.background);
-    root.style.setProperty('--popover-foreground', theme.foreground);
-    root.style.setProperty('--primary-foreground', "0 0% 100%");
-    root.style.setProperty('--secondary-foreground', theme.foreground);
-    root.style.setProperty('--muted', theme.secondary);
-    root.style.setProperty('--muted-foreground', "220 8% 45%");
-    root.style.setProperty('--accent-foreground', "0 0% 100%");
-    root.style.setProperty('--destructive', "0 84.2% 60.2%");
-    root.style.setProperty('--destructive-foreground', "0 0% 100%");
-    root.style.setProperty('--border', theme.secondary);
-    root.style.setProperty('--input', theme.secondary);
-    root.style.setProperty('--ring', theme.primary);
-
-    // Set dark mode class based on theme background
-    if (theme.background === "0 0% 100%") {
-      root.classList.remove('dark');
+    if (theme === 'black') {
+      root.style.setProperty('--background', '0 0% 0%');
+      root.style.setProperty('--foreground', '0 0% 100%');
+      root.style.setProperty('--primary', '142 76% 36%');
+      root.style.setProperty('--secondary', '0 0% 10%');
+      root.style.setProperty('--accent', '142 76% 36%');
+      root.style.setProperty('--card', '0 0% 0%');
+      root.style.setProperty('--card-foreground', '0 0% 100%');
+      root.style.setProperty('--popover', '0 0% 0%');
+      root.style.setProperty('--popover-foreground', '0 0% 100%');
+      root.style.setProperty('--muted', '0 0% 10%');
+      root.style.setProperty('--muted-foreground', '0 0% 70%');
+      root.style.setProperty('--border', '0 0% 20%');
+      root.style.setProperty('--input', '0 0% 20%');
     } else {
-      root.classList.add('dark');
+      // Reset to default theme variables from theme.css
+      root.style.removeProperty('--background');
+      root.style.removeProperty('--foreground');
+      root.style.removeProperty('--primary');
+      root.style.removeProperty('--secondary');
+      root.style.removeProperty('--accent');
+      root.style.removeProperty('--card');
+      root.style.removeProperty('--card-foreground');
+      root.style.removeProperty('--popover');
+      root.style.removeProperty('--popover-foreground');
+      root.style.removeProperty('--muted');
+      root.style.removeProperty('--muted-foreground');
+      root.style.removeProperty('--border');
+      root.style.removeProperty('--input');
     }
 
+    // Save theme preference
+    localStorage.setItem('theme', theme);
+
     toast({
-      title: "Theme applied!",
-      description: "The selected theme has been applied to the application.",
+      title: "Theme updated",
+      description: `${theme.charAt(0).toUpperCase() + theme.slice(1)} theme has been applied.`,
     });
   };
 

@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { generateColorTheme } from "@/lib/colorUtils";
 import { ModelsHeader } from "@/components/models/ModelsHeader";
 import { filterModels } from "@/lib/modelUtils";
 import { useModelsData } from "@/components/models/useModelsData";
 import { ModelOperations } from "@/components/models/ModelOperations";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ThemeManager } from "@/components/models/ThemeManager";
 import { ModelsErrorBoundary } from "@/components/models/ModelsErrorBoundary";
 import { ModelsContainer } from "@/components/models/ModelsContainer";
 
@@ -14,10 +12,8 @@ export default function Models() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProvider, setSelectedProvider] = useState("all");
   const [contextLength, setContextLength] = useState([0]);
-  const [currentTheme, setCurrentTheme] = useState(generateColorTheme());
   const queryClient = useQueryClient();
 
-  // Listen for auth state changes
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
@@ -43,7 +39,6 @@ export default function Models() {
     refetchSelectedModels
   } = useModelsData();
 
-  // Fetch models in use
   const { data: modelsInUse = [] } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
@@ -73,32 +68,18 @@ export default function Models() {
     ...(models?.map((model) => model.context_length || 0) || [0])
   );
 
-  const themeManager = ThemeManager({
-    onThemeChange: setCurrentTheme
-  });
-
   const filteredModels = filterModels(models, searchTerm, selectedProvider, contextLength);
 
   return (
-    <div 
-      className="min-h-screen transition-colors duration-300"
-      style={{
-        backgroundColor: currentTheme.background,
-        color: currentTheme.foreground
-      }}
-    >
+    <div className="min-h-screen transition-colors duration-300">
       <div className="container mx-auto py-8 px-4">
         <ModelsHeader
           providers={providers}
           maxContextLength={maxContextLength}
           selectedProvider={selectedProvider}
           contextLength={contextLength}
-          currentTheme={currentTheme}
-          isThemeLocked={themeManager.isThemeLocked}
           onProviderChange={setSelectedProvider}
           onContextLengthChange={setContextLength}
-          onGenerateNewTheme={themeManager.generateNewTheme}
-          onLockTheme={themeManager.lockCurrentTheme}
         />
 
         <ModelsErrorBoundary
@@ -111,7 +92,6 @@ export default function Models() {
         <ModelsContainer
           searchTerm={searchTerm}
           onSearch={setSearchTerm}
-          currentTheme={currentTheme}
           isLoading={isLoading}
           filteredModels={filteredModels}
           onAdd={handleAddModel}
