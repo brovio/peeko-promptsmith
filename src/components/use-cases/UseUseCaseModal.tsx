@@ -76,21 +76,16 @@ export function UseUseCaseModal({ useCase, open, onOpenChange }: UseUseCaseModal
       // Combine the user's prompt with the use case enhancer
       const combinedPrompt = `${useCase.enhancer}\n\nOriginal prompt: ${userPrompt.trim()}`;
       
-      // Call the OpenRouter API through our Supabase Edge Function
-      const response = await fetch('/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      // Call the Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('generate', {
+        body: {
           model: selectedModel,
           prompt: combinedPrompt,
-        }),
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to enhance prompt');
+      if (error) throw error;
       
-      const data = await response.json();
       setEnhancedPrompt(data.generatedText || 'Failed to enhance prompt');
     } catch (err) {
       console.error('Error enhancing prompt:', err);
