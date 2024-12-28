@@ -28,11 +28,10 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
     return "";
   };
 
-  const truncateText = (text: string, wordLimit: number) => {
+  const truncateText = (text: string, charLimit: number) => {
     if (!text) return "";
-    const words = text.split(' ');
-    if (words.length <= wordLimit) return text;
-    return `${words.slice(0, wordLimit).join(' ')}...`;
+    if (text.length <= charLimit) return text;
+    return `${text.substring(0, charLimit)}...`;
   };
 
   return (
@@ -72,7 +71,7 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
               <CardDescription className="text-left mt-2">
                 {isExpanded ? model.description : truncateText(model.description, 180)}
               </CardDescription>
-              {model.description.split(' ').length > 180 && (
+              {model.description.length > 180 && (
                 <Button
                   variant="ghost"
                   size="sm"
@@ -105,22 +104,20 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
                 </Button>
               } />
             </div>
-            <table className="w-full text-sm">
-              <tbody>
-                <tr>
-                  <td className="py-1 text-muted-foreground">Context Length:</td>
-                  <td className="py-1 text-left">{model.context_length ? formatNumber(model.context_length) : 'Unknown'}</td>
-                </tr>
-                <tr>
-                  <td className="py-1 text-muted-foreground">Input Price:</td>
-                  <td className="py-1 text-left">{model.input_price ? `$${model.input_price}/1M tokens` : 'Unknown'}</td>
-                </tr>
-                <tr>
-                  <td className="py-1 text-muted-foreground">Output Price:</td>
-                  <td className="py-1 text-left">{model.output_price ? `$${model.output_price}/1M tokens` : 'Unknown'}</td>
-                </tr>
-              </tbody>
-            </table>
+            <div className="space-y-1 text-sm">
+              <div className="flex flex-col">
+                <span className="text-muted-foreground">Context Length:</span>
+                <span>{model.context_length ? formatNumber(model.context_length) : 'Unknown'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground">Input Price:</span>
+                <span>{model.input_price ? `$${model.input_price}/1M tokens` : 'Unknown'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-muted-foreground">Output Price:</span>
+                <span>{model.output_price ? `$${model.output_price}/1M tokens` : 'Unknown'}</span>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
