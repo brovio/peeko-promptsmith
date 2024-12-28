@@ -7,21 +7,21 @@ import { ColorTheme, generateColorTheme } from "@/lib/colorUtils";
 import { ThemeCard } from "./ThemeCard";
 import { CreateThemeDialog } from "./CreateThemeDialog";
 
-// Predefined themes
+// Predefined themes with HSL values matching our CSS variables
 const lightTheme: ColorTheme = {
-  background: "#FFFFFF",
-  foreground: "#000000",
-  primary: "#F1F1F1",
-  secondary: "#F8F8F8",
-  accent: "#F2FCE2"
+  background: "220 33% 98%",
+  foreground: "220 10% 15%",
+  primary: "221 83% 53%",
+  secondary: "220 14% 96%",
+  accent: "221 83% 53%"
 };
 
 const darkTheme: ColorTheme = {
-  background: "#221F26",
-  foreground: "#FFFFFF",
-  primary: "#333333",
-  secondary: "#2A2A2A",
-  accent: "#C8C8C9"
+  background: "220 10% 15%",
+  foreground: "220 33% 98%",
+  primary: "221 83% 53%",
+  secondary: "220 14% 24%",
+  accent: "221 83% 53%"
 };
 
 export function ThemeSettings() {
@@ -109,12 +109,29 @@ export function ThemeSettings() {
   };
 
   const applyTheme = (theme: ColorTheme) => {
-    // Apply theme to CSS variables
-    document.documentElement.style.setProperty('--background', theme.background);
-    document.documentElement.style.setProperty('--foreground', theme.foreground);
-    document.documentElement.style.setProperty('--primary', theme.primary);
-    document.documentElement.style.setProperty('--secondary', theme.secondary);
-    document.documentElement.style.setProperty('--accent', theme.accent);
+    // Apply theme to CSS variables at the root level
+    const root = document.documentElement;
+    root.style.setProperty('--background', theme.background);
+    root.style.setProperty('--foreground', theme.foreground);
+    root.style.setProperty('--primary', theme.primary);
+    root.style.setProperty('--secondary', theme.secondary);
+    root.style.setProperty('--accent', theme.accent);
+
+    // Update other related variables to maintain consistency
+    root.style.setProperty('--card', theme.background);
+    root.style.setProperty('--card-foreground', theme.foreground);
+    root.style.setProperty('--popover', theme.background);
+    root.style.setProperty('--popover-foreground', theme.foreground);
+    root.style.setProperty('--primary-foreground', "210 40% 98%");
+    root.style.setProperty('--secondary-foreground', theme.foreground);
+    root.style.setProperty('--muted', theme.secondary);
+    root.style.setProperty('--muted-foreground', "220 8% 45%");
+    root.style.setProperty('--accent-foreground', "210 40% 98%");
+    root.style.setProperty('--destructive', "0 84.2% 60.2%");
+    root.style.setProperty('--destructive-foreground', "210 40% 98%");
+    root.style.setProperty('--border', "220 13% 91%");
+    root.style.setProperty('--input', "220 13% 91%");
+    root.style.setProperty('--ring', theme.primary);
 
     toast({
       title: "Theme applied!",
