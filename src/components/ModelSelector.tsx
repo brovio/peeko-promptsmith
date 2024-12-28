@@ -39,8 +39,3 @@ export function ModelSelector({
     </div>
   );
 }
-
-export function getTemplateForCategory(categoryId: string): string {
-  const category = defaultCategories.find((c) => c.id === categoryId);
-  return category?.template || "{prompt}";
-}
