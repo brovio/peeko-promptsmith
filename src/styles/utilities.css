@@ -38,3 +38,8 @@
   min-height: 200px;
   @apply rounded-lg border p-4 bg-card text-card-foreground font-mono text-sm;
 }
+
+/* Dark mode specific utilities */
+.dark .gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
+}
