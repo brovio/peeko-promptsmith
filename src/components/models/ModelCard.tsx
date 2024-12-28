@@ -31,11 +31,11 @@ export function ModelCard({ model, onAdd, style }: ModelCardProps) {
     <Card style={style}>
       <CardHeader className="space-y-1">
         <div className="flex justify-between items-start">
-          <div className="space-y-1 max-w-[200px]">
+          <div className="space-y-1 max-w-[200px] scroll-on-hover overflow-hidden">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <CardTitle className="text-[20px] text-left whitespace-nowrap overflow-x-auto scrollbar-none hover:cursor-help">
+                  <CardTitle className="text-[20px] text-left scrolling-text">
                     {getModelTitle()}
                   </CardTitle>
                 </TooltipTrigger>

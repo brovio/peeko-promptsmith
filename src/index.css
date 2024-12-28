@@ -36,6 +36,29 @@
   }
 }
 
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  45% {
+    transform: translateX(0%);
+  }
+  55% {
+    transform: translateX(calc(-100% + 200px));
+  }
+  95% {
+    transform: translateX(calc(-100% + 200px));
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.scroll-on-hover:hover .scrolling-text {
+  animation: scroll 8s infinite linear;
+  white-space: nowrap;
+}
+
 @layer base {
   * {
     @apply border-border;
