@@ -75,10 +75,14 @@ serve(async (req) => {
         statusText: response.statusText,
         error: errorData
       });
-      throw new Error(`OpenRouter API error: ${response.status} - ${errorData.error || 'Unknown error'}`);
+      
+      // Extract error message from the OpenRouter response
+      const errorMessage = errorData.error?.message || errorData.error || 'Unknown error';
+      throw new Error(`OpenRouter API error: ${response.status} - ${errorMessage}`);
     }
 
     const data = await response.json();
+    console.log('OpenRouter API response:', data);
     
     if (!data.choices?.[0]?.message?.content) {
       console.error('Unexpected OpenRouter API response format:', data);
