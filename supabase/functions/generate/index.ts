@@ -13,12 +13,17 @@ serve(async (req) => {
   }
 
   try {
-    const { prompt, model = "gemini/gemini-pro" } = await req.json();
+    const openAiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openAiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const { prompt, model = "gpt-4o-mini" } = await req.json();
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
+        'Authorization': `Bearer ${openAiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -31,12 +36,14 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
+      console.error('OpenAI API error:', response.status, await response.text());
       throw new Error(`OpenAI API returned ${response.status}`);
     }
 
     const data = await response.json();
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.error('Invalid OpenAI response:', data);
       throw new Error('Invalid response format from OpenAI');
     }
 
