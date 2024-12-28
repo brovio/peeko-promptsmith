@@ -4,6 +4,8 @@ import Settings from "@/pages/Settings";
 import Models from "@/pages/Models";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
+import Profile from "@/pages/Profile";
+import Account from "@/pages/Account";
 import ForgotPassword from "@/pages/ForgotPassword";
 import WhatPrompting from "@/pages/WhatPrompting";
 import Header from "@/components/Header";
@@ -67,6 +69,28 @@ function App() {
                 <>
                   <Header />
                   <Models />
+                </>
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <AuthGuard>
+                <>
+                  <Header />
+                  <Profile />
+                </>
+              </AuthGuard>
+            }
+          />
+          <Route
+            path="/account"
+            element={
+              <AuthGuard>
+                <>
+                  <Header />
+                  <Account />
                 </>
               </AuthGuard>
             }

@@ -1,18 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { Settings, Database, Home, MessageSquare } from "lucide-react";
+import { Database, Home, MessageSquare, Settings } from "lucide-react";
 import { NavLink } from "./header/NavLink";
 import { ThemeControls } from "./header/ThemeControls";
+import { ProfileMenu } from "./header/ProfileMenu";
 
 export default function Header() {
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
-  };
-
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -28,9 +19,7 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-4">
           <ThemeControls />
-          <Button variant="ghost" onClick={handleSignOut}>
-            Sign Out
-          </Button>
+          <ProfileMenu />
         </div>
       </div>
     </header>
