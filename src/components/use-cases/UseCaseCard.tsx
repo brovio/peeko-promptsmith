@@ -15,10 +15,49 @@ interface UseCaseCardProps {
   };
 }
 
+function generateBulletPoints(description: string, enhancer: string): string[] {
+  // Extract key points from the description and enhancer
+  const combinedText = `${description} ${enhancer}`;
+  
+  // Split into sentences and filter out empty ones
+  const sentences = combinedText
+    .split(/[.!?]/)
+    .map(s => s.trim())
+    .filter(s => s.length > 0);
+  
+  // Select up to 3 most relevant sentences as bullet points
+  // Prioritize sentences that mention prompts, enhancement, or key features
+  const relevantPoints = sentences
+    .filter(sentence => 
+      sentence.toLowerCase().includes("prompt") ||
+      sentence.toLowerCase().includes("enhance") ||
+      sentence.toLowerCase().includes("help") ||
+      sentence.toLowerCase().includes("improve")
+    )
+    .slice(0, 3);
+
+  // If we don't have enough relevant points, add other sentences
+  while (relevantPoints.length < 3 && sentences.length > relevantPoints.length) {
+    const nextSentence = sentences.find(s => !relevantPoints.includes(s));
+    if (nextSentence) {
+      relevantPoints.push(nextSentence);
+    } else {
+      break;
+    }
+  }
+
+  // Format the points to be more concise
+  return relevantPoints.map(point => 
+    point.length > 100 ? `${point.substring(0, 97)}...` : point
+  );
+}
+
 export function UseCaseCard({ useCase }: UseCaseCardProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isUseModalOpen, setIsUseModalOpen] = useState(false);
   const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
+
+  const bulletPoints = generateBulletPoints(useCase.description, useCase.enhancer);
 
   return (
     <>
@@ -54,9 +93,11 @@ export function UseCaseCard({ useCase }: UseCaseCardProps) {
         </CardHeader>
         <CardContent>
           <ul className="list-disc list-inside space-y-1">
-            <li>First bullet point</li>
-            <li>Second bullet point</li>
-            <li>Third bullet point</li>
+            {bulletPoints.map((point, index) => (
+              <li key={index} className="text-sm text-muted-foreground">
+                {point}
+              </li>
+            ))}
           </ul>
         </CardContent>
       </Card>
