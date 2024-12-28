@@ -13,21 +13,17 @@ serve(async (req) => {
   }
 
   try {
-    const openAiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAiKey) {
-      throw new Error('OpenAI API key not configured');
-    }
+    const { prompt, model = "gemini/gemini-pro" } = await req.json();
 
-    const { prompt, model = "gpt-4o-mini" } = await req.json();
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAiKey}`,
+        'Authorization': `Bearer ${Deno.env.get('OPENROUTER_API_KEY')}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://lovable.dev',
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: model,
         messages: [
           { role: 'system', content: 'You are a helpful assistant that generates content based on user prompts.' },
           { role: 'user', content: prompt }
@@ -36,15 +32,15 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      console.error('OpenAI API error:', response.status, await response.text());
-      throw new Error(`OpenAI API returned ${response.status}`);
+      console.error('OpenRouter API error:', response.status, await response.text());
+      throw new Error(`OpenRouter API returned ${response.status}`);
     }
 
     const data = await response.json();
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid OpenAI response:', data);
-      throw new Error('Invalid response format from OpenAI');
+      console.error('Invalid OpenRouter response:', data);
+      throw new Error('Invalid response format from OpenRouter');
     }
 
     // Calculate approximate cost based on token usage
