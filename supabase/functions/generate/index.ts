@@ -20,8 +20,11 @@ serve(async (req) => {
     }
 
     const { prompt, model = "gemini/gemini-pro" } = await req.json();
-
-    console.log('Making request to OpenRouter API with model:', model);
+    
+    console.log('Making request to OpenRouter API with:', {
+      model,
+      promptLength: prompt?.length || 0
+    });
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -33,22 +36,34 @@ serve(async (req) => {
       body: JSON.stringify({
         model: model,
         messages: [
-          { role: 'system', content: 'You are a helpful assistant that generates content based on user prompts.' },
-          { role: 'user', content: prompt }
+          {
+            role: 'user',
+            content: prompt
+          }
         ],
+        max_tokens: 1000,
+        temperature: 0.7,
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenRouter API error:', response.status, errorText);
+      console.error('OpenRouter API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
       throw new Error(`OpenRouter API returned ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('OpenRouter API response:', JSON.stringify(data, null, 2));
-    
-    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+    console.log('OpenRouter API response structure:', {
+      hasChoices: !!data.choices,
+      firstChoice: !!data.choices?.[0],
+      hasMessage: !!data.choices?.[0]?.message
+    });
+
+    if (!data.choices?.[0]?.message?.content) {
       console.error('Invalid OpenRouter response:', data);
       throw new Error('Invalid response format from OpenRouter');
     }
@@ -76,7 +91,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in generate function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack
+      }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
