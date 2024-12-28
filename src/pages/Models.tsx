@@ -88,11 +88,12 @@ export default function Models() {
         .from('available_models')
         .upsert({
           model_id: model.id,
-          name: model.name || model.id,
+          name: model.name,
           provider: provider,
           description: model.description || '',
           context_length: model.context_length,
-          is_active: true
+          is_active: true,
+          clean_model_name: model.name.replace(`${provider}/`, '').trim()
         }, {
           onConflict: 'model_id'
         });

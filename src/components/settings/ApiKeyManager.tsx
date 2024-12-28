@@ -113,7 +113,8 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
           provider: provider, // Ensure provider is always set
           description: model.description || '',
           context_length: model.context_length,
-          is_active: true
+          is_active: true,
+          clean_model_name: model.name.replace(`${provider}/`, '').trim()
         };
       });
 
