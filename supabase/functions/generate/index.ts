@@ -13,12 +13,20 @@ serve(async (req) => {
   }
 
   try {
+    const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
+    if (!openRouterKey) {
+      console.error('OpenRouter API key not configured');
+      throw new Error('OpenRouter API key not configured in environment variables');
+    }
+
     const { prompt, model = "gemini/gemini-pro" } = await req.json();
+
+    console.log('Making request to OpenRouter API with model:', model);
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENROUTER_API_KEY')}`,
+        'Authorization': `Bearer ${openRouterKey}`,
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://lovable.dev',
       },
@@ -32,11 +40,13 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      console.error('OpenRouter API error:', response.status, await response.text());
-      throw new Error(`OpenRouter API returned ${response.status}`);
+      const errorText = await response.text();
+      console.error('OpenRouter API error:', response.status, errorText);
+      throw new Error(`OpenRouter API returned ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('OpenRouter API response:', JSON.stringify(data, null, 2));
     
     if (!data.choices || !data.choices[0] || !data.choices[0].message) {
       console.error('Invalid OpenRouter response:', data);
