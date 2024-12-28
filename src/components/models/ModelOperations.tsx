@@ -15,17 +15,45 @@ export function ModelOperations({ onSuccess }: ModelOperationsProps) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("User not authenticated");
 
-      // Add to models in use
-      const { error: useError } = await supabase
+      // First check if the model is already in use
+      const { data: existingModel, error: checkError } = await supabase
         .from('models_in_use')
-        .upsert({
-          user_id: user.id,
-          model_id: model.id,
-          provider: model.provider,
-          is_active: true
-        });
+        .select()
+        .eq('user_id', user.id)
+        .eq('model_id', model.id)
+        .maybeSingle();
 
-      if (useError) throw useError;
+      if (checkError) throw checkError;
+
+      let error;
+      
+      if (existingModel) {
+        // Update the existing model
+        const { error: updateError } = await supabase
+          .from('models_in_use')
+          .update({
+            is_active: true,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id)
+          .eq('model_id', model.id);
+          
+        error = updateError;
+      } else {
+        // Add to models in use
+        const { error: useError } = await supabase
+          .from('models_in_use')
+          .insert({
+            user_id: user.id,
+            model_id: model.id,
+            provider: model.provider,
+            is_active: true
+          });
+          
+        error = useError;
+      }
+
+      if (error) throw error;
 
       // Add to user preferences
       const { error: prefError } = await supabase
