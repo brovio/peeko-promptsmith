@@ -16,12 +16,17 @@ interface UseCaseCardActionsProps {
 
 export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCaseCardActionsProps) {
   return (
-    <div className="flex gap-1"> {/* Reduced from gap-2 to gap-1 */}
+    <div className="flex gap-1">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onEdit}>
-              <Edit className="h-4 w-4" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 hover:text-primary" 
+              onClick={onEdit}
+            >
+              <Edit className="h-4 w-4 dark:text-[hsl(142,76%,36%)] black:text-[hsl(142,76%,36%)]" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -31,8 +36,13 @@ export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCa
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onUse}>
-              <Play className="h-4 w-4" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 hover:text-primary" 
+              onClick={onUse}
+            >
+              <Play className="h-4 w-4 dark:text-[hsl(142,76%,36%)] black:text-[hsl(142,76%,36%)]" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -42,8 +52,13 @@ export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCa
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onInfo}>
-              <Info className="h-4 w-4" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 hover:text-primary" 
+              onClick={onInfo}
+            >
+              <Info className="h-4 w-4 dark:text-[hsl(142,76%,36%)] black:text-[hsl(142,76%,36%)]" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -53,8 +68,13 @@ export function UseCaseCardActions({ onEdit, onUse, onInfo, onDuplicate }: UseCa
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onDuplicate}>
-              <Copy className="h-4 w-4" />
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-8 w-8 hover:text-primary" 
+              onClick={onDuplicate}
+            >
+              <Copy className="h-4 w-4 dark:text-[hsl(142,76%,36%)] black:text-[hsl(142,76%,36%)]" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
