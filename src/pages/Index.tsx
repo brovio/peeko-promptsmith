@@ -22,6 +22,10 @@ export default function Index() {
     setLogs(prev => [...prev, { timestamp: new Date(), message, type }]);
   };
 
+  const clearLogs = () => {
+    setLogs([]);
+  };
+
   // Check auth state on component mount
   useEffect(() => {
     const checkAuth = async () => {
@@ -34,10 +38,13 @@ export default function Index() {
           description: "Please try refreshing the page",
           variant: "destructive",
         });
+      } else if (session) {
+        addLog(`Authenticated as ${session.user.email}`, 'success');
       }
     };
 
     checkAuth();
+    addLog('Application initialized', 'info');
   }, [toast]);
 
   const { 
@@ -72,12 +79,11 @@ export default function Index() {
         throw error;
       }
       
-      addLog('Models fetched successfully', 'success');
+      addLog(`Found ${data?.length || 0} available models`, 'success');
       return data || [];
     },
   });
 
-  // Fetch details for models in use
   const { 
     data: models = [], 
     isError: isModelsError,
@@ -121,6 +127,22 @@ export default function Index() {
     refetchModels();
   };
 
+  const handleModelSelect = (modelId: string) => {
+    setSelectedModel(modelId);
+    const model = models.find(m => m.model_id === modelId);
+    addLog(`Selected model: ${model?.clean_model_name || modelId}`, 'info');
+  };
+
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    addLog(`Selected use case category: ${categoryId}`, 'info');
+  };
+
+  const handleEnhancerUpdate = (enhancer: string) => {
+    setSelectedEnhancer(enhancer);
+    addLog('Updated enhancer template', 'info');
+  };
+
   if (isModelsInUseError || isModelsError) {
     toast({
       title: "Error loading models",
@@ -148,7 +170,7 @@ export default function Index() {
   return (
     <SidebarProvider>
       <div className="min-h-screen gradient-bg flex w-full">
-        <LogSidebar logs={logs} />
+        <LogSidebar logs={logs} onClear={clearLogs} />
         <div className="container mx-auto py-8 px-4 flex-1">
           <div className="mb-8">
             <h1 className="text-3xl font-bold">PeekoPrompter</h1>
@@ -160,14 +182,14 @@ export default function Index() {
                 <ModelSelector
                   models={models}
                   selectedModel={selectedModel}
-                  onModelSelect={setSelectedModel}
+                  onModelSelect={handleModelSelect}
                   isLoading={isModelsInUseLoading || isModelsLoading}
                   onRefresh={handleRefreshModels}
                 />
                 <CategorySelector
                   selectedCategory={selectedCategory}
-                  onCategorySelect={setSelectedCategory}
-                  onEnhancerUpdate={setSelectedEnhancer}
+                  onCategorySelect={handleCategorySelect}
+                  onEnhancerUpdate={handleEnhancerUpdate}
                 />
               </div>
 
