@@ -29,11 +29,14 @@ export function CategorySelector({
   const { data: useCases, isLoading } = useQuery({
     queryKey: ['use-cases'],
     queryFn: async () => {
+      console.log('Fetching use cases...');
       const { data, error } = await supabase
         .from('use_cases')
         .select('id, title, enhancer');
       
       if (error) throw error;
+      
+      console.log(`Found ${data?.length || 0} use cases`);
       return data as UseCase[];
     }
   });
@@ -41,6 +44,8 @@ export function CategorySelector({
   const handleUseCaseSelect = (useCaseId: string) => {
     const selectedUseCase = useCases?.find(uc => uc.id === useCaseId);
     if (selectedUseCase) {
+      console.log(`Selected use case: ${selectedUseCase.title}`);
+      console.log(`Enhancer text for "${selectedUseCase.title}": ${selectedUseCase.enhancer}`);
       onCategorySelect(useCaseId);
       onEnhancerUpdate(selectedUseCase.enhancer);
     }
