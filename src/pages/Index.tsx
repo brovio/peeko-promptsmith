@@ -7,6 +7,8 @@ import { LogSidebar, LogEntry } from "@/components/LogSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { HomeHeader } from "@/components/home/Header";
 import { MainContent } from "@/components/home/MainContent";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ReloadIcon } from "@radix-ui/react-icons";
 
 export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
@@ -157,11 +159,15 @@ export default function Index() {
   };
 
   if (isModelsInUseError || isModelsError) {
-    toast({
-      title: "Error loading models",
-      description: "There was an error loading your models. Please try again.",
-      variant: "destructive",
-    });
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <Alert variant="destructive">
+          <AlertDescription>
+            There was an error loading your models. Please try refreshing the page.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (
@@ -170,19 +176,25 @@ export default function Index() {
         <LogSidebar logs={logs} onClear={clearLogs} />
         <div className="container mx-auto py-8 px-4 flex-1">
           <HomeHeader />
-          <MainContent
-            models={models}
-            selectedModel={selectedModel}
-            selectedCategory={selectedCategory}
-            selectedEnhancer={selectedEnhancer}
-            isModelsLoading={isModelsInUseLoading || isModelsLoading}
-            result={result}
-            onModelSelect={handleModelSelect}
-            onCategorySelect={handleCategorySelect}
-            onEnhancerUpdate={handleEnhancerUpdate}
-            onPromptSubmit={handlePromptSubmit}
-            onRefreshModels={handleRefreshModels}
-          />
+          {isModelsInUseLoading || isModelsLoading ? (
+            <div className="flex items-center justify-center h-[200px]">
+              <ReloadIcon className="h-8 w-8 animate-spin" />
+            </div>
+          ) : (
+            <MainContent
+              models={models}
+              selectedModel={selectedModel}
+              selectedCategory={selectedCategory}
+              selectedEnhancer={selectedEnhancer}
+              isModelsLoading={isModelsInUseLoading || isModelsLoading}
+              result={result}
+              onModelSelect={handleModelSelect}
+              onCategorySelect={handleCategorySelect}
+              onEnhancerUpdate={handleEnhancerUpdate}
+              onPromptSubmit={handlePromptSubmit}
+              onRefreshModels={handleRefreshModels}
+            />
+          )}
         </div>
       </div>
     </SidebarProvider>
