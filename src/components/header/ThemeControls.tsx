@@ -12,20 +12,20 @@ export function ThemeControls() {
   const { applyTheme } = useThemeManager();
 
   return (
-    <TooltipProvider>
-      <div className="flex gap-2">
+    <TooltipProvider delayDuration={300}>
+      <div className="flex gap-3">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="outline"
               size="icon"
               onClick={() => applyTheme('light')}
-              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="w-11 h-11 bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <Sun className="h-4 w-4 dark:text-primary black:text-primary" />
+              <Sun className="h-7 w-7 dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent side="bottom" align="center" sideOffset={5}>
             <p>Light Theme</p>
           </TooltipContent>
         </Tooltip>
@@ -36,12 +36,12 @@ export function ThemeControls() {
               variant="outline"
               size="icon"
               onClick={() => applyTheme('dark')}
-              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="w-11 h-11 bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <Moon className="h-4 w-4 dark:text-primary black:text-primary" />
+              <Moon className="h-7 w-7 dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent side="bottom" align="center" sideOffset={5}>
             <p>Dark Theme</p>
           </TooltipContent>
         </Tooltip>
@@ -52,12 +52,12 @@ export function ThemeControls() {
               variant="outline"
               size="icon"
               onClick={() => applyTheme('black')}
-              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="w-11 h-11 bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <CircleDot className="h-4 w-4 dark:text-primary black:text-primary" />
+              <CircleDot className="h-7 w-7 dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>
+          <TooltipContent side="bottom" align="center" sideOffset={5}>
             <p>Black Theme</p>
           </TooltipContent>
         </Tooltip>
