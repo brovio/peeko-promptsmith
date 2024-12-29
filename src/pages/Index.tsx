@@ -3,8 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Model } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { LogSidebar, LogEntry } from "@/components/LogSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
 import { HomeHeader } from "@/components/home/Header";
 import { MainContent } from "@/components/home/MainContent";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -15,35 +13,22 @@ export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedEnhancer, setSelectedEnhancer] = useState("");
   const [result, setResult] = useState("");
-  const [logs, setLogs] = useState<LogEntry[]>([]);
   const { toast } = useToast();
-
-  const addLog = (message: string, type: 'info' | 'error' | 'success' = 'info') => {
-    setLogs(prev => [...prev, { timestamp: new Date(), message, type }]);
-  };
-
-  const clearLogs = () => {
-    setLogs([]);
-  };
 
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
         console.error('Error checking auth state:', error);
-        addLog('Authentication error occurred', 'error');
         toast({
           title: "Authentication Error",
           description: "Please try refreshing the page",
           variant: "destructive",
         });
-      } else if (session) {
-        addLog(`Authenticated as ${session.user.email}`, 'success');
       }
     };
 
     checkAuth();
-    addLog('Application initialized', 'info');
   }, [toast]);
 
   const { 
@@ -54,10 +39,8 @@ export default function Index() {
   } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
-      addLog('Fetching available models...', 'info');
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        addLog('Authentication required', 'error');
         toast({
           title: "Authentication required",
           description: "Please sign in to use models",
@@ -74,11 +57,9 @@ export default function Index() {
 
       if (error) {
         console.error('Error fetching models in use:', error);
-        addLog('Failed to fetch models', 'error');
         throw error;
       }
       
-      addLog(`Found ${data?.length || 0} available models`, 'success');
       return data || [];
     },
   });
@@ -106,14 +87,12 @@ export default function Index() {
         
         if (error) {
           console.error('Error fetching available models:', error);
-          addLog('Failed to fetch model details', 'error');
           throw error;
         }
 
         return (data || []) as Model[];
       } catch (error) {
         console.error('Failed to fetch models:', error);
-        addLog('Error loading model details', 'error');
         throw error;
       }
     },
@@ -121,7 +100,6 @@ export default function Index() {
   });
 
   const handleRefreshModels = () => {
-    addLog('Refreshing models...', 'info');
     refetchModelsInUse();
     refetchModels();
   };
@@ -129,7 +107,7 @@ export default function Index() {
   const handleModelSelect = (modelId: string) => {
     setSelectedModel(modelId);
     const model = models.find(m => m.model_id === modelId);
-    addLog(`Selected model: ${model?.clean_model_name || modelId}`, 'info');
+    console.log(`Selected model: ${model?.clean_model_name || modelId}`);
   };
 
   const handleCategorySelect = async (categoryId: string) => {
@@ -138,34 +116,22 @@ export default function Index() {
     // Fetch the use case details to get the title
     const { data: useCase } = await supabase
       .from('use_cases')
-      .select('title')
+      .select('title, enhancer')
       .eq('id', categoryId)
       .single();
     
     if (useCase) {
-      addLog(`Selected Use Case: ${useCase.title}`, 'info');
+      console.log(`Selected Use Case: ${useCase.title}`);
+      console.log(`Selected Use Case Enhancer Text: ${useCase.enhancer}`);
     }
   };
 
   const handleEnhancerUpdate = (enhancer: string) => {
     setSelectedEnhancer(enhancer);
-    addLog('Updated enhancer template', 'info');
   };
 
   const handlePromptSubmit = async (enhancedPrompt: string) => {
-    try {
-      addLog('Processing prompt...', 'info');
-      setResult(enhancedPrompt);
-      addLog('Prompt processed successfully', 'success');
-    } catch (error) {
-      console.error('Error submitting prompt:', error);
-      addLog('Failed to process prompt', 'error');
-      toast({
-        title: "Error",
-        description: "Failed to process prompt. Please try again.",
-        variant: "destructive",
-      });
-    }
+    setResult(enhancedPrompt);
   };
 
   if (isModelsInUseError || isModelsError) {
@@ -181,32 +147,29 @@ export default function Index() {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-background text-foreground flex w-full">
-        <LogSidebar logs={logs} onClear={clearLogs} />
-        <div className="container mx-auto py-8 px-4 flex-1">
-          <HomeHeader />
-          {isModelsInUseLoading || isModelsLoading ? (
-            <div className="flex items-center justify-center h-[200px]">
-              <Loader2 className="h-8 w-8 animate-spin" />
-            </div>
-          ) : (
-            <MainContent
-              models={models}
-              selectedModel={selectedModel}
-              selectedCategory={selectedCategory}
-              selectedEnhancer={selectedEnhancer}
-              isModelsLoading={isModelsInUseLoading || isModelsLoading}
-              result={result}
-              onModelSelect={handleModelSelect}
-              onCategorySelect={handleCategorySelect}
-              onEnhancerUpdate={handleEnhancerUpdate}
-              onPromptSubmit={handlePromptSubmit}
-              onRefreshModels={handleRefreshModels}
-            />
-          )}
-        </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="container mx-auto py-8 px-4">
+        <HomeHeader />
+        {isModelsInUseLoading || isModelsLoading ? (
+          <div className="flex items-center justify-center h-[200px]">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+        ) : (
+          <MainContent
+            models={models}
+            selectedModel={selectedModel}
+            selectedCategory={selectedCategory}
+            selectedEnhancer={selectedEnhancer}
+            isModelsLoading={isModelsInUseLoading || isModelsLoading}
+            result={result}
+            onModelSelect={handleModelSelect}
+            onCategorySelect={handleCategorySelect}
+            onEnhancerUpdate={handleEnhancerUpdate}
+            onPromptSubmit={handlePromptSubmit}
+            onRefreshModels={handleRefreshModels}
+          />
+        )}
       </div>
-    </SidebarProvider>
+    </div>
   );
 }
