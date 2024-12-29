@@ -34,11 +34,16 @@ export function CategorySelector({
         .from('use_cases')
         .select('id, title, enhancer');
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching use cases:', error);
+        throw error;
+      }
       
       console.log(`Found ${data?.length || 0} use cases`);
       return data as UseCase[];
-    }
+    },
+    retry: 1,
+    retryDelay: 1000
   });
 
   const handleUseCaseSelect = (useCaseId: string) => {

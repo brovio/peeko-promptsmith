@@ -25,8 +25,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         if (location.pathname === '/login') {
           navigate('/');
         }
-      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        console.log('User signed out or deleted');
+      } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
         setIsAuthenticated(false);
         setIsLoading(false);
         if (!PUBLIC_ROUTES.includes(location.pathname)) {
