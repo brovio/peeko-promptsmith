@@ -33,8 +33,8 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
     setAttemptCount(1);
     
     try {
-      // Combine the enhancer with the user's prompt
-      const combinedPrompt = `${selectedEnhancer}\n\nUser prompt: ${prompt.trim()}`;
+      // Create the combined prompt by adding the user's prompt after the enhancer
+      const combinedPrompt = `${selectedEnhancer}\n${prompt.trim()}`;
       
       // Get the template and replace the prompt placeholder
       const template = getTemplateForCategory(selectedCategory, selectedEnhancer);
