@@ -6,7 +6,12 @@ import { ApiKeyInput } from "./ApiKeyInput";
 import { ValidatedKeyActions } from "./ValidatedKeyActions";
 import { ModelRefreshManager } from "./ModelRefreshManager";
 import { refreshModelsInDatabase } from "@/utils/modelUtils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { 
+  Tooltip, 
+  TooltipContent, 
+  TooltipTrigger,
+  TooltipProvider 
+} from "@/components/ui/tooltip";
 
 interface ApiKeyManagerProps {
   onApiKeyValidated: (key: string) => void;
@@ -144,16 +149,18 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
             <ValidatedKeyActions
               onUnlink={unlinkApiKey}
             />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <ModelRefreshManager apiKey={apiKey} />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Refresh available models from OpenRouter</p>
-              </TooltipContent>
-            </Tooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <ModelRefreshManager apiKey={apiKey} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Refresh available models from OpenRouter</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         )}
       </div>
