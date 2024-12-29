@@ -36,10 +36,8 @@ export default function Testing() {
     setAttemptCount(1);
 
     try {
-      // Combine the enhancer with the user's prompt if an enhancer is selected
-      const finalPrompt = selectedEnhancer 
-        ? `${selectedEnhancer}\n${prompt.trim()}`
-        : prompt.trim();
+      // Create the final prompt without duplicating the enhancer text
+      const finalPrompt = prompt.trim();
 
       const { data, error } = await supabase.functions.invoke('generate', {
         body: { 
@@ -80,7 +78,8 @@ export default function Testing() {
 
   const handleEnhancerUpdate = (enhancer: string) => {
     setSelectedEnhancer(enhancer);
-    setPrompt(enhancer); // Automatically set the prompt when enhancer is updated
+    // When enhancer is updated, set it as the prompt
+    setPrompt(enhancer ? `Please enhance the following prompt:\n${enhancer}` : "");
   };
 
   return (
