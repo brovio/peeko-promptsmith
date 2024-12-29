@@ -160,6 +160,7 @@ const Sidebar = React.forwardRef<
     side?: "left" | "right"
     variant?: "sidebar" | "floating" | "inset"
     collapsible?: "offcanvas" | "icon" | "none"
+    collapsed?: boolean
   }
 >(
   (
@@ -167,6 +168,7 @@ const Sidebar = React.forwardRef<
       side = "left",
       variant = "sidebar",
       collapsible = "offcanvas",
+      collapsed = false,
       className,
       children,
       ...props
@@ -174,6 +176,9 @@ const Sidebar = React.forwardRef<
     ref
   ) => {
     const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+
+    // Override state based on collapsed prop
+    const effectiveState = collapsed ? "collapsed" : "expanded"
 
     if (collapsible === "none") {
       return (
@@ -214,8 +219,8 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         className="group peer hidden md:block text-sidebar-foreground"
-        data-state={state}
-        data-collapsible={state === "collapsed" ? collapsible : ""}
+        data-state={effectiveState}
+        data-collapsible={effectiveState === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
       >
@@ -236,7 +241,6 @@ const Sidebar = React.forwardRef<
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
-            // Adjust the padding for floating and inset variants.
             variant === "floating" || variant === "inset"
               ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)_+_theme(spacing.4)_+2px)]"
               : "group-data-[collapsible=icon]:w-[--sidebar-width-icon] group-data-[side=left]:border-r group-data-[side=right]:border-l",
