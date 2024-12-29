@@ -17,6 +17,8 @@ export default function Testing() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [currentModel, setCurrentModel] = useState("");
   const [attemptCount, setAttemptCount] = useState(0);
+  const [usedModel, setUsedModel] = useState("");
+  const [usedPrompt, setUsedPrompt] = useState("");
   const { toast } = useToast();
   const { models } = useModelsData();
 
@@ -50,6 +52,10 @@ export default function Testing() {
 
       setCurrentModel(data.model || "Unknown model");
       setResult(data.generatedText);
+      
+      // Set the used model and prompt
+      setUsedModel(data.model || "Unknown model");
+      setUsedPrompt(finalPrompt);
 
       toast({
         title: "Success",
@@ -118,6 +124,19 @@ export default function Testing() {
         >
           {isProcessing ? "Processing..." : "Process Prompt"}
         </Button>
+
+        {(usedModel || usedPrompt) && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Processing Details</h2>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p><span className="font-medium">Model Used:</span> {usedModel}</p>
+              <p><span className="font-medium">Prompt Used:</span></p>
+              <div className="bg-muted/50 p-3 rounded-md whitespace-pre-wrap">
+                {usedPrompt}
+              </div>
+            </div>
+          </div>
+        )}
 
         {result && (
           <div className="space-y-4">
