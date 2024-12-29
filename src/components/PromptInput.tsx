@@ -9,10 +9,16 @@ import { supabase } from "@/integrations/supabase/client";
 interface PromptInputProps {
   selectedCategory: string;
   selectedEnhancer: string;
+  selectedModel: string; // Add this prop
   onSubmit: (enhancedPrompt: string) => void;
 }
 
-export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: PromptInputProps) {
+export function PromptInput({ 
+  selectedCategory, 
+  selectedEnhancer, 
+  selectedModel, // Add this prop
+  onSubmit 
+}: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [currentModel, setCurrentModel] = useState("");
@@ -42,31 +48,38 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
       return;
     }
     
+    if (!selectedModel) {
+      toast({
+        title: "Error",
+        description: "Please select a model first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsEnhancing(true);
     setAttemptCount(1);
     
     try {
       console.log('Starting prompt enhancement process...');
       console.log('Original prompt:', prompt.trim());
+      console.log('Using model:', selectedModel);
       console.log('Using enhancer:', selectedEnhancer || 'No enhancer selected');
       
-      // Send just the user's prompt to be enhanced
       const { data, error } = await supabase.functions.invoke('generate', {
         body: { 
           prompt: prompt.trim(),
-          model: currentModel
+          model: selectedModel // Use the selected model
         }
       });
 
       if (error) throw error;
       
-      const modelName = data.model || "Unknown model";
-      console.log('Using model:', modelName);
       console.log('Generated text:', data.generatedText);
       
       // Update submission details
       const details = {
-        modelUsed: modelName,
+        modelUsed: selectedModel,
         enhancerUsed: selectedEnhancer || 'No enhancer',
         fullPrompt: `${selectedEnhancer} ${prompt.trim()}`
       };
@@ -78,12 +91,12 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
         Enhancer Used: ${details.enhancerUsed}
         Full Prompt: ${details.fullPrompt}`);
       
-      setCurrentModel(modelName);
+      setCurrentModel(selectedModel);
       onSubmit(data.generatedText);
       
       toast({
         title: "Success",
-        description: `Enhanced using ${modelName}`,
+        description: `Enhanced using ${selectedModel}`,
       });
     } catch (error) {
       console.error('Error enhancing prompt:', error);
@@ -108,7 +121,7 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
       />
       <Button
         onClick={handleSubmit}
-        disabled={!prompt.trim() || isEnhancing}
+        disabled={!prompt.trim() || isEnhancing || !selectedModel}
         className="w-full"
       >
         {isEnhancing ? "Enhancing..." : "Enhance & Submit"}

@@ -47,6 +47,7 @@ export function MainContent({
         <PromptSection
           selectedCategory={selectedCategory}
           selectedEnhancer={selectedEnhancer}
+          selectedModel={selectedModel}
           onSubmit={onPromptSubmit}
         />
       </div>
