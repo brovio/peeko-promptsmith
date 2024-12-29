@@ -29,7 +29,7 @@ export function LogSidebar({ logs }: LogSidebarProps) {
   }, [logs]);
 
   return (
-    <Sidebar defaultCollapsed={true} collapsed={!isOpen}>
+    <Sidebar collapsed={!isOpen}>
       <SidebarHeader className="border-b p-4 flex justify-between items-center">
         <h2 className="text-lg font-semibold">Process Logs</h2>
         <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
