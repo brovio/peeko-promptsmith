@@ -9,20 +9,18 @@ import { supabase } from "@/integrations/supabase/client";
 interface PromptInputProps {
   selectedCategory: string;
   selectedEnhancer: string;
-  selectedModel: string; // Add this prop
+  selectedModel: string;
   onSubmit: (enhancedPrompt: string) => void;
 }
 
 export function PromptInput({ 
   selectedCategory, 
   selectedEnhancer, 
-  selectedModel, // Add this prop
+  selectedModel,
   onSubmit 
 }: PromptInputProps) {
   const [prompt, setPrompt] = useState("");
   const [isEnhancing, setIsEnhancing] = useState(false);
-  const [currentModel, setCurrentModel] = useState("");
-  const [attemptCount, setAttemptCount] = useState(0);
   const [submissionDetails, setSubmissionDetails] = useState<{
     modelUsed: string;
     enhancerUsed: string;
@@ -58,7 +56,6 @@ export function PromptInput({
     }
     
     setIsEnhancing(true);
-    setAttemptCount(1);
     
     try {
       console.log('Starting prompt enhancement process...');
@@ -69,7 +66,7 @@ export function PromptInput({
       const { data, error } = await supabase.functions.invoke('generate', {
         body: { 
           prompt: prompt.trim(),
-          model: selectedModel // Use the selected model
+          model: selectedModel
         }
       });
 
@@ -91,7 +88,6 @@ export function PromptInput({
         Enhancer Used: ${details.enhancerUsed}
         Full Prompt: ${details.fullPrompt}`);
       
-      setCurrentModel(selectedModel);
       onSubmit(data.generatedText);
       
       toast({
@@ -107,7 +103,6 @@ export function PromptInput({
       });
     } finally {
       setIsEnhancing(false);
-      setAttemptCount(0);
     }
   };
 
@@ -137,8 +132,8 @@ export function PromptInput({
       
       <LoadingModal 
         open={isEnhancing}
-        currentModel={currentModel}
-        attemptCount={attemptCount}
+        currentModel={selectedModel}
+        attemptCount={1}
       />
     </div>
   );
