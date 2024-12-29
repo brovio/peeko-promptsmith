@@ -20,7 +20,14 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
   const { toast } = useToast();
 
   const handleSubmit = async () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a prompt to enhance",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsEnhancing(true);
     setAttemptCount(1);
