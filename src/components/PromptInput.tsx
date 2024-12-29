@@ -17,6 +17,11 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
   const [isEnhancing, setIsEnhancing] = useState(false);
   const [currentModel, setCurrentModel] = useState("");
   const [attemptCount, setAttemptCount] = useState(0);
+  const [submissionDetails, setSubmissionDetails] = useState<{
+    modelUsed: string;
+    enhancerUsed: string;
+    fullPrompt: string;
+  } | null>(null);
   const { toast } = useToast();
 
   const handleSubmit = async () => {
@@ -47,15 +52,30 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
 
       if (error) throw error;
       
-      console.log('Using model:', data.model || 'Unknown model');
+      const modelName = data.model || "Unknown model";
+      console.log('Using model:', modelName);
       console.log('Generated text:', data.generatedText);
       
-      setCurrentModel(data.model || "Unknown model");
+      // Update submission details
+      const details = {
+        modelUsed: modelName,
+        enhancerUsed: selectedEnhancer || 'No enhancer',
+        fullPrompt: `${selectedEnhancer} ${prompt.trim()}`
+      };
+      setSubmissionDetails(details);
+      
+      // Add detailed log entry
+      console.log(`Submission details:
+        Model Used: ${details.modelUsed}
+        Enhancer Used: ${details.enhancerUsed}
+        Full Prompt: ${details.fullPrompt}`);
+      
+      setCurrentModel(modelName);
       onSubmit(data.generatedText);
       
       toast({
         title: "Success",
-        description: `Enhanced using ${data.model}`,
+        description: `Enhanced using ${modelName}`,
       });
     } catch (error) {
       console.error('Error enhancing prompt:', error);
@@ -85,6 +105,14 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
       >
         {isEnhancing ? "Enhancing..." : "Enhance & Submit"}
       </Button>
+      
+      {submissionDetails && (
+        <div className="mt-4 p-4 border rounded-md bg-muted/50 space-y-2 text-sm">
+          <div><strong>Model Used:</strong> {submissionDetails.modelUsed}</div>
+          <div><strong>Enhancer Used:</strong> {submissionDetails.enhancerUsed}</div>
+          <div><strong>Full prompt submitted:</strong> {submissionDetails.fullPrompt}</div>
+        </div>
+      )}
       
       <LoadingModal 
         open={isEnhancing}
