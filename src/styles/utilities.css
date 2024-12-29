@@ -26,11 +26,15 @@
 
   /* High contrast text utilities */
   .text-high-contrast {
-    @apply text-foreground;
+    @apply text-foreground font-medium;
   }
 
   .text-medium-contrast {
     @apply text-muted-foreground;
+  }
+
+  .text-low-contrast {
+    @apply text-muted-foreground/80;
   }
 
   /* Ensure tooltips stay within modal */
@@ -38,6 +42,16 @@
     .TooltipContent {
       max-width: calc(100vw - 4rem);
     }
+  }
+
+  /* Input field contrast improvements */
+  .input-high-contrast {
+    @apply bg-background text-foreground border-border;
+  }
+
+  /* Card contrast improvements */
+  .card-high-contrast {
+    @apply bg-card text-card-foreground border-border;
   }
 }
 
@@ -51,13 +65,18 @@
   background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
 }
 
+/* Black mode specific utilities */
+.black .gradient-bg {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
+}
+
 /* Ensure full height and proper dark theme application */
 #root {
   @apply min-h-screen bg-background text-foreground transition-colors duration-300;
 }
 
 html {
-  @apply min-h-screen dark transition-colors duration-300;
+  @apply min-h-screen transition-colors duration-300;
 }
 
 body {
@@ -68,14 +87,23 @@ body {
   @apply bg-background text-foreground;
 }
 
+.black body {
+  @apply bg-background text-foreground;
+}
+
 /* Input field specific styles for better contrast */
 input::placeholder,
 textarea::placeholder {
-  @apply text-muted-foreground opacity-70;
+  @apply text-muted-foreground/70;
 }
 
 /* Ensure dialog inputs are legible */
 [role="dialog"] input,
 [role="dialog"] textarea {
   @apply bg-background text-foreground border-border;
+}
+
+/* Ensure form labels are visible */
+[role="dialog"] label {
+  @apply text-foreground;
 }

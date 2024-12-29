@@ -39,7 +39,7 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 13% 91%;
+    --border: 220 13% 30%;
     --input: 220 14% 24%;
     --ring: 142 76% 36%;
   }
@@ -47,9 +47,9 @@
   .black {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
-    --card: 0 0% 0%;
+    --card: 0 0% 5%;
     --card-foreground: 0 0% 100%;
-    --popover: 0 0% 0%;
+    --popover: 0 0% 5%;
     --popover-foreground: 0 0% 100%;
     --primary: 142 76% 36%;
     --primary-foreground: 0 0% 100%;
@@ -83,5 +83,20 @@
   /* Ensure dialog content is legible */
   [role="dialog"] {
     @apply bg-background text-foreground;
+  }
+
+  /* Ensure form labels are visible */
+  label {
+    @apply text-foreground;
+  }
+
+  /* Make links visible */
+  a {
+    @apply text-primary hover:text-primary/80;
+  }
+
+  /* Ensure button text is visible */
+  button {
+    @apply text-foreground disabled:text-muted-foreground;
   }
 }
