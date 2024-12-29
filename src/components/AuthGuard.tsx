@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
-export default function AuthGuard({ children }: { children: React.ReactNode }) {
+export function AuthGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);

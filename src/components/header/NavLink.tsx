@@ -1,31 +1,22 @@
 import { Link } from "react-router-dom";
-import { LucideIcon } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 interface NavLinkProps {
   to: string;
-  icon: LucideIcon;
-  label: string;
+  className?: string;
+  children: React.ReactNode;
 }
 
-export function NavLink({ to, icon: Icon, label }: NavLinkProps) {
+export function NavLink({ to, className, children }: NavLinkProps) {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link to={to} className="p-2 hover:bg-accent rounded-md">
-            <Icon className="h-5 w-5" />
-          </Link>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{label}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Link 
+      to={to} 
+      className={cn(
+        "text-sm font-medium transition-colors hover:text-primary",
+        className
+      )}
+    >
+      {children}
+    </Link>
   );
 }
