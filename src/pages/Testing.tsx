@@ -68,6 +68,15 @@ export default function Testing() {
     }
   };
 
+  const handleCategorySelect = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+  };
+
+  const handleEnhancerUpdate = (enhancer: string) => {
+    setSelectedEnhancer(enhancer);
+    setPrompt(enhancer); // Automatically set the prompt when enhancer is updated
+  };
+
   return (
     <div className="container mx-auto py-8 px-4 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Testing Playground</h1>
@@ -87,8 +96,8 @@ export default function Testing() {
           <h2 className="text-lg font-semibold">2. Select Use Case (Optional)</h2>
           <CategorySelector
             selectedCategory={selectedCategory}
-            onCategorySelect={setSelectedCategory}
-            onEnhancerUpdate={setSelectedEnhancer}
+            onCategorySelect={handleCategorySelect}
+            onEnhancerUpdate={handleEnhancerUpdate}
           />
         </div>
 
