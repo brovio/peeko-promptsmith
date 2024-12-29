@@ -22,7 +22,7 @@ export function ThemeControls() {
               onClick={() => applyTheme('light')}
               className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <Sun className="h-4 w-4" />
+              <Sun className="h-4 w-4 dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -38,7 +38,7 @@ export function ThemeControls() {
               onClick={() => applyTheme('dark')}
               className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <Moon className="h-4 w-4" />
+              <Moon className="h-4 w-4 dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -54,7 +54,7 @@ export function ThemeControls() {
               onClick={() => applyTheme('black')}
               className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <CircleDot className="h-4 w-4" />
+              <CircleDot className="h-4 w-4 dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>

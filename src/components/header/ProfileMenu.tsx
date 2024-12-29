@@ -49,7 +49,7 @@ export function ProfileMenu() {
   return (
     <div className="flex items-center gap-2">
       <Settings 
-        className="h-5 w-5 cursor-pointer hover:text-primary" 
+        className="h-5 w-5 cursor-pointer hover:text-primary dark:text-primary black:text-primary" 
         onClick={() => navigate("/settings")}
       />
       <DropdownMenu>
@@ -57,21 +57,21 @@ export function ProfileMenu() {
           <Avatar>
             <AvatarImage src={avatarUrl || ''} />
             <AvatarFallback>
-              <User className="h-5 w-5" />
+              <User className="h-5 w-5 dark:text-primary black:text-primary" />
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-background">
           <DropdownMenuItem onClick={() => navigate("/profile")}>
-            <User className="mr-2 h-4 w-4" />
+            <User className="mr-2 h-4 w-4 dark:text-primary black:text-primary" />
             Profile
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => navigate("/account")}>
-            <Settings className="mr-2 h-4 w-4" />
+            <Settings className="mr-2 h-4 w-4 dark:text-primary black:text-primary" />
             Account
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleSignOut}>
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-2 h-4 w-4 dark:text-primary black:text-primary" />
             Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
