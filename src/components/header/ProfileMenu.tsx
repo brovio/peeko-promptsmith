@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Settings, User, LogOut, Sun, Moon, CircleDot } from "lucide-react";
+import { Settings, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { useThemeManager } from "@/hooks/use-theme-manager";
 import {
   Tooltip,
   TooltipContent,
@@ -24,7 +21,6 @@ export function ProfileMenu() {
   const navigate = useNavigate();
   const supabase = useSupabaseClient();
   const { toast } = useToast();
-  const { applyTheme } = useThemeManager();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -74,7 +70,7 @@ export function ProfileMenu() {
   };
 
   return (
-    <div className="flex items-center gap-6">
+    <div className="flex items-center gap-2">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -117,23 +113,6 @@ export function ProfileMenu() {
             <Settings className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
             Account
           </DropdownMenuItem>
-          
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
-          <DropdownMenuItem onClick={() => applyTheme('light')}>
-            <Sun className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-            Light Mode
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => applyTheme('dark')}>
-            <Moon className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-            Dark Mode
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => applyTheme('black')}>
-            <CircleDot className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-            Black Mode
-          </DropdownMenuItem>
-          
-          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut}>
             <LogOut className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
             Sign Out
