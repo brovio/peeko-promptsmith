@@ -42,7 +42,7 @@ export default function Testing() {
       const { data, error } = await supabase.functions.invoke('generate', {
         body: { 
           prompt: finalPrompt,
-          model: selectedModel
+          model: selectedModel  // Make sure we're passing the selected model ID
         }
       });
 

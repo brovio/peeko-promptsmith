@@ -14,63 +14,55 @@ const MODEL_SEQUENCE = [
   "openai/o1-mini"
 ];
 
-async function tryModelSequence(prompt: string, openRouterKey: string) {
-  let lastError = null;
-  
-  for (const model of MODEL_SEQUENCE) {
-    try {
-      console.log(`Attempting to use model: ${model}`);
-      
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${openRouterKey}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://lovable.dev',
-        },
-        body: JSON.stringify({
-          model: model,
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: 1000,
-          temperature: 0.7,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Error with model ${model}:`, {
-          status: response.status,
-          error: errorText
-        });
-        lastError = `${model} failed: ${errorText}`;
-        continue;
-      }
-
-      const data = await response.json();
-      if (!data.choices?.[0]?.message?.content) {
-        console.error(`Invalid response from ${model}:`, data);
-        lastError = `Invalid response from ${model}`;
-        continue;
-      }
-
-      console.log(`Successfully generated with model: ${model}`);
-      return {
-        generatedText: data.choices[0].message.content,
+async function tryModelSequence(prompt: string, model: string, openRouterKey: string) {
+  try {
+    console.log(`Attempting to use specified model: ${model}`);
+    
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openRouterKey}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://lovable.dev',
+      },
+      body: JSON.stringify({
         model: model,
-        usage: data.usage || { prompt_tokens: 0, completion_tokens: 0 }
-      };
-    } catch (error) {
-      console.error(`Error with model ${model}:`, error);
-      lastError = error.message;
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 1000,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`Error with model ${model}:`, {
+        status: response.status,
+        error: errorText
+      });
+      throw new Error(`${model} failed: ${errorText}`);
     }
+
+    const data = await response.json();
+    if (!data.choices?.[0]?.message?.content) {
+      console.error(`Invalid response from ${model}:`, data);
+      throw new Error(`Invalid response from ${model}`);
+    }
+
+    console.log(`Successfully generated with model: ${model}`);
+    return {
+      generatedText: data.choices[0].message.content,
+      model: model,
+      usage: data.usage || { prompt_tokens: 0, completion_tokens: 0 }
+    };
+  } catch (error) {
+    console.error(`Error with specified model ${model}:`, error);
+    throw error;
   }
-  
-  throw new Error(`All models failed. Last error: ${lastError}`);
 }
 
 serve(async (req) => {
@@ -84,10 +76,14 @@ serve(async (req) => {
       throw new Error('OpenRouter API key not configured');
     }
 
-    const { prompt } = await req.json();
-    console.log('Received prompt request:', { promptLength: prompt?.length || 0 });
+    const { prompt, model } = await req.json();
+    console.log('Received prompt request:', { 
+      promptLength: prompt?.length || 0,
+      requestedModel: model 
+    });
 
-    const result = await tryModelSequence(prompt, openRouterKey);
+    // Use the specified model instead of trying the sequence
+    const result = await tryModelSequence(prompt, model, openRouterKey);
 
     return new Response(
       JSON.stringify({
