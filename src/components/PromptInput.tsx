@@ -35,6 +35,7 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
     try {
       console.log('Starting prompt enhancement process...');
       console.log('Original prompt:', prompt.trim());
+      console.log('Using enhancer:', selectedEnhancer || 'No enhancer selected');
       
       // Send just the user's prompt to be enhanced
       const { data, error } = await supabase.functions.invoke('generate', {
@@ -46,7 +47,7 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
 
       if (error) throw error;
       
-      console.log('Received response from model:', data.model);
+      console.log('Using model:', data.model || 'Unknown model');
       console.log('Generated text:', data.generatedText);
       
       setCurrentModel(data.model || "Unknown model");
