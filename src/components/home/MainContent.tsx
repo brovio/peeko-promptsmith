@@ -10,10 +10,11 @@ interface MainContentProps {
   selectedEnhancer: string;
   isModelsLoading: boolean;
   result: string;
+  metadata?: any;
   onModelSelect: (modelId: string) => void;
   onCategorySelect: (categoryId: string) => void;
   onEnhancerUpdate: (enhancer: string) => void;
-  onPromptSubmit: (enhancedPrompt: string) => void;
+  onPromptSubmit: (enhancedPrompt: string, metadata?: any) => void;
   onRefreshModels: () => void;
 }
 
@@ -24,6 +25,7 @@ export function MainContent({
   selectedEnhancer,
   isModelsLoading,
   result,
+  metadata,
   onModelSelect,
   onCategorySelect,
   onEnhancerUpdate,
@@ -52,7 +54,7 @@ export function MainContent({
         />
       </div>
 
-      <ResultSection result={result} />
+      <ResultSection result={result} metadata={metadata} />
     </div>
   );
 }

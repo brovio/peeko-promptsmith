@@ -13,6 +13,7 @@ export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedEnhancer, setSelectedEnhancer] = useState("");
   const [result, setResult] = useState("");
+  const [metadata, setMetadata] = useState(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -113,7 +114,6 @@ export default function Index() {
   const handleCategorySelect = async (categoryId: string) => {
     setSelectedCategory(categoryId);
     
-    // Fetch the use case details to get the title
     const { data: useCase } = await supabase
       .from('use_cases')
       .select('title, enhancer')
@@ -130,8 +130,9 @@ export default function Index() {
     setSelectedEnhancer(enhancer);
   };
 
-  const handlePromptSubmit = async (enhancedPrompt: string) => {
+  const handlePromptSubmit = async (enhancedPrompt: string, metadata?: any) => {
     setResult(enhancedPrompt);
+    setMetadata(metadata);
   };
 
   if (isModelsInUseError || isModelsError) {
@@ -162,6 +163,7 @@ export default function Index() {
             selectedEnhancer={selectedEnhancer}
             isModelsLoading={isModelsInUseLoading || isModelsLoading}
             result={result}
+            metadata={metadata}
             onModelSelect={handleModelSelect}
             onCategorySelect={handleCategorySelect}
             onEnhancerUpdate={handleEnhancerUpdate}
