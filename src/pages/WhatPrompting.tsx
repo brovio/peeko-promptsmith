@@ -34,7 +34,7 @@ export default function WhatPrompting() {
       <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold">What ya prompting for? 🤔</h1>
-          <Button disabled className="bg-[#98c5f2] hover:bg-[#7ab0e8] text-white">
+          <Button disabled className="bg-[hsl(142,76%,36%)] hover:bg-[hsl(142,76%,30%)] text-white">
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Loading...
           </Button>
@@ -60,9 +60,9 @@ export default function WhatPrompting() {
             <TooltipTrigger asChild>
               <Button 
                 onClick={() => setIsAddModalOpen(true)} 
-                className="bg-[#98c5f2] hover:bg-[#7ab0e8] text-white"
+                className="bg-[hsl(142,76%,36%)] hover:bg-[hsl(142,76%,30%)] text-white"
               >
-                <Plus className="mr-2 h-4 w-4 dark:text-primary black:text-primary" />
+                <Plus className="mr-2 h-4 w-4 text-white" />
                 New Use Case
               </Button>
             </TooltipTrigger>
