@@ -45,7 +45,7 @@ export function CategorySelector({
     const selectedUseCase = useCases?.find(uc => uc.id === useCaseId);
     if (selectedUseCase) {
       console.log(`Selected Use Case: ${selectedUseCase.title}`);
-      console.log(`Enhancer Text for "${selectedUseCase.title}" is: ${selectedUseCase.enhancer}`);
+      console.log(`Selected Use Case Enhancer Text: ${selectedUseCase.enhancer}`);
       onCategorySelect(useCaseId);
       onEnhancerUpdate(selectedUseCase.enhancer);
     }
