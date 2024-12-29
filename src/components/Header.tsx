@@ -1,7 +1,7 @@
 import { NavLink } from "./header/NavLink";
 import { ProfileMenu } from "./header/ProfileMenu";
 import { ThemeControls } from "./header/ThemeControls";
-import { TestTube, Home, Database, FileText } from "lucide-react";
+import { TestTube, Home, Database, LayoutTemplate } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -40,7 +40,7 @@ export function Header() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/use-cases" className="p-2 hover:bg-accent rounded-md">
-                  <FileText className="h-5 w-5" />
+                  <LayoutTemplate className="h-5 w-5" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent>
