@@ -1,6 +1,7 @@
 import { NavLink } from "./header/NavLink";
 import { ProfileMenu } from "./header/ProfileMenu";
 import { ThemeControls } from "./header/ThemeControls";
+import { TestTube } from "lucide-react";
 
 export function Header() {
   return (
@@ -10,7 +11,8 @@ export function Header() {
           <NavLink to="/" className="mr-6">
             Home
           </NavLink>
-          <NavLink to="/testing" className="mr-6">
+          <NavLink to="/testing" className="mr-6 flex items-center gap-1">
+            <TestTube className="h-4 w-4" />
             Testing
           </NavLink>
           <NavLink to="/models">
