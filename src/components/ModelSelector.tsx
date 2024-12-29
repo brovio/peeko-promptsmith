@@ -42,7 +42,7 @@ export function ModelSelector({
             {models.map((model) => (
               <SelectItem 
                 key={model.id} 
-                value={model.id}
+                value={model.model_id} // Changed from id to model_id
                 className="text-foreground hover:bg-muted"
               >
                 {model.clean_model_name || model.name}
