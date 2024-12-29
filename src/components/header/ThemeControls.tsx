@@ -20,9 +20,9 @@ export function ThemeControls() {
               variant="outline"
               size="icon"
               onClick={() => applyTheme('light')}
-              className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="w-[100px] h-[100px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <Sun className="h-[30px] w-[30px] dark:text-primary black:text-primary" />
+              <Sun className="h-[100px] w-[100px] dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center" sideOffset={5}>
@@ -36,9 +36,9 @@ export function ThemeControls() {
               variant="outline"
               size="icon"
               onClick={() => applyTheme('dark')}
-              className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="w-[100px] h-[100px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <Moon className="h-[30px] w-[30px] dark:text-primary black:text-primary" />
+              <Moon className="h-[100px] w-[100px] dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center" sideOffset={5}>
@@ -52,9 +52,9 @@ export function ThemeControls() {
               variant="outline"
               size="icon"
               onClick={() => applyTheme('black')}
-              className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="w-[100px] h-[100px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
             >
-              <CircleDot className="h-[30px] w-[30px] dark:text-primary black:text-primary" />
+              <CircleDot className="h-[100px] w-[100px] dark:text-primary black:text-primary" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" align="center" sideOffset={5}>

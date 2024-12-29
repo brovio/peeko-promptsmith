@@ -22,10 +22,10 @@ export function Header() {
                   variant="outline"
                   size="icon"
                   asChild
-                  className="w-[40px] h-[40px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                  className="w-[100px] h-[100px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
                 >
                   <NavLink to="/">
-                    <Home className="h-[37px] w-[37px] dark:text-primary black:text-primary" />
+                    <Home className="h-[100px] w-[100px] dark:text-primary black:text-primary" />
                   </NavLink>
                 </Button>
               </TooltipTrigger>
@@ -40,10 +40,10 @@ export function Header() {
                   variant="outline"
                   size="icon"
                   asChild
-                  className="w-[40px] h-[40px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                  className="w-[100px] h-[100px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
                 >
                   <NavLink to="/models">
-                    <Database className="h-[37px] w-[37px] dark:text-primary black:text-primary" />
+                    <Database className="h-[100px] w-[100px] dark:text-primary black:text-primary" />
                   </NavLink>
                 </Button>
               </TooltipTrigger>
@@ -58,10 +58,10 @@ export function Header() {
                   variant="outline"
                   size="icon"
                   asChild
-                  className="w-[40px] h-[40px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                  className="w-[100px] h-[100px] bg-white/10 backdrop-blur-sm hover:bg-white/20"
                 >
                   <NavLink to="/what-prompting">
-                    <LayoutTemplate className="h-[37px] w-[37px] dark:text-primary black:text-primary" />
+                    <LayoutTemplate className="h-[100px] w-[100px] dark:text-primary black:text-primary" />
                   </NavLink>
                 </Button>
               </TooltipTrigger>
