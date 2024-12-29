@@ -10,6 +10,7 @@ export interface Model {
   max_tokens?: number;
   p_model?: string;
   p_provider?: string;
+  model_id: string; // Added this line
 }
 
 export interface Category {
