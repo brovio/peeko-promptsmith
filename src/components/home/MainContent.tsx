@@ -2,6 +2,13 @@ import { ModelAndCategorySelectors } from "./ModelAndCategorySelectors";
 import { PromptSection } from "./PromptSection";
 import { ResultSection } from "./ResultSection";
 import { Model } from "@/lib/types";
+import { Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface MainContentProps {
   models: Model[];
@@ -33,7 +40,7 @@ export function MainContent({
   onRefreshModels,
 }: MainContentProps) {
   return (
-    <div className="grid md:grid-cols-2 gap-8">
+    <div className="grid md:grid-cols-2 gap-8 max-w-screen-2xl mx-auto px-4">
       <div className="space-y-6">
         <ModelAndCategorySelectors
           models={models}
@@ -54,7 +61,21 @@ export function MainContent({
         />
       </div>
 
-      <ResultSection result={result} metadata={metadata} />
+      <div className="relative">
+        <ResultSection result={result} metadata={metadata} />
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button className="absolute top-2 right-2">
+                <Info className={`h-6 w-6 transition-colors ${result ? 'text-[hsl(142,76%,36%)]' : 'text-muted-foreground'}`} />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{result ? 'View result details' : 'No results yet'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
     </div>
   );
 }

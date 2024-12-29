@@ -1,6 +1,5 @@
 import { NavLink } from "./header/NavLink";
 import { ProfileMenu } from "./header/ProfileMenu";
-import { ThemeControls } from "./header/ThemeControls";
 import { Home, Database, LayoutTemplate } from "lucide-react";
 import {
   Tooltip,
@@ -12,8 +11,8 @@ import {
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center justify-between">
-        <div className="flex items-center space-x-6">
+      <div className="container flex h-14 max-w-screen-2xl items-center justify-between">
+        <div className="flex items-center space-x-6 pl-4">
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -49,8 +48,7 @@ export function Header() {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="flex items-center space-x-6">
-          <ThemeControls />
+        <div className="flex items-center space-x-6 pr-4">
           <ProfileMenu />
         </div>
       </div>
