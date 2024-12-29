@@ -93,12 +93,21 @@ export function EditUseCaseModal({ useCase, open, onOpenChange }: EditUseCaseMod
     setIsDeleting(true);
 
     try {
-      const { error } = await supabase
+      // First, delete all related operations
+      const { error: operationsError } = await supabase
+        .from("use_case_operations")
+        .delete()
+        .eq("use_case_id", useCase.id);
+
+      if (operationsError) throw operationsError;
+
+      // Then, delete the use case
+      const { error: useCaseError } = await supabase
         .from("use_cases")
         .delete()
         .eq("id", useCase.id);
 
-      if (error) throw error;
+      if (useCaseError) throw useCaseError;
 
       queryClient.invalidateQueries({ queryKey: ["use-cases"] });
       toast({
