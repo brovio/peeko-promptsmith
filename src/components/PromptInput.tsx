@@ -33,18 +33,10 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
     setAttemptCount(1);
     
     try {
-      // Create the combined prompt by adding the user's prompt after the enhancer
-      const combinedPrompt = selectedEnhancer 
-        ? `${selectedEnhancer}\n\nOriginal prompt: ${prompt.trim()}`
-        : prompt.trim();
-      
-      // Get the template and replace the prompt placeholder
-      const template = getTemplateForCategory(selectedCategory, selectedEnhancer);
-      const enhancedPrompt = template.replace("{prompt}", combinedPrompt);
-      
+      // Send just the user's prompt to be enhanced
       const { data, error } = await supabase.functions.invoke('generate', {
         body: { 
-          prompt: enhancedPrompt,
+          prompt: prompt.trim(),
           model: currentModel
         }
       });
