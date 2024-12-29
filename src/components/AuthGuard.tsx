@@ -12,13 +12,52 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+
     // Initial session check
-    checkUser();
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (mounted) {
+          if (error) {
+            console.error('Error getting session:', error);
+            setIsAuthenticated(false);
+            setIsLoading(false);
+            if (!PUBLIC_ROUTES.includes(location.pathname)) {
+              navigate('/login');
+            }
+            return;
+          }
+
+          console.log('Initial session check:', session?.user?.id ? 'Authenticated' : 'No session');
+          setIsAuthenticated(!!session);
+          setIsLoading(false);
+
+          if (!session && !PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login');
+          }
+        }
+      } catch (error) {
+        console.error('Error during session check:', error);
+        if (mounted) {
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          if (!PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login');
+          }
+        }
+      }
+    };
+
+    initializeAuth();
 
     // Subscribe to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log('Auth state changed:', event, session?.user?.id);
       
+      if (!mounted) return;
+
       if (event === 'SIGNED_IN') {
         setIsAuthenticated(true);
         setIsLoading(false);
@@ -40,38 +79,10 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, [navigate, location.pathname]);
-
-  const checkUser = async () => {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Error checking session:', error);
-        setIsAuthenticated(false);
-        if (!PUBLIC_ROUTES.includes(location.pathname)) {
-          navigate('/login');
-        }
-      } else {
-        console.log('Session check:', session?.user?.id ? 'User authenticated' : 'No session');
-        setIsAuthenticated(!!session);
-        
-        if (!session && !PUBLIC_ROUTES.includes(location.pathname)) {
-          navigate('/login');
-        }
-      }
-    } catch (error) {
-      console.error('Error checking auth state:', error);
-      setIsAuthenticated(false);
-      if (!PUBLIC_ROUTES.includes(location.pathname)) {
-        navigate('/login');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   if (isLoading) {
     return <LoadingModal 
