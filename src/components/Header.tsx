@@ -1,7 +1,7 @@
 import { NavLink } from "./header/NavLink";
 import { ProfileMenu } from "./header/ProfileMenu";
 import { ThemeControls } from "./header/ThemeControls";
-import { Home, Database, LayoutTemplate, Info } from "lucide-react";
+import { Home, Database, LayoutTemplate } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -18,7 +18,7 @@ export function Header() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/" className="p-2 rounded-md group">
-                  <Home className="h-5 w-5 group-hover:text-white transition-colors" />
+                  <Home className="h-8 w-8 group-hover:text-white transition-colors" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent>
@@ -29,7 +29,7 @@ export function Header() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/models" className="p-2 rounded-md group">
-                  <Database className="h-5 w-5 group-hover:text-white transition-colors" />
+                  <Database className="h-8 w-8 group-hover:text-white transition-colors" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent>
@@ -40,22 +40,11 @@ export function Header() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <NavLink to="/what-prompting" className="p-2 rounded-md group">
-                  <LayoutTemplate className="h-5 w-5 group-hover:text-white transition-colors" />
+                  <LayoutTemplate className="h-8 w-8 group-hover:text-white transition-colors" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Use Cases</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <NavLink to="/info" className="p-2 rounded-md group">
-                  <Info className="h-5 w-5 group-hover:text-white transition-colors text-muted-foreground group-hover:text-[hsl(142,76%,36%)]" />
-                </NavLink>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Information</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

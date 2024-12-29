@@ -19,7 +19,7 @@ export function ThemeControls() {
               onClick={() => applyTheme('light')}
               className="p-2 rounded-md group"
             >
-              <Sun className="h-5 w-5 group-hover:text-white transition-colors" />
+              <Sun className="h-8 w-8 text-[hsl(142,76%,36%)] group-hover:text-white transition-colors" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -33,7 +33,7 @@ export function ThemeControls() {
               onClick={() => applyTheme('dark')}
               className="p-2 rounded-md group"
             >
-              <Moon className="h-5 w-5 group-hover:text-white transition-colors" />
+              <Moon className="h-8 w-8 text-[hsl(142,76%,36%)] group-hover:text-white transition-colors" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -47,7 +47,7 @@ export function ThemeControls() {
               onClick={() => applyTheme('black')}
               className="p-2 rounded-md group"
             >
-              <CircleDot className="h-5 w-5 group-hover:text-white transition-colors" />
+              <CircleDot className="h-8 w-8 text-[hsl(142,76%,36%)] group-hover:text-white transition-colors" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
