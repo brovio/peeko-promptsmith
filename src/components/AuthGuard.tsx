@@ -44,7 +44,13 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   };
 
   if (isLoading) {
-    return <LoadingModal />;
+    return <LoadingModal 
+      open={isLoading} 
+      currentModel="Authenticating..." 
+      attemptCount={1}
+      title="Checking authentication..."
+      description="Please wait while we verify your session."
+    />;
   }
 
   if (!isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname)) {

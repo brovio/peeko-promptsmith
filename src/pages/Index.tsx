@@ -8,7 +8,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { HomeHeader } from "@/components/home/Header";
 import { MainContent } from "@/components/home/MainContent";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ReloadIcon } from "@radix-ui/react-icons";
+import { Loader2 } from "lucide-react";
 
 export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
@@ -178,7 +178,7 @@ export default function Index() {
           <HomeHeader />
           {isModelsInUseLoading || isModelsLoading ? (
             <div className="flex items-center justify-center h-[200px]">
-              <ReloadIcon className="h-8 w-8 animate-spin" />
+              <Loader2 className="h-8 w-8 animate-spin" />
             </div>
           ) : (
             <MainContent
