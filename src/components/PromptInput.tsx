@@ -26,8 +26,21 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
     setAttemptCount(1);
     
     try {
+      // First, get the use case description
+      const { data: useCase, error: useCaseError } = await supabase
+        .from('use_cases')
+        .select('description')
+        .eq('id', selectedCategory)
+        .single();
+
+      if (useCaseError) throw useCaseError;
+
+      // Combine the description with the user's prompt
+      const combinedPrompt = `${useCase.description}\n\nUser prompt: ${prompt.trim()}`;
+      
+      // Get the template and replace the prompt placeholder
       const template = getTemplateForCategory(selectedCategory, selectedEnhancer);
-      const enhancedPrompt = template.replace("{prompt}", prompt.trim());
+      const enhancedPrompt = template.replace("{prompt}", combinedPrompt);
       
       const { data, error } = await supabase.functions.invoke('generate', {
         body: { prompt: enhancedPrompt }
