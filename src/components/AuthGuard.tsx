@@ -15,8 +15,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         
         if (error) {
           console.error('Auth error:', error);
+          // Clear any stale session data
+          await supabase.auth.signOut();
+          localStorage.removeItem('supabase.auth.token');
+          
           toast({
-            title: "Authentication Error",
+            title: "Session Expired",
             description: "Please sign in again.",
             variant: "destructive",
           });
@@ -32,19 +36,32 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         setIsLoading(false);
       } catch (error) {
         console.error('Auth check error:', error);
+        // Clear any stale session data
+        await supabase.auth.signOut();
+        localStorage.removeItem('supabase.auth.token');
         navigate("/login");
       }
     };
 
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state change:', event);
+      
       if (event === 'TOKEN_REFRESHED') {
-        // Session was refreshed successfully
+        console.log('Token refreshed successfully');
         setIsLoading(false);
-      } else if (event === 'SIGNED_OUT' || !session) {
+      } else if (event === 'SIGNED_OUT') {
+        console.log('User signed out');
+        // Ensure clean session state
+        localStorage.removeItem('supabase.auth.token');
+        navigate("/login");
+      } else if (!session) {
+        console.log('No active session');
         navigate("/login");
       }
     });
 
+    // Initial auth check
     checkAuth();
 
     return () => {
