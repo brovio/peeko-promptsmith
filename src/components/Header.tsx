@@ -8,42 +8,64 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
         <div className="mr-4 hidden md:flex items-center space-x-4">
-          <TooltipProvider>
+          <TooltipProvider delayDuration={300}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/" className="p-2 hover:bg-accent rounded-md group">
-                  <Home className="h-6 w-6 bg-white/10 backdrop-blur-sm hover:bg-white/20 dark:text-primary black:text-primary group-hover:text-primary" />
-                </NavLink>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  asChild
+                  className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                >
+                  <NavLink to="/">
+                    <Home className="h-[30px] w-[30px] dark:text-primary black:text-primary" />
+                  </NavLink>
+                </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" align="center" sideOffset={5}>
                 <p>Home</p>
               </TooltipContent>
             </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/models" className="p-2 hover:bg-accent rounded-md group">
-                  <Database className="h-6 w-6 bg-white/10 backdrop-blur-sm hover:bg-white/20 dark:text-primary black:text-primary group-hover:text-primary" />
-                </NavLink>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  asChild
+                  className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                >
+                  <NavLink to="/models">
+                    <Database className="h-[30px] w-[30px] dark:text-primary black:text-primary" />
+                  </NavLink>
+                </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" align="center" sideOffset={5}>
                 <p>Models</p>
               </TooltipContent>
             </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/what-prompting" className="p-2 hover:bg-accent rounded-md group">
-                  <LayoutTemplate className="h-6 w-6 bg-white/10 backdrop-blur-sm hover:bg-white/20 dark:text-primary black:text-primary group-hover:text-primary" />
-                </NavLink>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  asChild
+                  className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-white/20"
+                >
+                  <NavLink to="/what-prompting">
+                    <LayoutTemplate className="h-[30px] w-[30px] dark:text-primary black:text-primary" />
+                  </NavLink>
+                </Button>
               </TooltipTrigger>
-              <TooltipContent>
+              <TooltipContent side="bottom" align="center" sideOffset={5}>
                 <p>Use Cases</p>
               </TooltipContent>
             </Tooltip>
