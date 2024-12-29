@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { LoadingModal } from "./LoadingModal";
@@ -22,15 +22,7 @@ export function PromptInput({
   const [isEnhancing, setIsEnhancing] = useState(false);
   const { toast } = useToast();
 
-  // Update prompt when selectedEnhancer changes
-  useEffect(() => {
-    if (selectedEnhancer) {
-      setPrompt(selectedEnhancer);
-      console.log('Prompt updated with enhancer:', selectedEnhancer);
-    }
-  }, [selectedEnhancer]);
-
-  const handleSubmit = async () => {
+  const handleEnhance = async () => {
     if (!prompt.trim()) {
       toast({
         title: "Error",
@@ -53,14 +45,11 @@ export function PromptInput({
     
     try {
       console.log('Starting prompt enhancement process...');
-      
-      // Use the selected enhancer as the template
-      const fullPrompt = `${selectedEnhancer}\n\n${prompt.trim()}`;
-      console.log('Full prompt:', fullPrompt);
+      console.log('Full prompt:', prompt);
       
       const { data, error } = await supabase.functions.invoke('generate', {
         body: { 
-          prompt: fullPrompt,
+          prompt: prompt.trim(),
           model: selectedModel
         }
       });
@@ -86,6 +75,60 @@ export function PromptInput({
     }
   };
 
+  const handleSubmit = async () => {
+    if (!prompt.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a prompt",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!selectedModel) {
+      toast({
+        title: "Error",
+        description: "Please select a model first",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsEnhancing(true);
+    
+    try {
+      console.log('Starting prompt submission process...');
+      const combinedPrompt = `${selectedEnhancer} ${prompt.trim()}`;
+      console.log('Combined prompt:', combinedPrompt);
+      
+      const { data, error } = await supabase.functions.invoke('generate', {
+        body: { 
+          prompt: combinedPrompt,
+          model: selectedModel
+        }
+      });
+
+      if (error) throw error;
+      
+      console.log('Generated text:', data.generatedText);
+      onSubmit(data.generatedText);
+      
+      toast({
+        title: "Success",
+        description: `Processed using ${selectedModel}`,
+      });
+    } catch (error) {
+      console.error('Error processing prompt:', error);
+      toast({
+        title: "Error",
+        description: "Failed to process prompt. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsEnhancing(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Textarea
@@ -94,13 +137,22 @@ export function PromptInput({
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
       />
-      <Button
-        onClick={handleSubmit}
-        disabled={!prompt.trim() || isEnhancing || !selectedModel}
-        className="w-full"
-      >
-        {isEnhancing ? "Enhancing..." : "Enhance & Submit"}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          onClick={handleEnhance}
+          disabled={!prompt.trim() || isEnhancing || !selectedModel}
+          className="flex-1"
+        >
+          {isEnhancing ? "Enhancing..." : "Enhance & Submit"}
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={!prompt.trim() || isEnhancing || !selectedModel}
+          className="flex-1"
+        >
+          Submit
+        </Button>
+      </div>
       
       <LoadingModal 
         open={isEnhancing}
