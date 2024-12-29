@@ -25,7 +25,6 @@ export function ProfileMenu() {
   const { toast } = useToast();
   const { applyTheme } = useThemeManager();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function getProfile() {
@@ -49,8 +48,6 @@ export function ProfileMenu() {
         }
       } catch (error) {
         console.error('Error loading avatar:', error);
-      } finally {
-        setIsLoading(false);
       }
     }
 
@@ -78,7 +75,7 @@ export function ProfileMenu() {
         <Tooltip>
           <TooltipTrigger asChild>
             <DropdownMenuTrigger className="focus:outline-none">
-              <Avatar className={isLoading ? "animate-pulse" : ""}>
+              <Avatar>
                 <AvatarImage src={avatarUrl || ''} />
                 <AvatarFallback>
                   <User className="h-8 w-8 text-[hsl(142,76%,36%)]" />

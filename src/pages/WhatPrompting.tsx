@@ -27,29 +27,8 @@ export default function WhatPrompting() {
       if (error) throw error;
       return data;
     },
+    placeholderData: [], // Show empty array while loading
   });
-
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold">What ya prompting for? 🤔</h1>
-          <Button disabled className="bg-[hsl(142,76%,36%)] hover:bg-[hsl(142,76%,30%)] text-white">
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Loading...
-          </Button>
-        </div>
-        <div className="grid gap-6 md:grid-cols-2">
-          {[1, 2, 3, 4].map((index) => (
-            <Card key={index} className="p-6 animate-pulse">
-              <div className="h-6 bg-muted rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-muted rounded w-1/2"></div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -61,9 +40,19 @@ export default function WhatPrompting() {
               <Button 
                 onClick={() => setIsAddModalOpen(true)} 
                 className="bg-[hsl(142,76%,36%)] hover:bg-[hsl(142,76%,30%)] text-white"
+                disabled={isLoading}
               >
-                <Plus className="mr-2 h-4 w-4 text-white" />
-                New Use Case
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Plus className="mr-2 h-4 w-4 text-white" />
+                    New Use Case
+                  </>
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -79,14 +68,25 @@ export default function WhatPrompting() {
       />
       
       <div className="grid gap-6 md:grid-cols-2">
-        {useCases?.map((useCase) => (
-          <UseCaseCard key={useCase.id} useCase={useCase} />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="p-6 animate-pulse">
+              <div className="h-6 bg-muted rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-muted rounded w-1/2"></div>
+            </Card>
+          ))
+        ) : (
+          <>
+            {useCases?.map((useCase) => (
+              <UseCaseCard key={useCase.id} useCase={useCase} />
+            ))}
 
-        {!useCases?.length && !isLoading && (
-          <div className="col-span-2 text-center text-muted-foreground">
-            No use cases found. Add your first one!
-          </div>
+            {!useCases?.length && (
+              <div className="col-span-2 text-center text-muted-foreground">
+                No use cases found. Add your first one!
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
