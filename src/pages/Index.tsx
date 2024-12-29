@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { ModelSelector } from "@/components/ModelSelector";
-import { CategorySelector } from "@/components/CategorySelector";
-import { PromptInput } from "@/components/PromptInput";
-import { ResultsDisplay } from "@/components/ResultsDisplay";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Model } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { LogSidebar, LogEntry } from "@/components/LogSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { ModelAndCategorySelectors } from "@/components/home/ModelAndCategorySelectors";
+import { PromptSection } from "@/components/home/PromptSection";
+import { ResultSection } from "@/components/home/ResultSection";
 
 export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
@@ -26,7 +25,6 @@ export default function Index() {
     setLogs([]);
   };
 
-  // Check auth state on component mount
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
@@ -143,14 +141,6 @@ export default function Index() {
     addLog('Updated enhancer template', 'info');
   };
 
-  if (isModelsInUseError || isModelsError) {
-    toast({
-      title: "Error loading models",
-      description: "There was an error loading your models. Please try again.",
-      variant: "destructive",
-    });
-  }
-
   const handlePromptSubmit = async (enhancedPrompt: string) => {
     try {
       addLog('Processing prompt...', 'info');
@@ -167,46 +157,44 @@ export default function Index() {
     }
   };
 
+  if (isModelsInUseError || isModelsError) {
+    toast({
+      title: "Error loading models",
+      description: "There was an error loading your models. Please try again.",
+      variant: "destructive",
+    });
+  }
+
   return (
     <SidebarProvider>
-      <div className="min-h-screen gradient-bg flex w-full">
+      <div className="min-h-screen bg-background flex w-full">
         <LogSidebar logs={logs} onClear={clearLogs} />
         <div className="container mx-auto py-8 px-4 flex-1">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold">PeekoPrompter</h1>
+            <h1 className="text-3xl font-bold text-foreground">PeekoPrompter</h1>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
-              <div className="flex gap-4 flex-col sm:flex-row">
-                <ModelSelector
-                  models={models}
-                  selectedModel={selectedModel}
-                  onModelSelect={handleModelSelect}
-                  isLoading={isModelsInUseLoading || isModelsLoading}
-                  onRefresh={handleRefreshModels}
-                />
-                <CategorySelector
-                  selectedCategory={selectedCategory}
-                  onCategorySelect={handleCategorySelect}
-                  onEnhancerUpdate={handleEnhancerUpdate}
-                />
-              </div>
+              <ModelAndCategorySelectors
+                models={models}
+                selectedModel={selectedModel}
+                selectedCategory={selectedCategory}
+                isModelsLoading={isModelsInUseLoading || isModelsLoading}
+                onModelSelect={handleModelSelect}
+                onCategorySelect={handleCategorySelect}
+                onEnhancerUpdate={handleEnhancerUpdate}
+                onRefreshModels={handleRefreshModels}
+              />
 
-              <div className="space-y-4">
-                <h2 className="text-xl font-semibold">Your Prompt</h2>
-                <PromptInput
-                  selectedCategory={selectedCategory}
-                  selectedEnhancer={selectedEnhancer}
-                  onSubmit={handlePromptSubmit}
-                />
-              </div>
+              <PromptSection
+                selectedCategory={selectedCategory}
+                selectedEnhancer={selectedEnhancer}
+                onSubmit={handlePromptSubmit}
+              />
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Results</h2>
-              <ResultsDisplay result={result} />
-            </div>
+            <ResultSection result={result} />
           </div>
         </div>
       </div>
