@@ -17,8 +17,8 @@ export function Header() {
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/" className="p-2 hover:bg-accent rounded-md">
-                  <Home className="h-5 w-5 dark:text-primary black:text-primary" />
+                <NavLink to="/" className="p-2 hover:bg-accent rounded-md group">
+                  <Home className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent>
@@ -28,8 +28,8 @@ export function Header() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/models" className="p-2 hover:bg-accent rounded-md">
-                  <Database className="h-5 w-5 dark:text-primary black:text-primary" />
+                <NavLink to="/models" className="p-2 hover:bg-accent rounded-md group">
+                  <Database className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent>
@@ -39,8 +39,8 @@ export function Header() {
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <NavLink to="/use-cases" className="p-2 hover:bg-accent rounded-md">
-                  <LayoutTemplate className="h-5 w-5 dark:text-primary black:text-primary" />
+                <NavLink to="/what-prompting" className="p-2 hover:bg-accent rounded-md group">
+                  <LayoutTemplate className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
                 </NavLink>
               </TooltipTrigger>
               <TooltipContent>
