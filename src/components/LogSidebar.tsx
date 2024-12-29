@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -20,19 +21,19 @@ interface LogSidebarProps {
 }
 
 export function LogSidebar({ logs }: LogSidebarProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const { setOpen } = useSidebar();
 
   useEffect(() => {
     if (logs.length > 0) {
-      setIsOpen(true);
+      setOpen(true);
     }
-  }, [logs]);
+  }, [logs, setOpen]);
 
   return (
-    <Sidebar collapsed={!isOpen}>
+    <Sidebar>
       <SidebarHeader className="border-b p-4 flex justify-between items-center">
         <h2 className="text-lg font-semibold">Process Logs</h2>
-        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+        <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
           <X className="h-4 w-4" />
         </Button>
       </SidebarHeader>
