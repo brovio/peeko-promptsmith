@@ -17,7 +17,12 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     // Initial session check
     const initializeAuth = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session error:', error);
+          throw error;
+        }
         
         if (mounted) {
           const isAuthed = !!session?.user;
