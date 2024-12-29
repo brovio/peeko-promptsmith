@@ -12,14 +12,14 @@ export function ThemeControls() {
 
   return (
     <TooltipProvider>
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-6">
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               onClick={() => applyTheme('light')}
-              className="p-2 hover:bg-accent rounded-md group"
+              className="p-2 rounded-md group"
             >
-              <Sun className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
+              <Sun className="h-5 w-5 group-hover:text-white transition-colors" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -31,9 +31,9 @@ export function ThemeControls() {
           <TooltipTrigger asChild>
             <button
               onClick={() => applyTheme('dark')}
-              className="p-2 hover:bg-accent rounded-md group"
+              className="p-2 rounded-md group"
             >
-              <Moon className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
+              <Moon className="h-5 w-5 group-hover:text-white transition-colors" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
@@ -45,9 +45,9 @@ export function ThemeControls() {
           <TooltipTrigger asChild>
             <button
               onClick={() => applyTheme('black')}
-              className="p-2 hover:bg-accent rounded-md group"
+              className="p-2 rounded-md group"
             >
-              <CircleDot className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
+              <CircleDot className="h-5 w-5 group-hover:text-white transition-colors" />
             </button>
           </TooltipTrigger>
           <TooltipContent>
