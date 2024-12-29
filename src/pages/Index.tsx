@@ -5,9 +5,8 @@ import { Model } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { LogSidebar, LogEntry } from "@/components/LogSidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { ModelAndCategorySelectors } from "@/components/home/ModelAndCategorySelectors";
-import { PromptSection } from "@/components/home/PromptSection";
-import { ResultSection } from "@/components/home/ResultSection";
+import { HomeHeader } from "@/components/home/Header";
+import { MainContent } from "@/components/home/MainContent";
 
 export default function Index() {
   const [selectedModel, setSelectedModel] = useState("");
@@ -167,35 +166,23 @@ export default function Index() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen bg-background flex w-full">
+      <div className="min-h-screen bg-background text-foreground flex w-full">
         <LogSidebar logs={logs} onClear={clearLogs} />
         <div className="container mx-auto py-8 px-4 flex-1">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-foreground">PeekoPrompter</h1>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-6">
-              <ModelAndCategorySelectors
-                models={models}
-                selectedModel={selectedModel}
-                selectedCategory={selectedCategory}
-                isModelsLoading={isModelsInUseLoading || isModelsLoading}
-                onModelSelect={handleModelSelect}
-                onCategorySelect={handleCategorySelect}
-                onEnhancerUpdate={handleEnhancerUpdate}
-                onRefreshModels={handleRefreshModels}
-              />
-
-              <PromptSection
-                selectedCategory={selectedCategory}
-                selectedEnhancer={selectedEnhancer}
-                onSubmit={handlePromptSubmit}
-              />
-            </div>
-
-            <ResultSection result={result} />
-          </div>
+          <HomeHeader />
+          <MainContent
+            models={models}
+            selectedModel={selectedModel}
+            selectedCategory={selectedCategory}
+            selectedEnhancer={selectedEnhancer}
+            isModelsLoading={isModelsInUseLoading || isModelsLoading}
+            result={result}
+            onModelSelect={handleModelSelect}
+            onCategorySelect={handleCategorySelect}
+            onEnhancerUpdate={handleEnhancerUpdate}
+            onPromptSubmit={handlePromptSubmit}
+            onRefreshModels={handleRefreshModels}
+          />
         </div>
       </div>
     </SidebarProvider>
