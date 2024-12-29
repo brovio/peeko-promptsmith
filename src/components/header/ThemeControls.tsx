@@ -1,5 +1,4 @@
 import { Sun, Moon, CircleDot } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useThemeManager } from "@/hooks/use-theme-manager";
 import {
   Tooltip,
@@ -13,17 +12,15 @@ export function ThemeControls() {
 
   return (
     <TooltipProvider>
-      <div className="flex gap-2">
+      <div className="flex items-center space-x-4">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
+            <button
               onClick={() => applyTheme('light')}
-              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="p-2 hover:bg-accent rounded-md group"
             >
-              <Sun className="h-4 w-4 dark:text-primary black:text-primary" />
-            </Button>
+              <Sun className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
+            </button>
           </TooltipTrigger>
           <TooltipContent>
             <p>Light Theme</p>
@@ -32,14 +29,12 @@ export function ThemeControls() {
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
+            <button
               onClick={() => applyTheme('dark')}
-              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="p-2 hover:bg-accent rounded-md group"
             >
-              <Moon className="h-4 w-4 dark:text-primary black:text-primary" />
-            </Button>
+              <Moon className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
+            </button>
           </TooltipTrigger>
           <TooltipContent>
             <p>Dark Theme</p>
@@ -48,14 +43,12 @@ export function ThemeControls() {
 
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              size="icon"
+            <button
               onClick={() => applyTheme('black')}
-              className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+              className="p-2 hover:bg-accent rounded-md group"
             >
-              <CircleDot className="h-4 w-4 dark:text-primary black:text-primary" />
-            </Button>
+              <CircleDot className="h-5 w-5 dark:text-primary black:text-primary group-hover:text-primary" />
+            </button>
           </TooltipTrigger>
           <TooltipContent>
             <p>Black Theme</p>
