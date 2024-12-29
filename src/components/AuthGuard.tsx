@@ -12,19 +12,31 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Initial session check
     checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+      
       if (event === 'SIGNED_IN') {
         setIsAuthenticated(true);
+        setIsLoading(false);
         if (location.pathname === '/login') {
           navigate('/');
         }
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        console.log('User signed out or deleted');
         setIsAuthenticated(false);
-        navigate('/login');
+        setIsLoading(false);
+        if (!PUBLIC_ROUTES.includes(location.pathname)) {
+          navigate('/login');
+        }
+      } else if (event === 'TOKEN_REFRESHED') {
+        console.log('Token refreshed');
+        setIsAuthenticated(!!session);
+        setIsLoading(false);
       }
-      setIsLoading(false);
     });
 
     return () => {
@@ -34,10 +46,28 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   const checkUser = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('Error checking session:', error);
+        setIsAuthenticated(false);
+        if (!PUBLIC_ROUTES.includes(location.pathname)) {
+          navigate('/login');
+        }
+      } else {
+        console.log('Session check:', session?.user?.id ? 'User authenticated' : 'No session');
+        setIsAuthenticated(!!session);
+        
+        if (!session && !PUBLIC_ROUTES.includes(location.pathname)) {
+          navigate('/login');
+        }
+      }
     } catch (error) {
       console.error('Error checking auth state:', error);
+      setIsAuthenticated(false);
+      if (!PUBLIC_ROUTES.includes(location.pathname)) {
+        navigate('/login');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -53,13 +83,15 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     />;
   }
 
-  if (!isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname)) {
-    navigate('/login');
+  // Handle public routes when authenticated
+  if (isAuthenticated && PUBLIC_ROUTES.includes(location.pathname)) {
+    navigate('/');
     return null;
   }
 
-  if (isAuthenticated && PUBLIC_ROUTES.includes(location.pathname)) {
-    navigate('/');
+  // Handle private routes when not authenticated
+  if (!isAuthenticated && !PUBLIC_ROUTES.includes(location.pathname)) {
+    navigate('/login');
     return null;
   }
 
