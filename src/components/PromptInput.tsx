@@ -54,8 +54,8 @@ export function PromptInput({
     try {
       console.log('Starting prompt enhancement process...');
       
-      // Construct the full prompt
-      const fullPrompt = `Please enhance the following prompt:\n\n${prompt.trim()}`;
+      // Use the selected enhancer as the template
+      const fullPrompt = `${selectedEnhancer}\n\n${prompt.trim()}`;
       console.log('Full prompt:', fullPrompt);
       
       const { data, error } = await supabase.functions.invoke('generate', {
