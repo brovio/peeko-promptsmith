@@ -33,7 +33,8 @@ export function ModelPreferences({
     name: provider.charAt(0).toUpperCase() + provider.slice(1),
     description: `Models from ${provider}`,
     provider: provider,
-    clean_model_name: provider // Adding clean_model_name for provider objects
+    clean_model_name: provider, // Adding clean_model_name for provider objects
+    model_id: provider // Adding model_id to match the Model interface
   }));
 
   // Filter models by selected provider and create model objects
@@ -44,7 +45,8 @@ export function ModelPreferences({
       name: model.name,
       description: model.description,
       provider: model.id.split('/')[0],
-      clean_model_name: model.name.replace(`${model.provider}/`, '').trim() // Adding clean_model_name for model objects
+      clean_model_name: model.name.replace(`${model.provider}/`, '').trim(),
+      model_id: model.id // Adding model_id to match the Model interface
     }));
 
   // Save model preference mutation
