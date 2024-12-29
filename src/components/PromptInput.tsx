@@ -22,59 +22,6 @@ export function PromptInput({
   const [isEnhancing, setIsEnhancing] = useState(false);
   const { toast } = useToast();
 
-  const handleEnhance = async () => {
-    if (!prompt.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter a prompt to enhance",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    if (!selectedModel) {
-      toast({
-        title: "Error",
-        description: "Please select a model first",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setIsEnhancing(true);
-    
-    try {
-      console.log('Starting prompt enhancement process...');
-      console.log('Full prompt:', prompt);
-      
-      const { data, error } = await supabase.functions.invoke('generate', {
-        body: { 
-          prompt: prompt.trim(),
-          model: selectedModel
-        }
-      });
-
-      if (error) throw error;
-      
-      console.log('Generated text:', data.generatedText);
-      onSubmit(data.generatedText);
-      
-      toast({
-        title: "Success",
-        description: `Enhanced using ${selectedModel}`,
-      });
-    } catch (error) {
-      console.error('Error enhancing prompt:', error);
-      toast({
-        title: "Error",
-        description: "Failed to enhance prompt. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsEnhancing(false);
-    }
-  };
-
   const handleSubmit = async () => {
     if (!prompt.trim()) {
       toast({
@@ -137,22 +84,13 @@ export function PromptInput({
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
       />
-      <div className="flex gap-2">
-        <Button
-          onClick={handleEnhance}
-          disabled={!prompt.trim() || isEnhancing || !selectedModel}
-          className="flex-1"
-        >
-          {isEnhancing ? "Enhancing..." : "Enhance & Submit"}
-        </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={!prompt.trim() || isEnhancing || !selectedModel}
-          className="flex-1"
-        >
-          Submit
-        </Button>
-      </div>
+      <Button
+        onClick={handleSubmit}
+        disabled={!prompt.trim() || isEnhancing || !selectedModel}
+        className="w-full"
+      >
+        Submit
+      </Button>
       
       <LoadingModal 
         open={isEnhancing}
