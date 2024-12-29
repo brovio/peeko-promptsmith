@@ -132,9 +132,19 @@ export default function Index() {
     addLog(`Selected model: ${model?.clean_model_name || modelId}`, 'info');
   };
 
-  const handleCategorySelect = (categoryId: string) => {
+  const handleCategorySelect = async (categoryId: string) => {
     setSelectedCategory(categoryId);
-    addLog(`Selected use case category: ${categoryId}`, 'info');
+    
+    // Fetch the use case details to get the title
+    const { data: useCase } = await supabase
+      .from('use_cases')
+      .select('title')
+      .eq('id', categoryId)
+      .single();
+    
+    if (useCase) {
+      addLog(`Selected Use Case: ${useCase.title}`, 'info');
+    }
   };
 
   const handleEnhancerUpdate = (enhancer: string) => {
