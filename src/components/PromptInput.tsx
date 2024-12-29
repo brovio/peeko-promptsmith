@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getTemplateForCategory } from "./CategorySelector";
@@ -23,6 +23,14 @@ export function PromptInput({ selectedCategory, selectedEnhancer, onSubmit }: Pr
     fullPrompt: string;
   } | null>(null);
   const { toast } = useToast();
+
+  // Update prompt when selectedEnhancer changes
+  useEffect(() => {
+    if (selectedEnhancer) {
+      setPrompt(selectedEnhancer);
+      console.log('Prompt updated with enhancer:', selectedEnhancer);
+    }
+  }, [selectedEnhancer]);
 
   const handleSubmit = async () => {
     if (!prompt.trim()) {
