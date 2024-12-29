@@ -6,7 +6,6 @@ import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import ForgotPassword from "@/pages/ForgotPassword";
 import Models from "@/pages/Models";
-import Testing from "@/pages/Testing";
 import Profile from "@/pages/Profile";
 import Settings from "@/pages/Settings";
 import Account from "@/pages/Account";
@@ -36,7 +35,6 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/models" element={<Models />} />
-              <Route path="/testing" element={<Testing />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/account" element={<Account />} />

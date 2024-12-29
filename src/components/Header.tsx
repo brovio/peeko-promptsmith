@@ -1,7 +1,7 @@
 import { NavLink } from "./header/NavLink";
 import { ProfileMenu } from "./header/ProfileMenu";
 import { ThemeControls } from "./header/ThemeControls";
-import { TestTube, Home, Database, LayoutTemplate } from "lucide-react";
+import { Home, Database, LayoutTemplate } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -47,11 +47,6 @@ export function Header() {
                 <p>Use Cases</p>
               </TooltipContent>
             </Tooltip>
-
-            <NavLink to="/testing" className="flex items-center gap-1 ml-2">
-              <TestTube className="h-4 w-4" />
-              Testing
-            </NavLink>
           </TooltipProvider>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
