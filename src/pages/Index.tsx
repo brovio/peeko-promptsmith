@@ -44,11 +44,6 @@ export default function Index() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         console.log('No user found');
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to use models",
-          variant: "destructive",
-        });
         return [];
       }
 
@@ -63,7 +58,6 @@ export default function Index() {
         throw error;
       }
       
-      console.log('Models in use:', data);
       return data || [];
     },
   });
@@ -76,7 +70,7 @@ export default function Index() {
   } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
-      const modelIds = modelsInUse?.map(m => m.model_id).filter(Boolean);
+      const modelIds = modelsInUse?.map(m => m.model_id);
       console.log('Fetching available models with IDs:', modelIds);
       
       if (!modelIds?.length) {
@@ -85,12 +79,13 @@ export default function Index() {
       }
 
       try {
+        // Using single query approach instead of 'in' clause
         const { data, error } = await supabase
           .from('available_models')
           .select('*')
-          .in('model_id', modelIds)
-          .eq('is_active', true);
-        
+          .eq('is_active', true)
+          .filter('model_id', 'in', `(${modelIds.join(',')})`);
+
         if (error) {
           console.error('Error fetching available models:', error);
           throw error;
