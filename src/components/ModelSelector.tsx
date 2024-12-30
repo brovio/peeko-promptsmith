@@ -7,9 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface ModelSelectorProps {
   onModelSelect: (modelId: string) => void;
   selectedModel: string;
+  models?: Model[]; // Make models optional to maintain backward compatibility
 }
 
-export function ModelSelector({ onModelSelect, selectedModel }: ModelSelectorProps) {
+export function ModelSelector({ onModelSelect, selectedModel, models }: ModelSelectorProps) {
   const { data: modelsInUse = [], isLoading: isModelsInUseLoading } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
@@ -26,9 +27,10 @@ export function ModelSelector({ onModelSelect, selectedModel }: ModelSelectorPro
       return data || [];
     },
     initialData: [],
+    enabled: !models, // Only fetch if models prop is not provided
   });
 
-  const { data: models = [], isLoading: isModelsLoading, error } = useQuery({
+  const { data: fetchedModels = [], isLoading: isModelsLoading, error } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
       const modelIds = modelsInUse?.map(m => m.model_id).filter(Boolean);
@@ -46,17 +48,18 @@ export function ModelSelector({ onModelSelect, selectedModel }: ModelSelectorPro
       if (error) throw error;
       return (data || []) as Model[];
     },
-    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0,
+    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0 && !models, // Only fetch if models prop is not provided
     initialData: [],
   });
 
   const isLoading = isModelsInUseLoading || isModelsLoading;
+  const displayModels = models || fetchedModels; // Use provided models or fetched models
 
-  if (isLoading) {
+  if (isLoading && !models) {
     return <Skeleton className="h-10 w-full" />;
   }
 
-  if (error) {
+  if (error && !models) {
     console.error('Error in ModelSelector:', error);
     return (
       <Select disabled>
@@ -73,7 +76,7 @@ export function ModelSelector({ onModelSelect, selectedModel }: ModelSelectorPro
         <SelectValue placeholder="Select a model" />
       </SelectTrigger>
       <SelectContent>
-        {models.map((model) => (
+        {displayModels.map((model) => (
           <SelectItem key={model.id} value={model.id}>
             {model.name}
           </SelectItem>
