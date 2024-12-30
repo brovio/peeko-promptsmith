@@ -37,6 +37,8 @@ export default function Settings() {
         return;
       }
 
+      // Log the superadmin check for debugging
+      console.log('Is Superadmin:', profile?.is_superadmin);
       setIsSuperAdmin(profile?.is_superadmin || false);
     };
     checkAuth();
