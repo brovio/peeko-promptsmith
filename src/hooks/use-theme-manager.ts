@@ -6,7 +6,7 @@ interface ThemeState {
   applyTheme: (theme: Theme) => void;
 }
 
-export const useThemeManager = create<ThemeState>((set) => ({
+export const useThemeManager = create<ThemeState>()((set) => ({
   currentTheme: null,
   applyTheme: (theme: Theme) => {
     // Apply theme CSS variables
