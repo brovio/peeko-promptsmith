@@ -25,6 +25,7 @@ export function ProfileMenu() {
   const { toast } = useToast();
   const { applyTheme } = useThemeManager();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   useEffect(() => {
     async function getProfile() {
@@ -55,10 +56,23 @@ export function ProfileMenu() {
   }, [supabase]);
 
   const handleSignOut = async () => {
+    if (isSigningOut) return; // Prevent multiple sign-out attempts
+    
+    setIsSigningOut(true);
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      navigate("/login");
+      
+      // Clear any cached data or state
+      setAvatarUrl(null);
+      
+      // Navigate to login page
+      navigate("/login", { replace: true });
+      
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account",
+      });
     } catch (error) {
       console.error("Error signing out:", error);
       toast({
@@ -66,6 +80,8 @@ export function ProfileMenu() {
         description: "Please try again",
         variant: "destructive",
       });
+    } finally {
+      setIsSigningOut(false);
     }
   };
 
@@ -116,9 +132,12 @@ export function ProfileMenu() {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={handleSignOut}>
+        <DropdownMenuItem 
+          onClick={handleSignOut}
+          disabled={isSigningOut}
+        >
           <LogOut className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-          Sign Out
+          {isSigningOut ? "Signing out..." : "Sign Out"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
