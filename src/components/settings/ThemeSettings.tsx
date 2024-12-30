@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
 import { useThemeManager } from "@/hooks/use-theme-manager";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
@@ -16,6 +13,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle } from "lucide-react";
+import { ColorPickerGroup } from "./ColorPickerGroup";
 
 interface ThemeConfiguration {
   id: string;
@@ -41,87 +39,6 @@ interface ThemeConfiguration {
   input: string;
   ring: string;
   is_active: boolean;
-}
-
-interface ColorPickerGroupProps {
-  label: string;
-  description: string;
-  mainColor: string;
-  foregroundColor: string;
-  onMainColorChange: (value: string) => void;
-  onForegroundColorChange: (value: string) => void;
-  previewClassName?: string;
-}
-
-function ColorPickerGroup({
-  label,
-  description,
-  mainColor,
-  foregroundColor,
-  onMainColorChange,
-  onForegroundColorChange,
-  previewClassName = "bg-background text-foreground"
-}: ColorPickerGroupProps) {
-  return (
-    <div className="space-y-4 p-4 border rounded-lg">
-      <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-medium">{label}</h3>
-          <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-        <div className={`${previewClassName} p-2 rounded border`}>
-          Preview Text
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>Main Color (HSL)</Label>
-          <Input
-            type="text"
-            value={mainColor}
-            onChange={(e) => onMainColorChange(e.target.value)}
-            placeholder="0 0% 100%"
-          />
-          <Input
-            type="color"
-            value={`hsl(${mainColor})`}
-            onChange={(e) => {
-              const color = e.target.value;
-              // Convert hex to HSL
-              const r = parseInt(color.substr(1,2), 16);
-              const g = parseInt(color.substr(3,2), 16);
-              const b = parseInt(color.substr(5,2), 16);
-              const hsl = rgbToHsl(r, g, b);
-              onMainColorChange(`${hsl[0]} ${hsl[1]}% ${hsl[2]}%`);
-            }}
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Foreground Color (HSL)</Label>
-          <Input
-            type="text"
-            value={foregroundColor}
-            onChange={(e) => onForegroundColorChange(e.target.value)}
-            placeholder="0 0% 0%"
-          />
-          <Input
-            type="color"
-            value={`hsl(${foregroundColor})`}
-            onChange={(e) => {
-              const color = e.target.value;
-              const r = parseInt(color.substr(1,2), 16);
-              const g = parseInt(color.substr(3,2), 16);
-              const b = parseInt(color.substr(5,2), 16);
-              const hsl = rgbToHsl(r, g, b);
-              onForegroundColorChange(`${hsl[0]} ${hsl[1]}% ${hsl[2]}%`);
-            }}
-          />
-        </div>
-      </div>
-    </div>
-  );
 }
 
 export function ThemeSettings() {
@@ -220,37 +137,6 @@ export function ThemeSettings() {
     });
 
     fetchThemes();
-  };
-
-  // Helper function to convert RGB to HSL
-  const rgbToHsl = (r: number, g: number, b: number): [number, number, number] => {
-    r /= 255;
-    g /= 255;
-    b /= 255;
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-
-    return [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];
   };
 
   if (isLoading) {
