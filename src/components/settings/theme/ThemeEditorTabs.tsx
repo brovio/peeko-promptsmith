@@ -4,7 +4,6 @@ import { StateColorsSection } from "./StateColorsSection";
 import { ComponentColorsSection } from "./ComponentColorsSection";
 import { ThemeConfiguration } from "@/types/theme";
 import { ThemePreview } from "../previews/ThemePreview";
-import { BaseColorPreview } from "../previews/BaseColorPreview";
 
 interface ThemeEditorTabsProps {
   selectedTheme: ThemeConfiguration;
@@ -94,13 +93,7 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
         {showPreview && (
           <div className="space-y-4">
             <TabsContent value="base" forceMount>
-              {showPreview && (
-                <BaseColorPreview 
-                  background={selectedTheme.background}
-                  foreground={selectedTheme.foreground}
-                  inputText={selectedTheme.input_text}
-                />
-              )}
+              <ThemePreview showAllExamples={false} previewType="base" />
             </TabsContent>
             <TabsContent value="buttons" forceMount>
               <ThemePreview showAllExamples={false} previewType="buttons" />

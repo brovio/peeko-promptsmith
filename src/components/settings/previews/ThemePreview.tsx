@@ -3,6 +3,7 @@ import { LoginPreview } from "./LoginPreview";
 import { ModelCardPreview } from "./ModelCardPreview";
 import { UseCasePreview } from "./UseCasePreview";
 import { FormPreview } from "./FormPreview";
+import { BaseColorPreview } from "./BaseColorPreview";
 
 interface ThemePreviewProps {
   showAllExamples?: boolean;
@@ -23,8 +24,23 @@ export const ThemePreview = memo(function ThemePreview({
     }
   }, [showAllExamples, previewType]);
 
+  if (showAllExamples) {
+    return (
+      <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
+        <FormPreview showAllExamples={true} />
+      </div>
+    );
+  }
+
   const renderPreview = () => {
     switch (previewType) {
+      case 'base':
+        return (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Base Color Examples</h3>
+            <BaseColorPreview />
+          </div>
+        );
       case 'buttons':
         return (
           <div className="space-y-4">
@@ -78,11 +94,7 @@ export const ThemePreview = memo(function ThemePreview({
           </div>
         );
       default:
-        return (
-          <div className="space-y-4">
-            <FormPreview showAllExamples={showAllExamples} />
-          </div>
-        );
+        return null;
     }
   };
 
