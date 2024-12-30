@@ -10,25 +10,33 @@ export function ThemePreviewWrapper() {
   const observerRef = useRef<ResizeObserver | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
+  const rafRef = useRef<number>();
   const { toast } = useToast();
 
-  // Debounced resize handler with RAF for smoother performance
+  // Debounced resize handler with RAF and error boundary
   const handleResize = useCallback(() => {
     if (!isMountedRef.current) return;
 
+    // Clear any existing timeouts
     if (resizeTimeoutRef.current) {
       clearTimeout(resizeTimeoutRef.current);
     }
 
-    requestAnimationFrame(() => {
-      if (!isMountedRef.current) return;
+    // Clear any existing animation frames
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+    }
+
+    // Use RAF to smooth out rapid resize events
+    rafRef.current = requestAnimationFrame(() => {
       setIsResizing(true);
 
+      // Debounce the resize completion
       resizeTimeoutRef.current = setTimeout(() => {
         if (isMountedRef.current) {
           setIsResizing(false);
         }
-      }, 150); // Increased debounce time for better performance
+      }, 250); // Increased debounce time to reduce notifications
     });
   }, []);
 
@@ -37,34 +45,41 @@ export function ThemePreviewWrapper() {
     if (!currentPreviewRef) return;
 
     try {
-      // Cleanup any existing observer
+      // Clean up any existing observer
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
 
-      // Create new observer with error handling
+      // Create new observer with error handling and throttling
       observerRef.current = new ResizeObserver((entries) => {
+        // Ignore notifications if component is unmounted
         if (!isMountedRef.current) return;
         
+        // Only process the last entry to reduce notifications
         const lastEntry = entries[entries.length - 1];
-        if (lastEntry && lastEntry.contentRect) {
+        if (lastEntry?.contentRect) {
           handleResize();
         }
       });
 
-      // Start observing with a slight delay to ensure DOM is ready
+      // Start observing with a delay to ensure DOM is ready
       const timeoutId = setTimeout(() => {
         if (isMountedRef.current && observerRef.current && currentPreviewRef) {
           observerRef.current.observe(currentPreviewRef);
         }
       }, 100);
 
+      // Cleanup function
       return () => {
         clearTimeout(timeoutId);
         isMountedRef.current = false;
         
         if (resizeTimeoutRef.current) {
           clearTimeout(resizeTimeoutRef.current);
+        }
+
+        if (rafRef.current) {
+          cancelAnimationFrame(rafRef.current);
         }
 
         if (observerRef.current) {
