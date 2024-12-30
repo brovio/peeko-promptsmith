@@ -6,8 +6,9 @@ import { FormPreview } from "./FormPreview";
 import { BaseColorPreview } from "./BaseColorPreview";
 import { useThemeManager } from "@/hooks/use-theme-manager";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type PreviewType = 'base' | 'buttons' | 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
+type PreviewType = 'all' | 'base' | 'buttons' | 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
 
 interface ThemePreviewProps {
   showAllExamples?: boolean;
@@ -30,6 +31,8 @@ export const ThemePreview = memo(function ThemePreview({
     if (!currentTheme) return null;
 
     switch (selectedPreview) {
+      case 'all':
+        return <FormPreview showAllExamples={true} />;
       case 'base':
         return (
           <BaseColorPreview 
@@ -64,53 +67,23 @@ export const ThemePreview = memo(function ThemePreview({
 
   return (
     <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
-      {showAllExamples ? (
-        <>
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-2">Filter Preview Elements</h3>
-            <Select value={selectedPreview} onValueChange={(value: PreviewType) => setSelectedPreview(value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select elements to preview" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="base">Base Colors</SelectItem>
-                <SelectItem value="buttons">Buttons</SelectItem>
-                <SelectItem value="cards">Cards</SelectItem>
-                <SelectItem value="inputs">Input Fields</SelectItem>
-                <SelectItem value="dropdowns">Dropdowns</SelectItem>
-                <SelectItem value="search">Search</SelectItem>
-                <SelectItem value="icons">Icons</SelectItem>
-                <SelectItem value="dividers">Dividers</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <FormPreview showAllExamples={true} />
-        </>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold capitalize">
-              {selectedPreview === 'base' ? 'Base Colors' : `${selectedPreview} Examples`}
-            </h3>
-            <Select value={selectedPreview} onValueChange={(value: PreviewType) => setSelectedPreview(value)}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select preview" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="base">Base Colors</SelectItem>
-                <SelectItem value="buttons">Buttons</SelectItem>
-                <SelectItem value="cards">Cards</SelectItem>
-                <SelectItem value="inputs">Input Fields</SelectItem>
-                <SelectItem value="dropdowns">Dropdowns</SelectItem>
-                <SelectItem value="search">Search</SelectItem>
-                <SelectItem value="icons">Icons</SelectItem>
-                <SelectItem value="dividers">Dividers</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+      <Tabs defaultValue={selectedPreview} onValueChange={(value) => setSelectedPreview(value as PreviewType)}>
+        <TabsList className="w-full justify-start border-b overflow-x-auto">
+          <TabsTrigger value="all">All Examples</TabsTrigger>
+          <TabsTrigger value="base">Base Colors</TabsTrigger>
+          <TabsTrigger value="buttons">Buttons</TabsTrigger>
+          <TabsTrigger value="cards">Cards</TabsTrigger>
+          <TabsTrigger value="inputs">Input Fields</TabsTrigger>
+          <TabsTrigger value="dropdowns">Dropdowns</TabsTrigger>
+          <TabsTrigger value="search">Search</TabsTrigger>
+          <TabsTrigger value="icons">Icons</TabsTrigger>
+          <TabsTrigger value="dividers">Dividers</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={selectedPreview} className="mt-6">
           {renderPreview()}
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 });
