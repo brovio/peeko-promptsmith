@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingModal } from "./LoadingModal";
+import { useToast } from "@/hooks/use-toast";
 
 const PUBLIC_ROUTES = ["/login", "/forgot-password"];
 
@@ -10,6 +11,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   useEffect(() => {
     let mounted = true;
@@ -17,10 +19,16 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     // Initial session check
     const initializeAuth = async () => {
       try {
+        console.log('Checking session...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Session error:', error);
+          toast({
+            title: "Authentication Error",
+            description: "Please try logging in again",
+            variant: "destructive",
+          });
           throw error;
         }
         
@@ -32,6 +40,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           setIsLoading(false);
 
           if (!isAuthed && !PUBLIC_ROUTES.includes(location.pathname)) {
+            console.log('No auth, redirecting to login');
             navigate('/login', { replace: true });
           }
         }
@@ -61,13 +70,16 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         if (location.pathname === '/login') {
           navigate('/', { replace: true });
         }
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
         setIsAuthenticated(false);
         setIsLoading(false);
         if (!PUBLIC_ROUTES.includes(location.pathname)) {
           navigate('/login', { replace: true });
         }
       } else if (event === 'TOKEN_REFRESHED') {
+        setIsAuthenticated(!!session);
+        setIsLoading(false);
+      } else if (event === 'USER_UPDATED') {
         setIsAuthenticated(!!session);
         setIsLoading(false);
       }
@@ -77,7 +89,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, toast]);
 
   if (isLoading) {
     return <LoadingModal 
