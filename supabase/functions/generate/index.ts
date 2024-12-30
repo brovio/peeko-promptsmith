@@ -25,7 +25,11 @@ serve(async (req) => {
       throw new Error('Missing required parameters: prompt and model');
     }
 
-    console.log('Calling OpenRouter API with:', { model, promptLength: prompt.length });
+    console.log('Calling OpenRouter API with:', { 
+      model, 
+      promptLength: prompt.length,
+      prompt: prompt.substring(0, 100) + '...' // Log first 100 chars for debugging
+    });
 
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -55,20 +59,33 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    console.log('Raw API response:', JSON.stringify(data, null, 2));
     
-    if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid OpenRouter API response:', data);
-      throw new Error('Invalid response format from OpenRouter API');
+    // More detailed validation of response structure
+    if (!data) {
+      throw new Error('Empty response from OpenRouter API');
+    }
+    
+    if (!Array.isArray(data.choices)) {
+      throw new Error('Invalid response format: missing choices array');
+    }
+    
+    if (!data.choices[0]?.message?.content) {
+      console.error('Invalid OpenRouter API response structure:', data);
+      throw new Error('Invalid response format: missing message content');
     }
 
+    const generatedText = data.choices[0].message.content;
     console.log('Successfully generated response:', {
       model,
-      tokensUsed: data.usage?.total_tokens || 'N/A'
+      tokensUsed: data.usage?.total_tokens || 'N/A',
+      contentLength: generatedText.length,
+      preview: generatedText.substring(0, 100) + '...' // Log preview of response
     });
 
     return new Response(
       JSON.stringify({
-        generatedText: data.choices[0].message.content,
+        generatedText,
         model: model,
         usage: {
           prompt_tokens: data.usage?.prompt_tokens || 0,
