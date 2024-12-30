@@ -6,9 +6,11 @@ import { FormPreview } from "./FormPreview";
 import { BaseColorPreview } from "./BaseColorPreview";
 import { useThemeManager } from "@/hooks/use-theme-manager";
 
+type PreviewType = 'base' | 'buttons' | 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
+
 interface ThemePreviewProps {
   showAllExamples?: boolean;
-  previewType?: 'base' | 'buttons' | 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
+  previewType?: PreviewType;
 }
 
 export const ThemePreview = memo(function ThemePreview({ 
@@ -50,49 +52,21 @@ export const ThemePreview = memo(function ThemePreview({
         return <FormPreview showButtons={true} />;
       case 'cards':
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Card Examples</h3>
-            <div className="grid gap-4">
-              <ModelCardPreview />
-              <UseCasePreview />
-            </div>
+          <div className="grid gap-4">
+            <ModelCardPreview />
+            <UseCasePreview />
           </div>
         );
       case 'inputs':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Input Examples</h3>
-            <FormPreview showInputs={true} />
-          </div>
-        );
+        return <FormPreview showInputs={true} />;
       case 'dropdowns':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Dropdown Examples</h3>
-            <FormPreview showDropdowns={true} />
-          </div>
-        );
+        return <FormPreview showDropdowns={true} />;
       case 'search':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Search Examples</h3>
-            <FormPreview showSearch={true} />
-          </div>
-        );
+        return <FormPreview showSearch={true} />;
       case 'icons':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Icon Examples</h3>
-            <FormPreview showIcons={true} />
-          </div>
-        );
+        return <FormPreview showIcons={true} />;
       case 'dividers':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Divider Examples</h3>
-            <FormPreview showDividers={true} />
-          </div>
-        );
+        return <FormPreview showDividers={true} />;
       default:
         return null;
     }
@@ -100,7 +74,12 @@ export const ThemePreview = memo(function ThemePreview({
 
   return (
     <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
-      {renderPreview()}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold capitalize">
+          {previewType === 'base' ? 'Base Colors' : `${previewType} Examples`}
+        </h3>
+        {renderPreview()}
+      </div>
     </div>
   );
 });
