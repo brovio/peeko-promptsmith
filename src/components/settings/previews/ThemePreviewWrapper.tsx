@@ -7,14 +7,14 @@ export function ThemePreviewWrapper() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const resizeTimeoutRef = useRef<NodeJS.Timeout>();
-  const startObservingTimeoutRef = useRef<NodeJS.Timeout>();
-  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const rafIdRef = useRef<number>();
+  const observerRef = useRef<ResizeObserver | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const isMountedRef = useRef(true);
   const { toast } = useToast();
 
-  // Improved resize handler with rate limiting
-  const debouncedResize = useCallback(() => {
+  // Improved resize handler with debouncing
+  const handleResize = useCallback(() => {
     if (!isMountedRef.current) return;
 
     if (resizeTimeoutRef.current) {
@@ -33,68 +33,57 @@ export function ThemePreviewWrapper() {
     const currentPreviewRef = previewRef.current;
     if (!currentPreviewRef) return;
 
-    let rafId: number;
-    let isObserving = false;
-
-    // Create ResizeObserver with batched updates
-    const observer = new ResizeObserver((entries) => {
-      // Cancel any pending animation frame
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-
-      // Schedule a new update
-      rafId = requestAnimationFrame(() => {
-        if (isMountedRef.current && isObserving) {
-          debouncedResize();
+    try {
+      // Create ResizeObserver with error handling
+      observerRef.current = new ResizeObserver((entries) => {
+        // Cancel any pending animation frame
+        if (rafIdRef.current) {
+          cancelAnimationFrame(rafIdRef.current);
         }
+
+        // Schedule a new update with RAF for smoother handling
+        rafIdRef.current = requestAnimationFrame(() => {
+          if (isMountedRef.current) {
+            handleResize();
+          }
+        });
       });
-    });
 
-    // Delay observation start
-    startObservingTimeoutRef.current = setTimeout(() => {
-      if (isMountedRef.current) {
-        try {
-          observer.observe(currentPreviewRef);
-          isObserving = true;
-          resizeObserverRef.current = observer;
-        } catch (error) {
-          console.error('Failed to start observing:', error);
+      // Start observing with a slight delay
+      const timeoutId = setTimeout(() => {
+        if (isMountedRef.current && observerRef.current) {
+          observerRef.current.observe(currentPreviewRef);
         }
-      }
-    }, 100);
+      }, 100);
 
-    // Enhanced cleanup
-    return () => {
-      isMountedRef.current = false;
-      isObserving = false;
+      return () => {
+        isMountedRef.current = false;
 
-      // Cancel any pending animation frame
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-
-      // Clear timeouts
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-      if (startObservingTimeoutRef.current) {
-        clearTimeout(startObservingTimeoutRef.current);
-      }
-
-      // Cleanup observer
-      if (observer) {
-        try {
-          observer.disconnect();
-        } catch (error) {
-          console.error('Failed to disconnect observer:', error);
+        // Clear all timeouts and animation frames
+        clearTimeout(timeoutId);
+        if (resizeTimeoutRef.current) {
+          clearTimeout(resizeTimeoutRef.current);
         }
-      }
+        if (rafIdRef.current) {
+          cancelAnimationFrame(rafIdRef.current);
+        }
 
-      // Reset state
-      setIsResizing(false);
-    };
-  }, [debouncedResize]);
+        // Disconnect observer
+        if (observerRef.current) {
+          try {
+            observerRef.current.disconnect();
+          } catch (error) {
+            console.error('Failed to disconnect observer:', error);
+          }
+        }
+      };
+    } catch (error) {
+      console.error('Error setting up ResizeObserver:', error);
+      return () => {
+        isMountedRef.current = false;
+      };
+    }
+  }, [handleResize]);
 
   return (
     <div className="space-y-4">
