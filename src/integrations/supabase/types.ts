@@ -193,6 +193,7 @@ export type Database = {
           id: string
           is_superadmin: boolean | null
           linkedin_url: string | null
+          role: string | null
           twitter_url: string | null
           updated_at: string | null
           username: string | null
@@ -207,6 +208,7 @@ export type Database = {
           id: string
           is_superadmin?: boolean | null
           linkedin_url?: string | null
+          role?: string | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
@@ -221,6 +223,7 @@ export type Database = {
           id?: string
           is_superadmin?: boolean | null
           linkedin_url?: string | null
+          role?: string | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
