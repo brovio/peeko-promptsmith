@@ -49,10 +49,9 @@ export function ModelRefreshManager({ apiKey }: ModelRefreshManagerProps) {
       variant="outline"
       onClick={refreshModels}
       disabled={isRefreshing}
-      className="w-full text-primary border-primary"
     >
       <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-      {isRefreshing ? 'Refreshing Models...' : 'Refresh Available Models'}
+      {isRefreshing ? 'Refreshing...' : 'Refresh Models'}
     </Button>
   );
 }

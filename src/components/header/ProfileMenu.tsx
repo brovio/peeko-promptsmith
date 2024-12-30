@@ -1,17 +1,14 @@
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Settings, User, LogOut, Sun, Moon, CircleDot } from "lucide-react";
+import { Settings, User, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
-import { useThemeManager } from "@/hooks/use-theme-manager";
 import {
   Tooltip,
   TooltipContent,
@@ -23,36 +20,7 @@ export function ProfileMenu() {
   const navigate = useNavigate();
   const supabase = useSupabaseClient();
   const { toast } = useToast();
-  const { applyTheme } = useThemeManager();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function getProfile() {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) throw new Error("No user");
-
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('avatar_url')
-          .eq('id', user.id)
-          .single();
-
-        if (error) throw error;
-        
-        if (data?.avatar_url) {
-          const { data: imageUrl } = supabase.storage
-            .from('profile_photos')
-            .getPublicUrl(data.avatar_url);
-          setAvatarUrl(imageUrl.publicUrl);
-        }
-      } catch (error) {
-        console.error('Error loading avatar:', error);
-      }
-    }
-
-    getProfile();
-  }, [supabase]);
+  const avatarUrl = null; // This should be replaced with actual avatar URL when implemented
 
   const handleSignOut = async () => {
     try {
@@ -70,57 +38,55 @@ export function ProfileMenu() {
   };
 
   return (
-    <DropdownMenu>
+    <div className="flex items-center gap-2">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <DropdownMenuTrigger className="focus:outline-none">
-              <Avatar>
-                <AvatarImage src={avatarUrl || ''} />
-                <AvatarFallback>
-                  <User className="h-8 w-8 text-[hsl(142,76%,36%)]" />
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
+            <Settings 
+              className="h-5 w-5 cursor-pointer hover:text-primary dark:text-primary black:text-primary" 
+              onClick={() => navigate("/settings")}
+            />
           </TooltipTrigger>
           <TooltipContent>
-            <p>Profile Menu</p>
+            <p>Settings</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuItem onClick={() => navigate("/profile")}>
-          <User className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-          Profile
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/settings")}>
-          <Settings className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-          Settings
-        </DropdownMenuItem>
-        
-        <DropdownMenuSeparator />
-        
-        <DropdownMenuItem onClick={() => applyTheme('light')}>
-          <Sun className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-          Light Theme
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => applyTheme('dark')}>
-          <Moon className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-          Dark Theme
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => applyTheme('black')}>
-          <CircleDot className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-          Black Theme
-        </DropdownMenuItem>
-        
-        <DropdownMenuSeparator />
-        
-        <DropdownMenuItem onClick={handleSignOut}>
-          <LogOut className="mr-2 h-4 w-4 text-[hsl(142,76%,36%)]" />
-          Sign Out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <DropdownMenu>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger className="focus:outline-none">
+                <Avatar>
+                  <AvatarImage src={avatarUrl || ''} />
+                  <AvatarFallback>
+                    <User className="h-5 w-5 dark:text-primary black:text-primary" />
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Profile Menu</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
+        <DropdownMenuContent align="end" className="bg-background">
+          <DropdownMenuItem onClick={() => navigate("/profile")}>
+            <User className="mr-2 h-4 w-4 dark:text-primary black:text-primary" />
+            Profile
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate("/account")}>
+            <Settings className="mr-2 h-4 w-4 dark:text-primary black:text-primary" />
+            Account
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4 dark:text-primary black:text-primary" />
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

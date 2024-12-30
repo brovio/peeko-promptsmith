@@ -6,12 +6,6 @@ import { ApiKeyInput } from "./ApiKeyInput";
 import { ValidatedKeyActions } from "./ValidatedKeyActions";
 import { ModelRefreshManager } from "./ModelRefreshManager";
 import { refreshModelsInDatabase } from "@/utils/modelUtils";
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipTrigger,
-  TooltipProvider 
-} from "@/components/ui/tooltip";
 
 interface ApiKeyManagerProps {
   onApiKeyValidated: (key: string) => void;
@@ -21,6 +15,7 @@ interface ApiKeyManagerProps {
 export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyManagerProps) {
   const [apiKey, setApiKey] = useState("");
   const [isValidating, setIsValidating] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasValidKey, setHasValidKey] = useState(false);
   const { toast } = useToast();
 
@@ -96,6 +91,37 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
     }
   };
 
+  const refreshModels = async () => {
+    if (!apiKey) {
+      toast({
+        title: "Error",
+        description: "Please validate your API key first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsRefreshing(true);
+    try {
+      const models = await fetchModels(apiKey);
+      await refreshModelsInDatabase(models);
+      
+      toast({
+        title: "Success",
+        description: "Models refreshed successfully",
+      });
+    } catch (error: any) {
+      console.error('Error refreshing models:', error);
+      toast({
+        title: "Error",
+        description: "Failed to refresh models",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   const unlinkApiKey = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -128,15 +154,12 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
   };
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-2xl font-bold mb-2">OpenRouter API Key</h2>
-        <p className="text-muted-foreground mb-6">
-          Connect your OpenRouter account to access a wide range of language models.
-        </p>
-      </div>
-
-      <div className="space-y-4">
+    <div className="space-y-2">
+      <h2 className="text-xl font-semibold">OpenRouter API Key</h2>
+      <p className="text-muted-foreground">
+        Enter your OpenRouter API key to access available language models.
+      </p>
+      <div className="flex gap-4">
         {!hasValidKey ? (
           <ApiKeyInput
             apiKey={apiKey}
@@ -145,22 +168,13 @@ export function ApiKeyManager({ onApiKeyValidated, onApiKeyDeleted }: ApiKeyMana
             onValidate={validateApiKey}
           />
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 w-full">
             <ValidatedKeyActions
+              isRefreshing={isRefreshing}
+              onRefresh={refreshModels}
               onUnlink={unlinkApiKey}
             />
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div>
-                    <ModelRefreshManager apiKey={apiKey} />
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Refresh available models from OpenRouter</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <ModelRefreshManager apiKey={apiKey} />
           </div>
         )}
       </div>

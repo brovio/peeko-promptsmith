@@ -4,13 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ApiKeyManager } from "@/components/settings/ApiKeyManager";
 import { ThemeSettings } from "@/components/settings/ThemeSettings";
-import { Separator } from "@/components/ui/separator";
 
 export default function Settings() {
   const [apiKey, setApiKey] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Check authentication and ensure profile exists
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -24,6 +24,7 @@ export default function Settings() {
         return;
       }
 
+      // Check if profile exists
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select()
@@ -31,6 +32,7 @@ export default function Settings() {
         .single();
 
       if (profileError || !profile) {
+        // Create profile if it doesn't exist
         const { error: insertError } = await supabase
           .from('profiles')
           .insert([{ id: session.user.id }]);
@@ -58,18 +60,18 @@ export default function Settings() {
   };
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto max-w-6xl py-8">
       <h1 className="text-3xl font-bold mb-8">Settings</h1>
       
-      <div className="space-y-8">
-        <section className="pb-8 border-b border-primary/20">
+      <div className="space-y-12">
+        <section>
           <ApiKeyManager 
             onApiKeyValidated={handleApiKeyValidated}
             onApiKeyDeleted={handleApiKeyDeleted}
           />
         </section>
 
-        <section className="pt-4">
+        <section>
           <ThemeSettings />
         </section>
       </div>

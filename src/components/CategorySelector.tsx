@@ -43,8 +43,7 @@ export function CategorySelector({
       return data as UseCase[];
     },
     retry: 1,
-    retryDelay: 1000,
-    placeholderData: [], // Show empty array while loading
+    retryDelay: 1000
   });
 
   const handleUseCaseSelect = (useCaseId: string) => {

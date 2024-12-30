@@ -1,34 +1,29 @@
 import { Button } from "@/components/ui/button";
-import { Unlink } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { RefreshCw, Unlink } from "lucide-react";
 
 interface ValidatedKeyActionsProps {
+  isRefreshing: boolean;
+  onRefresh: () => void;
   onUnlink: () => void;
 }
 
-export function ValidatedKeyActions({ onUnlink }: ValidatedKeyActionsProps) {
+export function ValidatedKeyActions({ isRefreshing, onRefresh, onUnlink }: ValidatedKeyActionsProps) {
   return (
     <div className="flex gap-2">
-      <Button variant="outline" className="text-primary border-primary">
+      <Button variant="outline" className="text-green-600 border-green-600">
         Validated
       </Button>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" onClick={onUnlink} className="text-destructive">
-              <Unlink className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Unlink API Key</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Button 
+        variant="outline" 
+        onClick={onRefresh} 
+        disabled={isRefreshing}
+        className="text-blue-600 border-blue-600"
+      >
+        <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+      </Button>
+      <Button variant="outline" onClick={onUnlink} className="text-destructive">
+        <Unlink className="h-4 w-4" />
+      </Button>
     </div>
   );
 }
