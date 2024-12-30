@@ -15,7 +15,6 @@ interface MainContentProps {
   onCategorySelect: (categoryId: string) => void;
   onEnhancerUpdate: (enhancer: string) => void;
   onPromptSubmit: (enhancedPrompt: string, metadata?: any) => void;
-  onRefreshModels: () => void;
 }
 
 export function MainContent({
@@ -30,7 +29,6 @@ export function MainContent({
   onCategorySelect,
   onEnhancerUpdate,
   onPromptSubmit,
-  onRefreshModels,
 }: MainContentProps) {
   return (
     <div className="grid md:grid-cols-2 gap-8">
@@ -43,7 +41,6 @@ export function MainContent({
           onModelSelect={onModelSelect}
           onCategorySelect={onCategorySelect}
           onEnhancerUpdate={onEnhancerUpdate}
-          onRefreshModels={onRefreshModels}
         />
 
         <PromptSection
