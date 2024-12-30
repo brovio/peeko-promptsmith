@@ -6,6 +6,8 @@ interface ThemeSelectorProps {
   selectedTheme: ThemeConfiguration | null;
   onThemeChange: (themeId: string) => void;
   isSuperAdmin: boolean;
+  onSaveChanges?: () => Promise<void>;
+  onEditModeChange?: (value: boolean) => void;
 }
 
 export function ThemeSelector({ 
