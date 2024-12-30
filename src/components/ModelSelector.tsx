@@ -7,9 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface ModelSelectorProps {
   onModelSelect: (modelId: string) => void;
   selectedModel: string;
-  models?: Model[]; // Make models optional to maintain backward compatibility
-  isLoading?: boolean; // Add isLoading prop
-  onRefresh?: () => void; // Add onRefresh prop
+  models?: Model[];
+  isLoading?: boolean;
+  onRefresh?: () => void;
 }
 
 export function ModelSelector({ onModelSelect, selectedModel, models, isLoading: externalLoading, onRefresh }: ModelSelectorProps) {
@@ -29,33 +29,34 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
       return data || [];
     },
     initialData: [],
-    enabled: !models, // Only fetch if models prop is not provided
+    enabled: !models,
   });
 
   const { data: fetchedModels = [], isLoading: isModelsLoading, error } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
-      const modelIds = modelsInUse?.map(m => m.model_id).filter(Boolean);
-      
-      if (!modelIds?.length) {
+      if (!modelsInUse?.length) {
         return [];
       }
 
+      // First get all active models
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
-        .in('id', modelIds)
         .eq('is_active', true);
 
       if (error) throw error;
-      return (data || []) as Model[];
+
+      // Then filter them client-side based on modelsInUse
+      const modelIds = modelsInUse.map(m => m.model_id);
+      return (data || []).filter(model => modelIds.includes(model.id)) as Model[];
     },
-    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0 && !models, // Only fetch if models prop is not provided
+    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0 && !models,
     initialData: [],
   });
 
   const isLoading = isModelsInUseLoading || isModelsLoading || externalLoading;
-  const displayModels = models || fetchedModels; // Use provided models or fetched models
+  const displayModels = models || fetchedModels;
 
   if (isLoading && !models) {
     return <Skeleton className="h-10 w-full" />;
