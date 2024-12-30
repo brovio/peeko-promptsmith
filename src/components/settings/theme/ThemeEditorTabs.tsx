@@ -15,6 +15,7 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
   return (
     <Tabs defaultValue="base" className="w-full">
       <TabsList className="w-full justify-start border-b overflow-x-auto">
+        <TabsTrigger value="all">All Elements</TabsTrigger>
         <TabsTrigger value="base">Base Colors</TabsTrigger>
         <TabsTrigger value="buttons">Buttons</TabsTrigger>
         <TabsTrigger value="cards">Cards</TabsTrigger>
@@ -27,20 +28,24 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
         <div className="space-y-4">
+          <TabsContent value="all">
+            <BaseColorsSection 
+              selectedTheme={selectedTheme} 
+              handleColorChange={handleColorChange}
+            />
+          </TabsContent>
           <TabsContent value="base">
             <BaseColorsSection 
               selectedTheme={selectedTheme} 
               handleColorChange={handleColorChange}
             />
           </TabsContent>
-
           <TabsContent value="buttons">
             <StateColorsSection 
               selectedTheme={selectedTheme} 
               handleColorChange={handleColorChange}
             />
           </TabsContent>
-
           <TabsContent value="cards">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
@@ -48,7 +53,6 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
               type="cards"
             />
           </TabsContent>
-
           <TabsContent value="inputs">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
@@ -56,7 +60,6 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
               type="inputs"
             />
           </TabsContent>
-
           <TabsContent value="dropdowns">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
@@ -64,7 +67,6 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
               type="dropdowns"
             />
           </TabsContent>
-
           <TabsContent value="search">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
@@ -72,7 +74,6 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
               type="search"
             />
           </TabsContent>
-
           <TabsContent value="icons">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
@@ -80,7 +81,6 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
               type="icons"
             />
           </TabsContent>
-
           <TabsContent value="dividers">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
@@ -92,30 +92,7 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
 
         {showPreview && (
           <div className="space-y-4">
-            <TabsContent value="base" forceMount>
-              <ThemePreview showAllExamples={false} previewType="base" />
-            </TabsContent>
-            <TabsContent value="buttons" forceMount>
-              <ThemePreview showAllExamples={false} previewType="buttons" />
-            </TabsContent>
-            <TabsContent value="cards" forceMount>
-              <ThemePreview showAllExamples={false} previewType="cards" />
-            </TabsContent>
-            <TabsContent value="inputs" forceMount>
-              <ThemePreview showAllExamples={false} previewType="inputs" />
-            </TabsContent>
-            <TabsContent value="dropdowns" forceMount>
-              <ThemePreview showAllExamples={false} previewType="dropdowns" />
-            </TabsContent>
-            <TabsContent value="search" forceMount>
-              <ThemePreview showAllExamples={false} previewType="search" />
-            </TabsContent>
-            <TabsContent value="icons" forceMount>
-              <ThemePreview showAllExamples={false} previewType="icons" />
-            </TabsContent>
-            <TabsContent value="dividers" forceMount>
-              <ThemePreview showAllExamples={false} previewType="dividers" />
-            </TabsContent>
+            <ThemePreview showAllExamples={false} previewType="all" />
           </div>
         )}
       </div>

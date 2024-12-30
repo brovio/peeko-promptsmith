@@ -5,7 +5,6 @@ import { UseCasePreview } from "./UseCasePreview";
 import { FormPreview } from "./FormPreview";
 import { BaseColorPreview } from "./BaseColorPreview";
 import { useThemeManager } from "@/hooks/use-theme-manager";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type PreviewType = 'all' | 'base' | 'buttons' | 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
@@ -67,23 +66,9 @@ export const ThemePreview = memo(function ThemePreview({
 
   return (
     <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
-      <Tabs defaultValue={selectedPreview} onValueChange={(value) => setSelectedPreview(value as PreviewType)}>
-        <TabsList className="w-full justify-start border-b overflow-x-auto">
-          <TabsTrigger value="all">All Examples</TabsTrigger>
-          <TabsTrigger value="base">Base Colors</TabsTrigger>
-          <TabsTrigger value="buttons">Buttons</TabsTrigger>
-          <TabsTrigger value="cards">Cards</TabsTrigger>
-          <TabsTrigger value="inputs">Input Fields</TabsTrigger>
-          <TabsTrigger value="dropdowns">Dropdowns</TabsTrigger>
-          <TabsTrigger value="search">Search</TabsTrigger>
-          <TabsTrigger value="icons">Icons</TabsTrigger>
-          <TabsTrigger value="dividers">Dividers</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={selectedPreview} className="mt-6">
-          {renderPreview()}
-        </TabsContent>
-      </Tabs>
+      <TabsContent value={selectedPreview} className="mt-6">
+        {renderPreview()}
+      </TabsContent>
     </div>
   );
 });

@@ -6,6 +6,9 @@ import type { ThemeConfiguration } from "@/types/theme";
 import { ThemeSelector } from "./theme/ThemeSelector";
 import { ThemePreviewWrapper } from "./previews/ThemePreviewWrapper";
 import { ThemeEditorTabs } from "./theme/ThemeEditorTabs";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { Eye } from "lucide-react";
 
 export function ThemeSettings() {
   const { applyTheme } = useThemeManager();
@@ -15,6 +18,7 @@ export function ThemeSettings() {
   const [selectedTheme, setSelectedTheme] = useState<ThemeConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     checkSuperAdmin();
@@ -112,20 +116,34 @@ export function ThemeSettings() {
 
       <div className="grid grid-cols-1 gap-8">
         <div className="space-y-4">
-          <ThemeSelector
-            themes={themes}
-            selectedTheme={selectedTheme}
-            onThemeChange={handleThemeChange}
-            onSaveChanges={handleSaveTheme}
-            isSuperAdmin={isSuperAdmin}
-            onEditModeChange={setIsEditMode}
-          />
+          <div className="flex items-center justify-between">
+            <ThemeSelector
+              themes={themes}
+              selectedTheme={selectedTheme}
+              onThemeChange={handleThemeChange}
+              onSaveChanges={handleSaveTheme}
+              isSuperAdmin={isSuperAdmin}
+              onEditModeChange={setIsEditMode}
+            />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={showPreview}
+                  onCheckedChange={setShowPreview}
+                  id="preview-mode"
+                />
+                <label htmlFor="preview-mode" className="text-sm">
+                  Show Preview
+                </label>
+              </div>
+            </div>
+          </div>
 
           {selectedTheme && (
             <ThemeEditorTabs
               selectedTheme={selectedTheme}
               handleColorChange={handleColorChange}
-              showPreview={isEditMode}
+              showPreview={showPreview}
             />
           )}
         </div>
