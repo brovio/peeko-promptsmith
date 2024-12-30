@@ -15,13 +15,14 @@ import { ThemePreview } from "./previews/ThemePreview";
 import { BaseColorsSection } from "./theme/BaseColorsSection";
 import { ComponentColorsSection } from "./theme/ComponentColorsSection";
 import { StateColorsSection } from "./theme/StateColorsSection";
+import type { ThemeConfiguration } from "@/types/theme";
 
 export function ThemeSettings() {
   const { applyTheme } = useThemeManager();
   const { toast } = useToast();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [themes, setThemes] = useState([]);
-  const [selectedTheme, setSelectedTheme] = useState(null);
+  const [themes, setThemes] = useState<ThemeConfiguration[]>([]);
+  const [selectedTheme, setSelectedTheme] = useState<ThemeConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -71,7 +72,8 @@ export function ThemeSettings() {
     // Apply theme changes immediately
     Object.entries(theme).forEach(([key, value]) => {
       if (typeof value === 'string' && key !== 'id' && key !== 'name' && key !== 'theme_type') {
-        document.documentElement.style.setProperty(`--${key.replace(/_/g, '-')}`, value);
+        const cssVarName = key.replace(/_/g, '-');
+        document.documentElement.style.setProperty(`--${cssVarName}`, value);
       }
     });
   };
@@ -113,7 +115,8 @@ export function ThemeSettings() {
     setSelectedTheme(updatedTheme);
     
     // Apply change immediately
-    document.documentElement.style.setProperty(`--${key.replace(/_/g, '-')}`, value);
+    const cssVarName = key.replace(/_/g, '-');
+    document.documentElement.style.setProperty(`--${cssVarName}`, value);
   };
 
   return (
