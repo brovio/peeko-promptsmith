@@ -79,20 +79,24 @@ export default function Index() {
       }
 
       try {
-        // Using single query approach instead of 'in' clause
+        // Fetch all active models first
         const { data, error } = await supabase
           .from('available_models')
           .select('*')
-          .eq('is_active', true)
-          .filter('model_id', 'in', `(${modelIds.join(',')})`);
+          .eq('is_active', true);
 
         if (error) {
           console.error('Error fetching available models:', error);
           throw error;
         }
 
-        console.log('Fetched models:', data);
-        return (data || []) as Model[];
+        // Filter the models client-side
+        const filteredModels = data?.filter(model => 
+          modelIds.includes(model.model_id)
+        ) || [];
+
+        console.log('Fetched models:', filteredModels);
+        return filteredModels as Model[];
       } catch (error) {
         console.error('Failed to fetch models:', error);
         throw error;
