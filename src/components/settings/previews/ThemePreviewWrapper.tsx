@@ -7,6 +7,8 @@ export function ThemePreviewWrapper() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const resizeTimeoutRef = useRef<NodeJS.Timeout>();
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   const debouncedResize = useCallback(() => {
@@ -22,10 +24,23 @@ export function ThemePreviewWrapper() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener('resize', debouncedResize);
+    if (previewRef.current) {
+      resizeObserverRef.current = new ResizeObserver((entries) => {
+        // Only trigger resize handling if the component is mounted
+        if (previewRef.current) {
+          debouncedResize();
+        }
+      });
+
+      resizeObserverRef.current.observe(previewRef.current);
+    }
     
     return () => {
-      window.removeEventListener('resize', debouncedResize);
+      // Cleanup resize observer
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+      // Clear any pending timeouts
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
@@ -51,7 +66,7 @@ export function ThemePreviewWrapper() {
           {isEditMode ? "Hide Examples" : "Show All Examples"}
         </Button>
       </div>
-      <div className="relative min-h-[200px]">
+      <div ref={previewRef} className="relative min-h-[200px]">
         {!isResizing && (
           <ThemePreview showAllExamples={isEditMode} />
         )}
