@@ -7,9 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 interface ModelSelectorProps {
   onModelSelect: (modelId: string) => void;
   selectedModel: string;
-  models?: Model[];
-  isLoading?: boolean;
-  onRefresh?: () => void;
+  models?: Model[]; // Make models optional to maintain backward compatibility
+  isLoading?: boolean; // Add isLoading prop
+  onRefresh?: () => void; // Add onRefresh prop
 }
 
 export function ModelSelector({ onModelSelect, selectedModel, models, isLoading: externalLoading, onRefresh }: ModelSelectorProps) {
@@ -29,34 +29,33 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
       return data || [];
     },
     initialData: [],
-    enabled: !models,
+    enabled: !models, // Only fetch if models prop is not provided
   });
 
   const { data: fetchedModels = [], isLoading: isModelsLoading, error } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
-      if (!modelsInUse?.length) {
+      const modelIds = modelsInUse?.map(m => m.model_id).filter(Boolean);
+      
+      if (!modelIds?.length) {
         return [];
       }
 
-      // First get all active models
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
+        .in('id', modelIds)
         .eq('is_active', true);
 
       if (error) throw error;
-
-      // Then filter them client-side based on modelsInUse
-      const modelIds = modelsInUse.map(m => m.model_id);
-      return (data || []).filter(model => modelIds.includes(model.id)) as Model[];
+      return (data || []) as Model[];
     },
-    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0 && !models,
+    enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0 && !models, // Only fetch if models prop is not provided
     initialData: [],
   });
 
   const isLoading = isModelsInUseLoading || isModelsLoading || externalLoading;
-  const displayModels = models || fetchedModels;
+  const displayModels = models || fetchedModels; // Use provided models or fetched models
 
   if (isLoading && !models) {
     return <Skeleton className="h-10 w-full" />;
