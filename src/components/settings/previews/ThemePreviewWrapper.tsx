@@ -9,6 +9,7 @@ export function ThemePreviewWrapper() {
   const resizeTimeoutRef = useRef<NodeJS.Timeout>();
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const isMountedRef = useRef(true);
   const { toast } = useToast();
 
   const debouncedResize = useCallback(() => {
@@ -16,18 +17,22 @@ export function ThemePreviewWrapper() {
       clearTimeout(resizeTimeoutRef.current);
     }
 
+    if (!isMountedRef.current) return;
+    
     setIsResizing(true);
     
     resizeTimeoutRef.current = setTimeout(() => {
-      setIsResizing(false);
+      if (isMountedRef.current) {
+        setIsResizing(false);
+      }
     }, 150);
   }, []);
 
   useEffect(() => {
     if (previewRef.current) {
-      resizeObserverRef.current = new ResizeObserver((entries) => {
+      resizeObserverRef.current = new ResizeObserver(() => {
         // Only trigger resize handling if the component is mounted
-        if (previewRef.current) {
+        if (isMountedRef.current && previewRef.current) {
           debouncedResize();
         }
       });
@@ -36,6 +41,8 @@ export function ThemePreviewWrapper() {
     }
     
     return () => {
+      isMountedRef.current = false;
+      
       // Cleanup resize observer
       if (resizeObserverRef.current) {
         resizeObserverRef.current.disconnect();
