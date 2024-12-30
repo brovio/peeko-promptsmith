@@ -12,7 +12,7 @@ export function ThemePreviewWrapper() {
   const isMountedRef = useRef(true);
   const { toast } = useToast();
 
-  // Debounced resize handler with error handling and RAF
+  // Debounced resize handler with RAF for smoother performance
   const handleResize = useCallback(() => {
     if (!isMountedRef.current) return;
 
@@ -28,7 +28,7 @@ export function ThemePreviewWrapper() {
         if (isMountedRef.current) {
           setIsResizing(false);
         }
-      }, 50);
+      }, 150); // Increased debounce time for better performance
     });
   }, []);
 
@@ -36,57 +36,46 @@ export function ThemePreviewWrapper() {
     const currentPreviewRef = previewRef.current;
     if (!currentPreviewRef) return;
 
-    let isObserving = false;
+    try {
+      // Cleanup any existing observer
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
 
-    const setupObserver = () => {
-      try {
+      // Create new observer with error handling
+      observerRef.current = new ResizeObserver((entries) => {
+        if (!isMountedRef.current) return;
+        
+        const lastEntry = entries[entries.length - 1];
+        if (lastEntry && lastEntry.contentRect) {
+          handleResize();
+        }
+      });
+
+      // Start observing with a slight delay to ensure DOM is ready
+      const timeoutId = setTimeout(() => {
+        if (isMountedRef.current && observerRef.current && currentPreviewRef) {
+          observerRef.current.observe(currentPreviewRef);
+        }
+      }, 100);
+
+      return () => {
+        clearTimeout(timeoutId);
+        isMountedRef.current = false;
+        
+        if (resizeTimeoutRef.current) {
+          clearTimeout(resizeTimeoutRef.current);
+        }
+
         if (observerRef.current) {
           observerRef.current.disconnect();
+          observerRef.current = null;
         }
-
-        observerRef.current = new ResizeObserver((entries) => {
-          if (!isMountedRef.current || !isObserving) return;
-          
-          // Only process size changes above a threshold
-          const lastEntry = entries[entries.length - 1];
-          if (lastEntry && lastEntry.contentRect) {
-            handleResize();
-          }
-        });
-
-        // Start observing with a slight delay
-        setTimeout(() => {
-          if (isMountedRef.current && observerRef.current && currentPreviewRef) {
-            observerRef.current.observe(currentPreviewRef);
-            isObserving = true;
-          }
-        }, 100);
-
-      } catch (error) {
-        console.error('Error setting up ResizeObserver:', error);
-        setIsResizing(false);
-      }
-    };
-
-    setupObserver();
-
-    return () => {
-      isMountedRef.current = false;
-      isObserving = false;
-      
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-
-      if (observerRef.current) {
-        try {
-          observerRef.current.disconnect();
-        } catch (error) {
-          console.error('Error disconnecting observer:', error);
-        }
-        observerRef.current = null;
-      }
-    };
+      };
+    } catch (error) {
+      console.error('Error setting up ResizeObserver:', error);
+      setIsResizing(false);
+    }
   }, [handleResize]);
 
   return (
