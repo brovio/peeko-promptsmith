@@ -1,4 +1,4 @@
-import { Model, ModelSelectorProps } from "@/lib/types";
+import { Model } from "@/lib/types";
 import { RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+interface ModelSelectorProps {
+  models: Model[];
+  selectedModel: string;
+  onModelSelect: (modelId: string) => void;
+  isLoading?: boolean;
+  onRefresh?: () => void;
+}
 
 export function ModelSelector({ 
   models, 
@@ -34,7 +42,7 @@ export function ModelSelector({
             {models.map((model) => (
               <SelectItem 
                 key={model.id} 
-                value={model.model_id}
+                value={model.model_id} // Changed from id to model_id
                 className="text-foreground hover:bg-muted"
               >
                 {model.clean_model_name || model.name}

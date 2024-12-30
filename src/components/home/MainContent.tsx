@@ -1,7 +1,22 @@
 import { ModelAndCategorySelectors } from "./ModelAndCategorySelectors";
 import { PromptSection } from "./PromptSection";
 import { ResultSection } from "./ResultSection";
-import { HomeProps } from "@/lib/types";
+import { Model } from "@/lib/types";
+
+interface MainContentProps {
+  models: Model[];
+  selectedModel: string;
+  selectedCategory: string;
+  selectedEnhancer: string;
+  isModelsLoading: boolean;
+  result: string;
+  metadata?: any;
+  onModelSelect: (modelId: string) => void;
+  onCategorySelect: (categoryId: string) => void;
+  onEnhancerUpdate: (enhancer: string) => void;
+  onPromptSubmit: (enhancedPrompt: string, metadata?: any) => void;
+  onRefreshModels: () => void;
+}
 
 export function MainContent({
   models,
@@ -16,7 +31,7 @@ export function MainContent({
   onEnhancerUpdate,
   onPromptSubmit,
   onRefreshModels,
-}: HomeProps) {
+}: MainContentProps) {
   return (
     <div className="grid md:grid-cols-2 gap-8">
       <div className="space-y-6">

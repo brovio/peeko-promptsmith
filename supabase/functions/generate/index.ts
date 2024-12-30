@@ -6,11 +6,17 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
+const MODEL_SEQUENCE = [
+  "google/gemini-2.0-flash-thinking-exp:free",
+  "google/gemini-2.0-flash-exp:free",
+  "google/gemini-exp-1206:free",
+  "meta-llama/llama-3.1-405b-instruct",
+  "openai/o1-mini"
+];
 
-async function tryModelSequence(prompt: string, model: string) {
+async function tryModelSequence(prompt: string, model: string, openRouterKey: string) {
   try {
-    console.log(`Attempting to use model: ${model}`);
+    console.log(`Attempting to use specified model: ${model}`);
     
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -34,39 +40,27 @@ async function tryModelSequence(prompt: string, model: string) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('OpenRouter API error:', {
+      console.error(`Error with model ${model}:`, {
         status: response.status,
-        statusText: response.statusText,
         error: errorText
       });
-      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText} - ${errorText}`);
+      throw new Error(`${model} failed: ${errorText}`);
     }
 
     const data = await response.json();
-    console.log('OpenRouter API response:', {
-      model: model,
-      hasChoices: !!data.choices,
-      choicesLength: data.choices?.length,
-      firstChoice: data.choices?.[0]
-    });
-
     if (!data.choices?.[0]?.message?.content) {
-      console.error('Invalid response structure:', data);
-      throw new Error('Invalid response structure from OpenRouter API');
+      console.error(`Invalid response from ${model}:`, data);
+      throw new Error(`Invalid response from ${model}`);
     }
 
     console.log(`Successfully generated with model: ${model}`);
     return {
       generatedText: data.choices[0].message.content,
       model: model,
-      usage: data.usage || { 
-        prompt_tokens: data.usage?.prompt_tokens || 0, 
-        completion_tokens: data.usage?.completion_tokens || 0,
-        total_tokens: data.usage?.total_tokens || 0
-      }
+      usage: data.usage || { prompt_tokens: 0, completion_tokens: 0 }
     };
   } catch (error) {
-    console.error(`Error with model ${model}:`, error);
+    console.error(`Error with specified model ${model}:`, error);
     throw error;
   }
 }
@@ -77,25 +71,19 @@ serve(async (req) => {
   }
 
   try {
+    const openRouterKey = Deno.env.get('OPENROUTER_API_KEY');
+    if (!openRouterKey) {
+      throw new Error('OpenRouter API key not configured');
+    }
+
     const { prompt, model } = await req.json();
     console.log('Received prompt request:', { 
       promptLength: prompt?.length || 0,
       requestedModel: model 
     });
 
-    if (!openRouterKey) {
-      throw new Error('OpenRouter API key not configured');
-    }
-
-    if (!prompt?.trim()) {
-      throw new Error('Prompt is required');
-    }
-
-    if (!model?.trim()) {
-      throw new Error('Model is required');
-    }
-
-    const result = await tryModelSequence(prompt, model);
+    // Use the specified model instead of trying the sequence
+    const result = await tryModelSequence(prompt, model, openRouterKey);
 
     return new Response(
       JSON.stringify({

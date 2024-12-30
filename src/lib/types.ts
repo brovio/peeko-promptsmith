@@ -28,26 +28,3 @@ export interface ChatMessage {
   model: string;
   timestamp: Date;
 }
-
-export interface HomeProps {
-  readonly models: Model[];
-  readonly selectedModel: string;
-  readonly selectedCategory: string;
-  readonly selectedEnhancer: string;
-  readonly isModelsLoading: boolean;
-  readonly result: string;
-  readonly metadata?: any;
-  readonly onModelSelect: (modelId: string) => void;
-  readonly onCategorySelect: (categoryId: string) => void;
-  readonly onEnhancerUpdate: (enhancer: string) => void;
-  readonly onPromptSubmit: (enhancedPrompt: string, metadata?: any) => void;
-  readonly onRefreshModels: () => void;
-}
-
-export interface ModelSelectorProps {
-  readonly models: Model[];
-  readonly selectedModel: string;
-  readonly onModelSelect: (modelId: string) => void;
-  readonly isLoading?: boolean;
-  readonly onRefresh?: () => void;
-}

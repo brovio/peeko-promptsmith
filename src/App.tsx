@@ -13,16 +13,12 @@ import WhatPrompting from "@/pages/WhatPrompting";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./App.css";
 
-// Create a client with longer stale time to persist data between route changes
+// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
       retry: 1,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
     },
   },
 });
