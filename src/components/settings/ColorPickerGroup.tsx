@@ -52,29 +52,34 @@ export function ColorPickerGroup({
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
         <div className="space-x-2">
-          <div className={`${previewClassName} p-2 rounded-md border`}>
+          <div 
+            className={`${previewClassName} p-2 rounded-md border`}
+            style={{
+              backgroundColor: `hsl(${mainColor})`,
+              color: `hsl(${foregroundColor})`
+            }}
+          >
             Style Example
           </div>
-          {inputTextColor && (
-            <Input
-              type="text"
-              placeholder="Type here..."
-              className={`w-32 ${previewClassName}`}
-              style={{ color: `hsl(${inputTextColor})` }}
-            />
-          )}
         </div>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label>Main Color (HSL)</Label>
-          <Input
-            type="text"
-            value={mainColor}
-            onChange={(e) => onMainColorChange(e.target.value)}
-            placeholder="0 0% 100%"
-          />
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              value={mainColor}
+              onChange={(e) => onMainColorChange(e.target.value)}
+              placeholder="0 0% 100%"
+              className="flex-1"
+            />
+            <div 
+              className="w-10 h-10 rounded border"
+              style={{ backgroundColor: `hsl(${mainColor})` }}
+            />
+          </div>
           <Input
             type="color"
             value={`hsl(${mainColor})`}
@@ -86,17 +91,25 @@ export function ColorPickerGroup({
               const hsl = rgbToHsl(r, g, b);
               onMainColorChange(`${hsl[0]} ${hsl[1]}% ${hsl[2]}%`);
             }}
+            className="h-10"
           />
         </div>
         
         <div className="space-y-2">
           <Label>Foreground Color (HSL)</Label>
-          <Input
-            type="text"
-            value={foregroundColor}
-            onChange={(e) => onForegroundColorChange(e.target.value)}
-            placeholder="0 0% 0%"
-          />
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              value={foregroundColor}
+              onChange={(e) => onForegroundColorChange(e.target.value)}
+              placeholder="0 0% 0%"
+              className="flex-1"
+            />
+            <div 
+              className="w-10 h-10 rounded border"
+              style={{ backgroundColor: `hsl(${foregroundColor})` }}
+            />
+          </div>
           <Input
             type="color"
             value={`hsl(${foregroundColor})`}
@@ -108,18 +121,26 @@ export function ColorPickerGroup({
               const hsl = rgbToHsl(r, g, b);
               onForegroundColorChange(`${hsl[0]} ${hsl[1]}% ${hsl[2]}%`);
             }}
+            className="h-10"
           />
         </div>
 
         {inputTextColor && onInputTextColorChange && (
           <div className="space-y-2 col-span-2">
             <Label>Input Text Color (HSL)</Label>
-            <Input
-              type="text"
-              value={inputTextColor}
-              onChange={(e) => onInputTextColorChange(e.target.value)}
-              placeholder="0 0% 0%"
-            />
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                value={inputTextColor}
+                onChange={(e) => onInputTextColorChange(e.target.value)}
+                placeholder="0 0% 0%"
+                className="flex-1"
+              />
+              <div 
+                className="w-10 h-10 rounded border"
+                style={{ backgroundColor: `hsl(${inputTextColor})` }}
+              />
+            </div>
             <Input
               type="color"
               value={`hsl(${inputTextColor})`}
@@ -131,6 +152,7 @@ export function ColorPickerGroup({
                 const hsl = rgbToHsl(r, g, b);
                 onInputTextColorChange(`${hsl[0]} ${hsl[1]}% ${hsl[2]}%`);
               }}
+              className="h-10"
             />
           </div>
         )}

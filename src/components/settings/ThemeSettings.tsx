@@ -110,7 +110,7 @@ export function ThemeSettings() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         <div className="space-y-4">
           <ThemeSelector
             themes={themes}
@@ -125,15 +125,10 @@ export function ThemeSettings() {
             <ThemeEditorTabs
               selectedTheme={selectedTheme}
               handleColorChange={handleColorChange}
+              showPreview={isEditMode}
             />
           )}
         </div>
-
-        {isEditMode && (
-          <div className="space-y-4">
-            <ThemePreviewWrapper />
-          </div>
-        )}
       </div>
     </div>
   );

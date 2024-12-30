@@ -11,25 +11,37 @@ import {
 
 interface FormPreviewProps {
   showAllExamples?: boolean;
+  showButtons?: boolean;
+  showInputs?: boolean;
+  showDropdowns?: boolean;
+  showSearch?: boolean;
+  showIcons?: boolean;
+  showDividers?: boolean;
 }
 
-export function FormPreview({ showAllExamples = false }: FormPreviewProps) {
+export function FormPreview({ 
+  showAllExamples = false,
+  showButtons = false,
+  showInputs = false,
+  showDropdowns = false,
+  showSearch = false,
+  showIcons = false,
+  showDividers = false,
+}: FormPreviewProps) {
   return (
     <div className="space-y-6">
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Form Elements</h3>
-        
-        {/* Search and Filter Bar - Only shown in edit mode */}
-        {showAllExamples && (
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="pl-10"
-              />
-            </div>
+      {/* Search and Filter Bar */}
+      {(showAllExamples || showSearch) && (
+        <div className="flex gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="pl-10"
+            />
+          </div>
+          {showDropdowns && (
             <Select>
               <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Filter" />
@@ -40,43 +52,47 @@ export function FormPreview({ showAllExamples = false }: FormPreviewProps) {
                 <SelectItem value="inactive">Inactive</SelectItem>
               </SelectContent>
             </Select>
+          )}
+          {showButtons && (
             <Button variant="outline" size="icon">
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Login Form - Always shown */}
-        <div className="space-y-4 p-4 border rounded-lg">
+      {/* Input Fields */}
+      {(showAllExamples || showInputs) && (
+        <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-foreground" />
+              {showIcons && <Mail className="h-4 w-4 text-foreground" />}
               <span className="text-sm font-medium">Email</span>
             </div>
             <Input type="email" placeholder="Enter your email" />
           </div>
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4 text-foreground" />
+              {showIcons && <Lock className="h-4 w-4 text-foreground" />}
               <span className="text-sm font-medium">Password</span>
             </div>
             <Input type="password" placeholder="Enter your password" />
           </div>
-          <Button className="w-full">Sign In</Button>
+          {showButtons && <Button className="w-full">Sign In</Button>}
         </div>
+      )}
 
-        {/* Divider Example - Only shown in edit mode */}
-        {showAllExamples && (
-          <div className="space-y-2">
-            <div className="border-t border-border" />
-            <div className="flex items-center">
-              <div className="flex-1 border-t border-border" />
-              <span className="px-4 text-sm text-muted-foreground">OR</span>
-              <div className="flex-1 border-t border-border" />
-            </div>
+      {/* Divider Example */}
+      {(showAllExamples || showDividers) && (
+        <div className="space-y-2">
+          <div className="border-t border-border" />
+          <div className="flex items-center">
+            <div className="flex-1 border-t border-border" />
+            <span className="px-4 text-sm text-muted-foreground">OR</span>
+            <div className="flex-1 border-t border-border" />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
