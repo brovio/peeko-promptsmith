@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Model } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { RotateCw } from "lucide-react";
 
 interface ModelSelectorProps {
   onModelSelect: (modelId: string) => void;
@@ -32,7 +34,12 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
     enabled: !models,
   });
 
-  const { data: fetchedModels = [], isLoading: isModelsLoading, error } = useQuery({
+  const { 
+    data: fetchedModels = [], 
+    isLoading: isModelsLoading,
+    error,
+    refetch
+  } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
       if (!modelsInUse?.length) {
@@ -56,33 +63,48 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
   const isLoading = isModelsInUseLoading || isModelsLoading || externalLoading;
   const displayModels = models || fetchedModels;
 
+  const handleRefresh = () => {
+    if (onRefresh) {
+      onRefresh();
+    } else {
+      refetch();
+    }
+  };
+
   if (isLoading && !models) {
     return <Skeleton className="h-10 w-full" />;
   }
 
-  if (error && !models) {
-    console.error('Error in ModelSelector:', error);
-    return (
-      <Select disabled>
-        <SelectTrigger>
-          <SelectValue placeholder="Error loading models" />
-        </SelectTrigger>
-      </Select>
-    );
-  }
-
   return (
-    <Select value={selectedModel} onValueChange={onModelSelect}>
-      <SelectTrigger>
-        <SelectValue placeholder="Select a model" />
-      </SelectTrigger>
-      <SelectContent>
-        {displayModels.map((model) => (
-          <SelectItem key={model.id} value={model.id}>
-            {model.name}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="flex gap-2 items-center">
+      <div className="flex-1">
+        <Select value={selectedModel} onValueChange={onModelSelect}>
+          <SelectTrigger>
+            <SelectValue placeholder={isLoading ? "Loading models..." : "Select a model"} />
+          </SelectTrigger>
+          <SelectContent>
+            {error ? (
+              <SelectItem value="error" disabled>Error loading models</SelectItem>
+            ) : displayModels.length === 0 ? (
+              <SelectItem value="empty" disabled>No models available</SelectItem>
+            ) : (
+              displayModels.map((model) => (
+                <SelectItem key={model.id} value={model.id}>
+                  {model.name}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+      </div>
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={handleRefresh}
+        disabled={isLoading}
+      >
+        <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+      </Button>
+    </div>
   );
 }
