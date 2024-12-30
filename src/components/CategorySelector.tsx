@@ -1,91 +1,83 @@
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-export interface UseCase {
+interface UseCaseProps {
   id: string;
   title: string;
+  description: string;
   enhancer: string;
 }
 
 interface CategorySelectorProps {
-  selectedCategory: string;
   onCategorySelect: (categoryId: string) => void;
   onEnhancerUpdate: (enhancer: string) => void;
+  selectedCategory: string;
 }
 
 export function CategorySelector({ 
-  selectedCategory, 
-  onCategorySelect,
-  onEnhancerUpdate 
+  onCategorySelect, 
+  onEnhancerUpdate,
+  selectedCategory 
 }: CategorySelectorProps) {
-  const { data: useCases, isLoading } = useQuery({
+  const { data: useCases, isLoading, error } = useQuery({
     queryKey: ['use-cases'],
     queryFn: async () => {
       console.log('Fetching use cases...');
       const { data, error } = await supabase
         .from('use_cases')
-        .select('id, title, enhancer');
-      
+        .select('*')
+        .order('created_at', { ascending: false });
+
       if (error) {
         console.error('Error fetching use cases:', error);
         throw error;
       }
-      
-      console.log(`Found ${data?.length || 0} use cases`);
-      return data as UseCase[];
+
+      console.log('Found', data?.length, 'use cases');
+      return data as UseCaseProps[];
     },
     retry: 1,
     retryDelay: 1000,
-    placeholderData: [], // Show empty array while loading
+    initialData: [], // Show empty array initially
   });
 
   const handleUseCaseSelect = (useCaseId: string) => {
     const selectedUseCase = useCases?.find(uc => uc.id === useCaseId);
     if (selectedUseCase) {
-      console.log(`Selected Use Case: ${selectedUseCase.title}`);
-      console.log(`Selected Use Case Enhancer Text: ${selectedUseCase.enhancer}`);
       onCategorySelect(useCaseId);
       onEnhancerUpdate(selectedUseCase.enhancer);
     }
   };
 
-  return (
-    <div className="w-full">
-      <Select value={selectedCategory} onValueChange={handleUseCaseSelect}>
-        <SelectTrigger className="w-full bg-background text-foreground border-input">
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span>Loading use cases...</span>
-            </div>
-          ) : (
-            <SelectValue placeholder="Choose Use Case" />
-          )}
-        </SelectTrigger>
-        <SelectContent className="bg-background border-input">
-          {useCases?.map((useCase) => (
-            <SelectItem 
-              key={useCase.id} 
-              value={useCase.id}
-              className="text-foreground hover:bg-muted"
-            >
-              {useCase.title}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
-  );
-}
+  if (isLoading) {
+    return <Skeleton className="h-10 w-full" />;
+  }
 
-export function getTemplateForCategory(categoryId: string, enhancer: string): string {
-  return enhancer || "{prompt}";
+  if (error) {
+    console.error('Error in CategorySelector:', error);
+    return (
+      <Select disabled>
+        <SelectTrigger>
+          <SelectValue placeholder="Error loading categories" />
+        </SelectTrigger>
+      </Select>
+    );
+  }
+
+  return (
+    <Select value={selectedCategory} onValueChange={handleUseCaseSelect}>
+      <SelectTrigger>
+        <SelectValue placeholder="Select a category" />
+      </SelectTrigger>
+      <SelectContent>
+        {useCases?.map((useCase) => (
+          <SelectItem key={useCase.id} value={useCase.id}>
+            {useCase.title}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
 }
