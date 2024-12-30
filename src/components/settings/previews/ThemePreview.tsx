@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { LoginPreview } from "./LoginPreview";
 import { ModelCardPreview } from "./ModelCardPreview";
 import { UseCasePreview } from "./UseCasePreview";
@@ -13,6 +13,17 @@ export const ThemePreview = memo(function ThemePreview({
   showAllExamples = false, 
   previewType = 'base' 
 }: ThemePreviewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Force a reflow when the component mounts or updates
+    if (containerRef.current) {
+      containerRef.current.style.display = 'none';
+      void containerRef.current.offsetHeight; // Trigger reflow
+      containerRef.current.style.display = '';
+    }
+  }, [showAllExamples, previewType]);
+
   const renderPreview = () => {
     switch (previewType) {
       case 'buttons':
@@ -85,7 +96,7 @@ export const ThemePreview = memo(function ThemePreview({
   };
 
   return (
-    <div className="space-y-8 p-6 border rounded-lg bg-background">
+    <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
       {renderPreview()}
     </div>
   );

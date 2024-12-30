@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemePreview } from "./ThemePreview";
 import { useToast } from "@/hooks/use-toast";
@@ -6,22 +6,29 @@ import { useToast } from "@/hooks/use-toast";
 export function ThemePreviewWrapper() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
+  const resizeTimeoutRef = useRef<NodeJS.Timeout>();
   const { toast } = useToast();
 
   const debouncedResize = useCallback(() => {
-    if (isResizing) return;
+    if (resizeTimeoutRef.current) {
+      clearTimeout(resizeTimeoutRef.current);
+    }
+
     setIsResizing(true);
     
-    setTimeout(() => {
+    resizeTimeoutRef.current = setTimeout(() => {
       setIsResizing(false);
-    }, 100);
-  }, [isResizing]);
+    }, 150);
+  }, []);
 
   useEffect(() => {
     window.addEventListener('resize', debouncedResize);
     
     return () => {
       window.removeEventListener('resize', debouncedResize);
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
     };
   }, [debouncedResize]);
 
@@ -44,9 +51,11 @@ export function ThemePreviewWrapper() {
           {isEditMode ? "Hide Examples" : "Show All Examples"}
         </Button>
       </div>
-      {!isResizing && (
-        <ThemePreview showAllExamples={isEditMode} />
-      )}
+      <div className="relative min-h-[200px]">
+        {!isResizing && (
+          <ThemePreview showAllExamples={isEditMode} />
+        )}
+      </div>
     </div>
   );
 }
