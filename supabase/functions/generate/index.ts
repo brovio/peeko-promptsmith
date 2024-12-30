@@ -10,6 +10,20 @@ async function tryModelSequence(prompt: string, model: string, openRouterKey: st
   try {
     console.log(`Attempting to use model: ${model}`);
     
+    const requestBody = {
+      model: model,
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      max_tokens: 1000,
+      temperature: 0.7,
+    };
+
+    console.log('Request body:', JSON.stringify(requestBody));
+    
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -17,34 +31,25 @@ async function tryModelSequence(prompt: string, model: string, openRouterKey: st
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://lovable.dev',
       },
-      body: JSON.stringify({
-        model: model,
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Error with model ${model}:`, {
+      console.error(`Error response from OpenRouter API:`, {
         status: response.status,
-        error: errorText
+        error: errorText,
+        headers: Object.fromEntries(response.headers.entries())
       });
-      throw new Error(`API request failed: ${errorText}`);
+      throw new Error(`OpenRouter API request failed: ${errorText}`);
     }
 
     const data = await response.json();
     console.log('OpenRouter API Response:', JSON.stringify(data));
 
     if (!data.choices?.[0]?.message?.content) {
-      console.error(`Invalid response structure from ${model}:`, data);
-      throw new Error('Invalid response structure from API');
+      console.error(`Invalid response structure:`, data);
+      throw new Error('Invalid response structure from OpenRouter API');
     }
 
     console.log(`Successfully generated with model: ${model}`);
