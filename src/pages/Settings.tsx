@@ -15,20 +15,29 @@ export default function Settings() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/login');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log('Session check:', session ? 'Session exists' : 'No session');
+      
+      if (sessionError) {
+        console.error('Error checking auth state:', sessionError);
         toast({
-          title: "Authentication required",
-          description: "Please log in to access settings",
+          title: "Authentication Error",
+          description: "Please try refreshing the page",
           variant: "destructive",
         });
         return;
       }
 
+      if (!session) {
+        console.log('No session found, redirecting to login');
+        navigate('/login');
+        return;
+      }
+
+      console.log('Checking profile for user:', session.user.id);
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('is_superadmin')
+        .select('*')
         .eq('id', session.user.id)
         .single();
 
@@ -37,20 +46,13 @@ export default function Settings() {
         return;
       }
 
-      // Log the superadmin check for debugging
+      console.log('Profile data:', profile);
       console.log('Is Superadmin:', profile?.is_superadmin);
       setIsSuperAdmin(profile?.is_superadmin || false);
     };
+    
     checkAuth();
   }, [navigate, toast]);
-
-  const handleApiKeyValidated = (key: string) => {
-    setApiKey(key);
-  };
-
-  const handleApiKeyDeleted = () => {
-    setApiKey("");
-  };
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -59,8 +61,8 @@ export default function Settings() {
       <div className="space-y-8">
         <section className="pb-8 border-b border-primary/20">
           <ApiKeyManager 
-            onApiKeyValidated={handleApiKeyValidated}
-            onApiKeyDeleted={handleApiKeyDeleted}
+            onApiKeyValidated={setApiKey}
+            onApiKeyDeleted={() => setApiKey("")}
           />
         </section>
 
