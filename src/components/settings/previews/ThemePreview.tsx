@@ -25,6 +25,21 @@ export const ThemePreview = memo(function ThemePreview({
   }, [showAllExamples, previewType]);
 
   const renderPreview = () => {
+    // If showAllExamples is true and we're on the base tab, show everything
+    if (showAllExamples && previewType === 'base') {
+      return (
+        <div className="space-y-8">
+          <FormPreview showAllExamples={true} />
+          <LoginPreview />
+          <div className="max-w-md">
+            <ModelCardPreview />
+            <UseCasePreview />
+          </div>
+        </div>
+      );
+    }
+
+    // Otherwise, show only the relevant preview for each tab
     switch (previewType) {
       case 'buttons':
         return (
@@ -37,7 +52,7 @@ export const ThemePreview = memo(function ThemePreview({
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Card Examples</h3>
-            <div className="max-w-md">
+            <div className="max-w-md space-y-4">
               <ModelCardPreview />
               <UseCasePreview />
             </div>
@@ -79,18 +94,6 @@ export const ThemePreview = memo(function ThemePreview({
           </div>
         );
       default:
-        if (showAllExamples) {
-          return (
-            <div className="space-y-8">
-              <FormPreview showAllExamples={true} />
-              <LoginPreview />
-              <div className="max-w-md">
-                <ModelCardPreview />
-                <UseCasePreview />
-              </div>
-            </div>
-          );
-        }
         return <FormPreview showAllExamples={false} />;
     }
   };
