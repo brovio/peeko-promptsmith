@@ -13,63 +13,68 @@ export function ThemePreviewWrapper() {
   const isMountedRef = useRef(true);
   const { toast } = useToast();
 
-  // Enhanced debounced resize handler
+  // Improved resize handler with rate limiting
   const debouncedResize = useCallback(() => {
+    if (!isMountedRef.current) return;
+
     if (resizeTimeoutRef.current) {
       clearTimeout(resizeTimeoutRef.current);
     }
 
-    if (!isMountedRef.current) return;
-
-    try {
-      setIsResizing(true);
-      resizeTimeoutRef.current = setTimeout(() => {
-        if (isMountedRef.current) {
-          setIsResizing(false);
-        }
-      }, 150);
-    } catch (error) {
-      console.error('Error in resize handling:', error);
-      setIsResizing(false);
-    }
+    setIsResizing(true);
+    resizeTimeoutRef.current = setTimeout(() => {
+      if (isMountedRef.current) {
+        setIsResizing(false);
+      }
+    }, 150);
   }, []);
 
   useEffect(() => {
     const currentPreviewRef = previewRef.current;
+    if (!currentPreviewRef) return;
 
-    // Delay starting the observer
-    startObservingTimeoutRef.current = setTimeout(() => {
-      if (!isMountedRef.current || !currentPreviewRef) return;
+    let rafId: number;
+    let isObserving = false;
 
-      try {
-        // Create ResizeObserver with error handling
-        resizeObserverRef.current = new ResizeObserver((entries) => {
-          if (!isMountedRef.current) return;
+    // Create ResizeObserver with batched updates
+    const observer = new ResizeObserver((entries) => {
+      // Cancel any pending animation frame
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
 
-          // Use requestAnimationFrame to avoid layout thrashing
-          window.requestAnimationFrame(() => {
-            if (isMountedRef.current && entries.length > 0) {
-              debouncedResize();
-            }
-          });
-        });
-
-        // Start observing with error handling
-        try {
-          resizeObserverRef.current.observe(currentPreviewRef);
-        } catch (error) {
-          console.error('Error starting ResizeObserver:', error);
+      // Schedule a new update
+      rafId = requestAnimationFrame(() => {
+        if (isMountedRef.current && isObserving) {
+          debouncedResize();
         }
-      } catch (error) {
-        console.error('Error creating ResizeObserver:', error);
+      });
+    });
+
+    // Delay observation start
+    startObservingTimeoutRef.current = setTimeout(() => {
+      if (isMountedRef.current) {
+        try {
+          observer.observe(currentPreviewRef);
+          isObserving = true;
+          resizeObserverRef.current = observer;
+        } catch (error) {
+          console.error('Failed to start observing:', error);
+        }
       }
     }, 100);
 
-    // Enhanced cleanup function
+    // Enhanced cleanup
     return () => {
       isMountedRef.current = false;
+      isObserving = false;
 
-      // Clear all timeouts
+      // Cancel any pending animation frame
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+      }
+
+      // Clear timeouts
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);
       }
@@ -77,17 +82,16 @@ export function ThemePreviewWrapper() {
         clearTimeout(startObservingTimeoutRef.current);
       }
 
-      // Cleanup ResizeObserver
-      if (resizeObserverRef.current) {
+      // Cleanup observer
+      if (observer) {
         try {
-          resizeObserverRef.current.disconnect();
-          resizeObserverRef.current = null;
+          observer.disconnect();
         } catch (error) {
-          console.error('Error disconnecting ResizeObserver:', error);
+          console.error('Failed to disconnect observer:', error);
         }
       }
 
-      // Reset state if component is unmounting
+      // Reset state
       setIsResizing(false);
     };
   }, [debouncedResize]);
