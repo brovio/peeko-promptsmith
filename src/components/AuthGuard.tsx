@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingModal } from "./LoadingModal";
 import { useToast } from "@/hooks/use-toast";
+import { AuthError, Session, User } from "@supabase/supabase-js";
 
 const PUBLIC_ROUTES = ["/login", "/forgot-password"];
 
@@ -64,24 +65,28 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
       console.log('Auth state changed:', event, session?.user?.id);
 
-      if (event === 'SIGNED_IN') {
-        setIsAuthenticated(true);
-        setIsLoading(false);
-        if (location.pathname === '/login') {
-          navigate('/', { replace: true });
-        }
-      } else if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        setIsAuthenticated(false);
-        setIsLoading(false);
-        if (!PUBLIC_ROUTES.includes(location.pathname)) {
-          navigate('/login', { replace: true });
-        }
-      } else if (event === 'TOKEN_REFRESHED') {
-        setIsAuthenticated(!!session);
-        setIsLoading(false);
-      } else if (event === 'USER_UPDATED') {
-        setIsAuthenticated(!!session);
-        setIsLoading(false);
+      switch (event) {
+        case 'SIGNED_IN':
+          setIsAuthenticated(true);
+          setIsLoading(false);
+          if (location.pathname === '/login') {
+            navigate('/', { replace: true });
+          }
+          break;
+        case 'SIGNED_OUT':
+          setIsAuthenticated(false);
+          setIsLoading(false);
+          if (!PUBLIC_ROUTES.includes(location.pathname)) {
+            navigate('/login', { replace: true });
+          }
+          break;
+        case 'TOKEN_REFRESHED':
+        case 'USER_UPDATED':
+          setIsAuthenticated(!!session);
+          setIsLoading(false);
+          break;
+        default:
+          break;
       }
     });
 
