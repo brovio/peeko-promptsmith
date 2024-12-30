@@ -1,60 +1,52 @@
 import { Model } from "@/lib/types";
-import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
-import { CSSProperties, useState } from "react";
-import { ModelCardHeader } from "./ModelCardHeader";
-import { ModelDescription } from "./ModelDescription";
-import { ModelInfo } from "./ModelInfo";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus, Check } from "lucide-react";
 
 interface ModelCardProps {
   model: Model;
   onAdd: (model: Model) => void;
   onRemove?: (modelId: string) => void;
   isInUse?: boolean;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
 }
 
 export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: ModelCardProps) {
-  const [isHighlighted, setIsHighlighted] = useState(false);
-  const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
-  
-  const getModelSubtitle = () => {
-    if (model.p_provider && model.p_model) {
-      return `${capitalizeFirstLetter(model.p_provider)}'s ${model.p_model}`;
+  const handleClick = () => {
+    if (isInUse && onRemove) {
+      onRemove(model.id);
+    } else {
+      onAdd(model);
     }
-    return "";
   };
-
-  const handleAdd = async (model: Model) => {
-    setIsHighlighted(true);
-    await onAdd(model);
-    setTimeout(() => setIsHighlighted(false), 1000);
-  };
-
-  const cardClasses = `p-[3%] transition-colors duration-300 flex flex-col h-full ${
-    isInUse ? 'border-emerald-500 border-2' : ''
-  } ${isHighlighted ? 'bg-emerald-50 dark:bg-emerald-900' : ''}`;
-  
-  const dividerClasses = `border-t pt-2 ${isInUse ? 'border-emerald-500' : 'border-border'}`;
 
   return (
-    <Card style={style} className={cardClasses}>
-      <CardHeader className="space-y-1 p-0">
-        <ModelCardHeader 
-          model={model} 
-          onAdd={handleAdd} 
-          onRemove={onRemove}
-          isInUse={isInUse}
-        />
-        <div className={dividerClasses}>
-          <CardDescription className="text-left font-medium">
-            {getModelSubtitle()}
-          </CardDescription>
-          <ModelDescription description={model.description} />
-        </div>
+    <Card 
+      className={`relative transition-all duration-200 ${
+        isInUse ? 'border-primary border-2' : 'hover:border-muted'
+      }`}
+      style={style}
+    >
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg font-semibold flex justify-between items-start">
+          <span>{model.clean_model_name}</span>
+          <Button
+            variant={isInUse ? "outline" : "default"}
+            size="sm"
+            onClick={handleClick}
+            className={`ml-2 ${isInUse ? 'text-primary' : ''}`}
+          >
+            {isInUse ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          </Button>
+        </CardTitle>
+        <CardDescription className="text-xs text-muted-foreground">
+          {model.provider}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="p-0 mt-4 flex-grow flex flex-col">
-        <div className="flex-grow" />
-        <ModelInfo model={model} />
+      <CardContent>
+        <p className="text-sm text-muted-foreground line-clamp-2">
+          {model.description || "No description available"}
+        </p>
       </CardContent>
     </Card>
   );
