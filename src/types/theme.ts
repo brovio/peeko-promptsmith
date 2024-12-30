@@ -1,6 +1,6 @@
 export type ThemeType = 'light' | 'dark' | 'custom' | 'peeko';
 
-export interface ThemeConfiguration {
+export interface Theme {
   id: string;
   name: string;
   theme_type: ThemeType;
@@ -37,3 +37,6 @@ export interface ThemeConfiguration {
   created_by?: string;
   is_active?: boolean;
 }
+
+// Make ThemeConfiguration extend Theme to ensure compatibility
+export type ThemeConfiguration = Theme;
