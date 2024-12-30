@@ -193,6 +193,8 @@ export type Database = {
           id: string
           is_superadmin: boolean | null
           linkedin_url: string | null
+          role: string | null
+          role_type: Database["public"]["Enums"]["user_role"] | null
           twitter_url: string | null
           updated_at: string | null
           username: string | null
@@ -207,6 +209,8 @@ export type Database = {
           id: string
           is_superadmin?: boolean | null
           linkedin_url?: string | null
+          role?: string | null
+          role_type?: Database["public"]["Enums"]["user_role"] | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
@@ -221,6 +225,8 @@ export type Database = {
           id?: string
           is_superadmin?: boolean | null
           linkedin_url?: string | null
+          role?: string | null
+          role_type?: Database["public"]["Enums"]["user_role"] | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
@@ -347,6 +353,83 @@ export type Database = {
           },
         ]
       }
+      role_available_models: {
+        Row: {
+          created_at: string | null
+          id: string
+          model_id: string | null
+          role_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          model_id?: string | null
+          role_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          model_id?: string | null
+          role_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_available_models_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "available_models"
+            referencedColumns: ["model_id"]
+          },
+          {
+            foreignKeyName: "role_available_models_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "role_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_definitions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          role_type: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          role_type?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          role_type?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_definitions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       templates: {
         Row: {
           created_at: string | null
@@ -385,6 +468,128 @@ export type Database = {
           {
             foreignKeyName: "templates_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      theme_configurations: {
+        Row: {
+          accent: string
+          accent_foreground: string
+          background: string
+          border: string
+          card: string
+          card_foreground: string
+          created_at: string | null
+          created_by: string | null
+          destructive: string
+          destructive_foreground: string
+          divider: string
+          dropdown_bg: string | null
+          dropdown_text: string | null
+          filter_bg: string | null
+          filter_text: string | null
+          foreground: string
+          icon: string
+          id: string
+          input: string
+          input_text: string | null
+          is_active: boolean | null
+          muted: string
+          muted_foreground: string
+          name: string
+          popover: string
+          popover_foreground: string
+          primary_color: string
+          primary_foreground: string
+          ring: string
+          search_bg: string | null
+          search_text: string | null
+          secondary: string
+          secondary_foreground: string
+          theme_type: Database["public"]["Enums"]["theme_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          accent: string
+          accent_foreground: string
+          background: string
+          border: string
+          card: string
+          card_foreground: string
+          created_at?: string | null
+          created_by?: string | null
+          destructive: string
+          destructive_foreground: string
+          divider: string
+          dropdown_bg?: string | null
+          dropdown_text?: string | null
+          filter_bg?: string | null
+          filter_text?: string | null
+          foreground: string
+          icon: string
+          id?: string
+          input: string
+          input_text?: string | null
+          is_active?: boolean | null
+          muted: string
+          muted_foreground: string
+          name: string
+          popover: string
+          popover_foreground: string
+          primary_color: string
+          primary_foreground: string
+          ring: string
+          search_bg?: string | null
+          search_text?: string | null
+          secondary: string
+          secondary_foreground: string
+          theme_type?: Database["public"]["Enums"]["theme_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          accent?: string
+          accent_foreground?: string
+          background?: string
+          border?: string
+          card?: string
+          card_foreground?: string
+          created_at?: string | null
+          created_by?: string | null
+          destructive?: string
+          destructive_foreground?: string
+          divider?: string
+          dropdown_bg?: string | null
+          dropdown_text?: string | null
+          filter_bg?: string | null
+          filter_text?: string | null
+          foreground?: string
+          icon?: string
+          id?: string
+          input?: string
+          input_text?: string | null
+          is_active?: boolean | null
+          muted?: string
+          muted_foreground?: string
+          name?: string
+          popover?: string
+          popover_foreground?: string
+          primary_color?: string
+          primary_foreground?: string
+          ring?: string
+          search_bg?: string | null
+          search_text?: string | null
+          secondary?: string
+          secondary_foreground?: string
+          theme_type?: Database["public"]["Enums"]["theme_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theme_configurations_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -574,7 +779,8 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      theme_type: "light" | "dark" | "black" | "custom" | "peeko"
+      user_role: "admin" | "basic" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
