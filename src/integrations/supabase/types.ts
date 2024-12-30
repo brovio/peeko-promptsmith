@@ -474,6 +474,101 @@ export type Database = {
           },
         ]
       }
+      theme_configurations: {
+        Row: {
+          accent: string
+          accent_foreground: string
+          background: string
+          border: string
+          card: string
+          card_foreground: string
+          created_at: string | null
+          created_by: string | null
+          destructive: string
+          destructive_foreground: string
+          foreground: string
+          id: string
+          input: string
+          is_active: boolean | null
+          muted: string
+          muted_foreground: string
+          name: string
+          popover: string
+          popover_foreground: string
+          primary_color: string
+          primary_foreground: string
+          ring: string
+          secondary: string
+          secondary_foreground: string
+          theme_type: Database["public"]["Enums"]["theme_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          accent: string
+          accent_foreground: string
+          background: string
+          border: string
+          card: string
+          card_foreground: string
+          created_at?: string | null
+          created_by?: string | null
+          destructive: string
+          destructive_foreground: string
+          foreground: string
+          id?: string
+          input: string
+          is_active?: boolean | null
+          muted: string
+          muted_foreground: string
+          name: string
+          popover: string
+          popover_foreground: string
+          primary_color: string
+          primary_foreground: string
+          ring: string
+          secondary: string
+          secondary_foreground: string
+          theme_type?: Database["public"]["Enums"]["theme_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          accent?: string
+          accent_foreground?: string
+          background?: string
+          border?: string
+          card?: string
+          card_foreground?: string
+          created_at?: string | null
+          created_by?: string | null
+          destructive?: string
+          destructive_foreground?: string
+          foreground?: string
+          id?: string
+          input?: string
+          is_active?: boolean | null
+          muted?: string
+          muted_foreground?: string
+          name?: string
+          popover?: string
+          popover_foreground?: string
+          primary_color?: string
+          primary_foreground?: string
+          ring?: string
+          secondary?: string
+          secondary_foreground?: string
+          theme_type?: Database["public"]["Enums"]["theme_type"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "theme_configurations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       themes: {
         Row: {
           accent_color: string
@@ -657,6 +752,7 @@ export type Database = {
       }
     }
     Enums: {
+      theme_type: "light" | "dark" | "black" | "custom"
       user_role: "admin" | "basic" | "premium"
     }
     CompositeTypes: {
