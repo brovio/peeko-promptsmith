@@ -486,11 +486,13 @@ export type Database = {
           created_by: string | null
           destructive: string
           destructive_foreground: string
+          divider: string
           dropdown_bg: string | null
           dropdown_text: string | null
           filter_bg: string | null
           filter_text: string | null
           foreground: string
+          icon: string
           id: string
           input: string
           input_text: string | null
@@ -521,11 +523,13 @@ export type Database = {
           created_by?: string | null
           destructive: string
           destructive_foreground: string
+          divider: string
           dropdown_bg?: string | null
           dropdown_text?: string | null
           filter_bg?: string | null
           filter_text?: string | null
           foreground: string
+          icon: string
           id?: string
           input: string
           input_text?: string | null
@@ -556,11 +560,13 @@ export type Database = {
           created_by?: string | null
           destructive?: string
           destructive_foreground?: string
+          divider?: string
           dropdown_bg?: string | null
           dropdown_text?: string | null
           filter_bg?: string | null
           filter_text?: string | null
           foreground?: string
+          icon?: string
           id?: string
           input?: string
           input_text?: string | null

@@ -44,23 +44,28 @@ export function ThemeSettings() {
   };
 
   const fetchThemes = async () => {
-    const { data: themes, error } = await supabase
-      .from('theme_configurations')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('theme_configurations')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching themes:', error);
-      toast({
-        title: "Error fetching themes",
-        description: error.message,
-        variant: "destructive",
-      });
-      return;
+      if (error) {
+        console.error('Error fetching themes:', error);
+        toast({
+          title: "Error fetching themes",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setThemes(data as ThemeConfiguration[]);
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    setThemes(themes as ThemeConfiguration[]);
-    setIsLoading(false);
   };
 
   const handleThemeChange = async (themeId: string) => {
@@ -81,27 +86,28 @@ export function ThemeSettings() {
   const handleSaveTheme = async () => {
     if (!selectedTheme) return;
 
-    const { error } = await supabase
-      .from('theme_configurations')
-      .update(selectedTheme)
-      .eq('id', selectedTheme.id);
+    try {
+      const { error } = await supabase
+        .from('theme_configurations')
+        .update(selectedTheme)
+        .eq('id', selectedTheme.id);
 
-    if (error) {
+      if (error) throw error;
+
+      toast({
+        title: "Theme saved",
+        description: "Your theme changes have been saved successfully.",
+      });
+
+      fetchThemes();
+    } catch (error: any) {
       console.error('Error saving theme:', error);
       toast({
         title: "Error saving theme",
         description: error.message,
         variant: "destructive",
       });
-      return;
     }
-
-    toast({
-      title: "Theme saved",
-      description: "Your theme changes have been saved successfully.",
-    });
-
-    fetchThemes();
   };
 
   const handleColorChange = (key: keyof ThemeConfiguration, value: string) => {

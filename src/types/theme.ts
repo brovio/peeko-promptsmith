@@ -1,7 +1,9 @@
+export type ThemeType = 'light' | 'dark' | 'custom' | 'peeko';
+
 export interface ThemeConfiguration {
   id: string;
   name: string;
-  theme_type: 'light' | 'dark' | 'custom' | 'peeko';
+  theme_type: ThemeType;
   background: string;
   foreground: string;
   input_text: string;
