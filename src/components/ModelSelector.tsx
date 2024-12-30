@@ -3,23 +3,24 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Model } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { RotateCw } from "lucide-react";
 
 interface ModelSelectorProps {
   onModelSelect: (modelId: string) => void;
   selectedModel: string;
   models?: Model[];
   isLoading?: boolean;
-  onRefresh?: () => void;
 }
 
-export function ModelSelector({ onModelSelect, selectedModel, models, isLoading: externalLoading, onRefresh }: ModelSelectorProps) {
+export function ModelSelector({ onModelSelect, selectedModel, models, isLoading: externalLoading }: ModelSelectorProps) {
   const { data: modelsInUse = [], isLoading: isModelsInUseLoading } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
+      console.log('Fetching models in use...');
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return [];
+      if (!user) {
+        console.log('No user found');
+        return [];
+      }
 
       const { data, error } = await supabase
         .from('models_in_use')
@@ -27,7 +28,11 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
         .eq('user_id', user.id)
         .eq('is_active', true);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching models in use:', error);
+        throw error;
+      }
+      console.log('Models in use:', data);
       return data || [];
     },
     initialData: [],
@@ -37,12 +42,13 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
   const { 
     data: fetchedModels = [], 
     isLoading: isModelsLoading,
-    error,
-    refetch
+    error
   } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
+      console.log('Fetching available models...');
       if (!modelsInUse?.length) {
+        console.log('No models in use to fetch');
         return [];
       }
 
@@ -51,10 +57,15 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
         .select('*')
         .eq('is_active', true);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching available models:', error);
+        throw error;
+      }
 
       const modelIds = modelsInUse.map(m => m.model_id);
-      return (data || []).filter(model => modelIds.includes(model.id)) as Model[];
+      const filteredModels = (data || []).filter(model => modelIds.includes(model.id));
+      console.log('Filtered models:', filteredModels);
+      return filteredModels as Model[];
     },
     enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0 && !models,
     initialData: [],
@@ -63,48 +74,28 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
   const isLoading = isModelsInUseLoading || isModelsLoading || externalLoading;
   const displayModels = models || fetchedModels;
 
-  const handleRefresh = () => {
-    if (onRefresh) {
-      onRefresh();
-    } else {
-      refetch();
-    }
-  };
-
   if (isLoading && !models) {
     return <Skeleton className="h-10 w-full" />;
   }
 
   return (
-    <div className="flex gap-2 items-center">
-      <div className="flex-1">
-        <Select value={selectedModel} onValueChange={onModelSelect}>
-          <SelectTrigger>
-            <SelectValue placeholder={isLoading ? "Loading models..." : "Select a model"} />
-          </SelectTrigger>
-          <SelectContent>
-            {error ? (
-              <SelectItem value="error" disabled>Error loading models</SelectItem>
-            ) : displayModels.length === 0 ? (
-              <SelectItem value="empty" disabled>No models available</SelectItem>
-            ) : (
-              displayModels.map((model) => (
-                <SelectItem key={model.id} value={model.id}>
-                  {model.name}
-                </SelectItem>
-              ))
-            )}
-          </SelectContent>
-        </Select>
-      </div>
-      <Button
-        variant="outline"
-        size="icon"
-        onClick={handleRefresh}
-        disabled={isLoading}
-      >
-        <RotateCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-      </Button>
-    </div>
+    <Select value={selectedModel} onValueChange={onModelSelect}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder={isLoading ? "Loading models..." : "Select a model"} />
+      </SelectTrigger>
+      <SelectContent>
+        {error ? (
+          <SelectItem value="error" disabled>Error loading models</SelectItem>
+        ) : displayModels.length === 0 ? (
+          <SelectItem value="empty" disabled>No models available</SelectItem>
+        ) : (
+          displayModels.map((model) => (
+            <SelectItem key={model.id} value={model.id}>
+              {model.name}
+            </SelectItem>
+          ))
+        )}
+      </SelectContent>
+    </Select>
   );
 }
