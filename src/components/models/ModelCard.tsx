@@ -38,7 +38,7 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
   };
 
   const cardClasses = `p-[3%] transition-colors duration-300 flex flex-col h-full ${
-    isInUse ? 'border-emerald-500 border-2' : 'border-border'
+    isInUse ? 'border-emerald-500 border-2' : 'border-border border'
   } ${isHighlighted ? 'bg-emerald-50 dark:bg-emerald-900' : ''}`;
   
   const dividerClasses = `border-t pt-2 ${isInUse ? 'border-emerald-500' : 'border-border'}`;
