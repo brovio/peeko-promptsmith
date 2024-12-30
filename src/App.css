@@ -131,9 +131,9 @@
     @apply bg-background text-foreground transition-colors duration-300;
   }
 
-  /* Input fields */
+  /* Input fields - Updated to use input-text color */
   input, textarea, select {
-    @apply bg-background text-input-text placeholder:text-muted-foreground border-input;
+    @apply text-[hsl(var(--input-text))] bg-background border-input placeholder:text-muted-foreground;
   }
 
   /* Dropdowns */
