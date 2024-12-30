@@ -59,7 +59,7 @@ export function ThemeSettings() {
       return;
     }
 
-    setThemes(themes || []);
+    setThemes(themes as ThemeConfiguration[]);
     setIsLoading(false);
   };
 

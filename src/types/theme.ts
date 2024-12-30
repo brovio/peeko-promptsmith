@@ -30,4 +30,8 @@ export interface ThemeConfiguration {
   border: string;
   input: string;
   ring: string;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+  is_active?: boolean;
 }
