@@ -67,32 +67,32 @@
 
   .black {
     --background: 0 0% 0%;
-    --foreground: 210 40% 98%;
+    --foreground: 0 0% 100%;
  
     --card: 0 0% 0%;
-    --card-foreground: 210 40% 98%;
+    --card-foreground: 0 0% 100%;
  
     --popover: 0 0% 0%;
-    --popover-foreground: 210 40% 98%;
+    --popover-foreground: 0 0% 100%;
  
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
  
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
  
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 80%;
  
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 100%;
  
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
  
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 100%;
   }
 }
  
@@ -101,6 +101,31 @@
     @apply border-border;
   }
   body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+
+  /* Ensure proper text contrast in forms */
+  input, textarea, select {
+    @apply bg-background text-foreground placeholder:text-muted-foreground;
+  }
+
+  /* Ensure dialog content has proper contrast */
+  [role="dialog"] {
     @apply bg-background text-foreground;
+  }
+
+  /* Ensure form labels are visible */
+  label {
+    @apply text-foreground;
+  }
+
+  /* Make links visible */
+  a {
+    @apply text-primary hover:text-primary/80;
+  }
+
+  /* Ensure button text is visible */
+  button {
+    @apply text-foreground disabled:text-muted-foreground;
   }
 }

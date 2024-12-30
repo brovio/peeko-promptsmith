@@ -55,21 +55,6 @@
   }
 }
 
-.gradient-bg {
-  @apply transition-colors duration-300;
-  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
-}
-
-/* Dark mode specific utilities */
-.dark .gradient-bg {
-  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
-}
-
-/* Black mode specific utilities */
-.black .gradient-bg {
-  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--secondary)) 100%);
-}
-
 /* Ensure full height and proper dark theme application */
 #root {
   @apply min-h-screen bg-background text-foreground transition-colors duration-300;
@@ -81,14 +66,6 @@ html {
 
 body {
   @apply min-h-screen bg-background text-foreground transition-colors duration-300;
-}
-
-.dark body {
-  @apply bg-background text-foreground;
-}
-
-.black body {
-  @apply bg-background text-foreground;
 }
 
 /* Input field specific styles for better contrast */
