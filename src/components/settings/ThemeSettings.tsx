@@ -193,7 +193,7 @@ export function ThemeSettings() {
                   onMainColorChange={(value) => handleColorChange('background', value)}
                   onForegroundColorChange={(value) => handleColorChange('foreground', value)}
                   onInputTextColorChange={(value) => handleColorChange('input', value)}
-                  tooltipContent="Base colors control the main background and text colors throughout the application, including form fields and general content."
+                  tooltipContent="Controls the main background color, text color, and input field text colors throughout the application. These colors affect the overall look and readability of your content."
                 />
 
                 <ColorPickerGroup
@@ -204,7 +204,7 @@ export function ThemeSettings() {
                   onMainColorChange={(value) => handleColorChange('card', value)}
                   onForegroundColorChange={(value) => handleColorChange('card_foreground', value)}
                   previewClassName="bg-card text-card-foreground"
-                  tooltipContent="Card colors determine the appearance of card elements, which are used to group related content throughout the interface."
+                  tooltipContent="Defines the appearance of card elements, which are used to group related content. This includes backgrounds and text colors for cards throughout the interface."
                 />
               </TabsContent>
 
@@ -217,7 +217,7 @@ export function ThemeSettings() {
                   onMainColorChange={(value) => handleColorChange('primary_color', value)}
                   onForegroundColorChange={(value) => handleColorChange('primary_foreground', value)}
                   previewClassName="bg-primary text-primary-foreground"
-                  tooltipContent="Primary colors are used for main interactive elements like primary buttons and key UI components."
+                  tooltipContent="Used for primary buttons, links, and key interactive elements. These colors should stand out and guide users to important actions."
                 />
 
                 <ColorPickerGroup
@@ -228,7 +228,7 @@ export function ThemeSettings() {
                   onMainColorChange={(value) => handleColorChange('secondary', value)}
                   onForegroundColorChange={(value) => handleColorChange('secondary_foreground', value)}
                   previewClassName="bg-secondary text-secondary-foreground"
-                  tooltipContent="Secondary colors are used for less prominent elements and alternative actions."
+                  tooltipContent="Used for secondary buttons and less prominent interactive elements. These colors should complement the primary colors while being visually distinct."
                 />
               </TabsContent>
 
@@ -241,7 +241,7 @@ export function ThemeSettings() {
                   onMainColorChange={(value) => handleColorChange('accent', value)}
                   onForegroundColorChange={(value) => handleColorChange('accent_foreground', value)}
                   previewClassName="bg-accent text-accent-foreground"
-                  tooltipContent="Accent colors are used to highlight important elements and provide visual emphasis."
+                  tooltipContent="Used for highlighting important elements and providing visual emphasis. These colors help draw attention to specific parts of the interface."
                 />
 
                 <ColorPickerGroup
@@ -252,7 +252,7 @@ export function ThemeSettings() {
                   onMainColorChange={(value) => handleColorChange('destructive', value)}
                   onForegroundColorChange={(value) => handleColorChange('destructive_foreground', value)}
                   previewClassName="bg-destructive text-destructive-foreground"
-                  tooltipContent="Destructive colors are used for warning messages and actions that can't be undone."
+                  tooltipContent="Used for warning messages and destructive actions like delete buttons. These colors should clearly indicate potential danger or irreversible actions."
                 />
               </TabsContent>
             </Tabs>

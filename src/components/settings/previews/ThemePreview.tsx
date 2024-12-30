@@ -1,10 +1,13 @@
 import { LoginPreview } from "./LoginPreview";
 import { ModelCardPreview } from "./ModelCardPreview";
 import { UseCasePreview } from "./UseCasePreview";
+import { FormPreview } from "./FormPreview";
 
 export function ThemePreview() {
   return (
     <div className="space-y-8 p-6 border rounded-lg bg-background">
+      <FormPreview />
+      
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Login Form</h3>
         <LoginPreview />
