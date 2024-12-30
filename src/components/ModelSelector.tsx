@@ -39,7 +39,6 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
         return [];
       }
 
-      // First get all active models
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
@@ -47,7 +46,6 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
 
       if (error) throw error;
 
-      // Then filter them client-side based on modelsInUse
       const modelIds = modelsInUse.map(m => m.model_id);
       return (data || []).filter(model => modelIds.includes(model.id)) as Model[];
     },

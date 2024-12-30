@@ -79,7 +79,6 @@ export default function Index() {
       }
 
       try {
-        // Fetch all active models first
         const { data, error } = await supabase
           .from('available_models')
           .select('*')
@@ -90,7 +89,6 @@ export default function Index() {
           throw error;
         }
 
-        // Filter the models client-side
         const filteredModels = data?.filter(model => 
           modelIds.includes(model.model_id)
         ) || [];

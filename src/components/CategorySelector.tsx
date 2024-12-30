@@ -40,7 +40,6 @@ export function CategorySelector({
     },
     retry: 1,
     retryDelay: 1000,
-    initialData: [], // Show empty array initially
   });
 
   const handleUseCaseSelect = (useCaseId: string) => {
