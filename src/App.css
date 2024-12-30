@@ -7,6 +7,14 @@
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --input-text: 222.2 84% 4.9%;
+    --dropdown-bg: 0 0% 100%;
+    --dropdown-text: 222.2 84% 4.9%;
+    --search-bg: 0 0% 100%;
+    --search-text: 222.2 84% 4.9%;
+    --filter-bg: 0 0% 100%;
+    --filter-text: 222.2 84% 4.9%;
+    --icon: 222.2 84% 4.9%;
+    --divider: 214.3 31.8% 91.4%;
  
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -40,6 +48,14 @@
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --input-text: 210 40% 98%;
+    --dropdown-bg: 217.2 32.6% 17.5%;
+    --dropdown-text: 210 40% 98%;
+    --search-bg: 217.2 32.6% 17.5%;
+    --search-text: 210 40% 98%;
+    --filter-bg: 217.2 32.6% 17.5%;
+    --filter-text: 210 40% 98%;
+    --icon: 210 40% 98%;
+    --divider: 217.2 32.6% 17.5%;
  
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -67,27 +83,35 @@
     --ring: 212.7 26.8% 83.9%;
   }
 
-  .black {
-    --background: 0 0% 0%;
+  .peeko {
+    --background: 0 0% 13%;
     --foreground: 0 0% 100%;
     --input-text: 0 0% 100%;
+    --dropdown-bg: 0 0% 15%;
+    --dropdown-text: 0 0% 100%;
+    --search-bg: 0 0% 15%;
+    --search-text: 0 0% 100%;
+    --filter-bg: 0 0% 15%;
+    --filter-text: 0 0% 100%;
+    --icon: 142 76% 36%;
+    --divider: 0 0% 20%;
  
-    --card: 0 0% 0%;
+    --card: 0 0% 15%;
     --card-foreground: 0 0% 100%;
  
-    --popover: 0 0% 0%;
+    --popover: 0 0% 15%;
     --popover-foreground: 0 0% 100%;
  
-    --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
+    --primary: 142 76% 36%;
+    --primary-foreground: 0 0% 100%;
  
-    --secondary: 0 0% 10%;
+    --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 100%;
  
-    --muted: 0 0% 15%;
+    --muted: 0 0% 20%;
     --muted-foreground: 0 0% 80%;
  
-    --accent: 0 0% 20%;
+    --accent: 142 76% 36%;
     --accent-foreground: 0 0% 100%;
  
     --destructive: 0 62.8% 30.6%;
@@ -95,7 +119,7 @@
  
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 0 0% 100%;
+    --ring: 142 76% 36%;
   }
 }
  
@@ -107,43 +131,53 @@
     @apply bg-background text-foreground transition-colors duration-300;
   }
 
-  /* Ensure proper text contrast in forms */
+  /* Input fields */
   input, textarea, select {
-    @apply bg-background text-input-text placeholder:text-muted-foreground;
+    @apply bg-background text-input-text placeholder:text-muted-foreground border-input;
   }
 
-  /* Ensure dialog content has proper contrast */
+  /* Dropdowns */
+  [role="listbox"] {
+    @apply bg-dropdown-bg text-dropdown-text border-border;
+  }
+
+  /* Search bars */
+  [type="search"] {
+    @apply bg-search-bg text-search-text;
+  }
+
+  /* Filter bars */
+  .filter-bar {
+    @apply bg-filter-bg text-filter-text;
+  }
+
+  /* Icons */
+  svg {
+    @apply text-icon;
+  }
+
+  /* Dividing lines */
+  hr, .divider {
+    @apply border-divider;
+  }
+
+  /* Dialog content */
   [role="dialog"] {
     @apply bg-background text-foreground;
   }
 
-  /* Ensure form labels are visible */
+  /* Form labels */
   label {
     @apply text-foreground;
   }
 
-  /* Make links visible */
+  /* Links */
   a {
     @apply text-primary hover:text-primary/80;
   }
 
-  /* Ensure button text is visible */
+  /* Buttons */
   button {
     @apply text-foreground disabled:text-muted-foreground;
-  }
-
-  /* Ensure proper contrast for select components */
-  [role="listbox"] {
-    @apply bg-background text-foreground border-border;
-  }
-
-  /* Style dividers */
-  hr, .divider {
-    @apply border-border;
-  }
-
-  /* Style icons */
-  svg {
-    @apply text-foreground;
   }
 }

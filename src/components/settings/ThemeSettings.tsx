@@ -11,41 +11,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ColorPickerGroup } from "./ColorPickerGroup";
 import { ThemePreview } from "./previews/ThemePreview";
-
-interface ThemeConfiguration {
-  id: string;
-  name: string;
-  theme_type: 'light' | 'dark' | 'black' | 'custom';
-  background: string;
-  foreground: string;
-  card: string;
-  card_foreground: string;
-  popover: string;
-  popover_foreground: string;
-  primary_color: string;
-  primary_foreground: string;
-  secondary: string;
-  secondary_foreground: string;
-  muted: string;
-  muted_foreground: string;
-  accent: string;
-  accent_foreground: string;
-  destructive: string;
-  destructive_foreground: string;
-  border: string;
-  input: string;
-  ring: string;
-  is_active: boolean;
-}
+import { BaseColorsSection } from "./theme/BaseColorsSection";
+import { ComponentColorsSection } from "./theme/ComponentColorsSection";
+import { StateColorsSection } from "./theme/StateColorsSection";
 
 export function ThemeSettings() {
   const { applyTheme } = useThemeManager();
   const { toast } = useToast();
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [themes, setThemes] = useState<ThemeConfiguration[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState<ThemeConfiguration | null>(null);
+  const [themes, setThemes] = useState([]);
+  const [selectedTheme, setSelectedTheme] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -184,75 +160,23 @@ export function ThemeSettings() {
               </TabsList>
 
               <TabsContent value="base" className="space-y-4 mt-4">
-                <ColorPickerGroup
-                  label="Background & Text"
-                  description="Main background and text colors"
-                  mainColor={selectedTheme.background}
-                  foregroundColor={selectedTheme.foreground}
-                  inputTextColor={selectedTheme.input}
-                  onMainColorChange={(value) => handleColorChange('background', value)}
-                  onForegroundColorChange={(value) => handleColorChange('foreground', value)}
-                  onInputTextColorChange={(value) => handleColorChange('input', value)}
-                  tooltipContent="Controls the main background color, text color, and input field text colors throughout the application. These colors affect the overall look and readability of your content."
-                />
-
-                <ColorPickerGroup
-                  label="Card"
-                  description="Colors for card components"
-                  mainColor={selectedTheme.card}
-                  foregroundColor={selectedTheme.card_foreground}
-                  onMainColorChange={(value) => handleColorChange('card', value)}
-                  onForegroundColorChange={(value) => handleColorChange('card_foreground', value)}
-                  previewClassName="bg-card text-card-foreground"
-                  tooltipContent="Defines the appearance of card elements, which are used to group related content. This includes backgrounds and text colors for cards throughout the interface."
+                <BaseColorsSection
+                  selectedTheme={selectedTheme}
+                  handleColorChange={handleColorChange}
                 />
               </TabsContent>
 
               <TabsContent value="components" className="space-y-4 mt-4">
-                <ColorPickerGroup
-                  label="Primary"
-                  description="Main action colors"
-                  mainColor={selectedTheme.primary_color}
-                  foregroundColor={selectedTheme.primary_foreground}
-                  onMainColorChange={(value) => handleColorChange('primary_color', value)}
-                  onForegroundColorChange={(value) => handleColorChange('primary_foreground', value)}
-                  previewClassName="bg-primary text-primary-foreground"
-                  tooltipContent="Used for primary buttons, links, and key interactive elements. These colors should stand out and guide users to important actions."
-                />
-
-                <ColorPickerGroup
-                  label="Secondary"
-                  description="Secondary action colors"
-                  mainColor={selectedTheme.secondary}
-                  foregroundColor={selectedTheme.secondary_foreground}
-                  onMainColorChange={(value) => handleColorChange('secondary', value)}
-                  onForegroundColorChange={(value) => handleColorChange('secondary_foreground', value)}
-                  previewClassName="bg-secondary text-secondary-foreground"
-                  tooltipContent="Used for secondary buttons and less prominent interactive elements. These colors should complement the primary colors while being visually distinct."
+                <ComponentColorsSection
+                  selectedTheme={selectedTheme}
+                  handleColorChange={handleColorChange}
                 />
               </TabsContent>
 
               <TabsContent value="states" className="space-y-4 mt-4">
-                <ColorPickerGroup
-                  label="Accent"
-                  description="Accent colors for highlights"
-                  mainColor={selectedTheme.accent}
-                  foregroundColor={selectedTheme.accent_foreground}
-                  onMainColorChange={(value) => handleColorChange('accent', value)}
-                  onForegroundColorChange={(value) => handleColorChange('accent_foreground', value)}
-                  previewClassName="bg-accent text-accent-foreground"
-                  tooltipContent="Used for highlighting important elements and providing visual emphasis. These colors help draw attention to specific parts of the interface."
-                />
-
-                <ColorPickerGroup
-                  label="Destructive"
-                  description="Colors for destructive actions"
-                  mainColor={selectedTheme.destructive}
-                  foregroundColor={selectedTheme.destructive_foreground}
-                  onMainColorChange={(value) => handleColorChange('destructive', value)}
-                  onForegroundColorChange={(value) => handleColorChange('destructive_foreground', value)}
-                  previewClassName="bg-destructive text-destructive-foreground"
-                  tooltipContent="Used for warning messages and destructive actions like delete buttons. These colors should clearly indicate potential danger or irreversible actions."
+                <StateColorsSection
+                  selectedTheme={selectedTheme}
+                  handleColorChange={handleColorChange}
                 />
               </TabsContent>
             </Tabs>
