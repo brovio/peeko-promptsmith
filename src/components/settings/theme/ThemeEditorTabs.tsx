@@ -30,56 +30,62 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
           <TabsContent value="base">
             <BaseColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
             />
           </TabsContent>
 
           <TabsContent value="buttons">
             <StateColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
             />
           </TabsContent>
 
           <TabsContent value="cards">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
+              type="cards"
             />
           </TabsContent>
 
           <TabsContent value="inputs">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
+              type="inputs"
             />
           </TabsContent>
 
           <TabsContent value="dropdowns">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
+              type="dropdowns"
             />
           </TabsContent>
 
           <TabsContent value="search">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
+              type="search"
             />
           </TabsContent>
 
           <TabsContent value="icons">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
+              type="icons"
             />
           </TabsContent>
 
           <TabsContent value="dividers">
             <ComponentColorsSection 
               selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange} 
+              handleColorChange={handleColorChange}
+              type="dividers"
             />
           </TabsContent>
         </div>
