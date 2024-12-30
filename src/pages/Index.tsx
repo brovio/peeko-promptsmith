@@ -40,8 +40,10 @@ export default function Index() {
   } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
+      console.log('Fetching models in use...');
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
+        console.log('No user found');
         toast({
           title: "Authentication required",
           description: "Please sign in to use models",
@@ -61,6 +63,7 @@ export default function Index() {
         throw error;
       }
       
+      console.log('Models in use:', data);
       return data || [];
     },
   });
@@ -74,8 +77,10 @@ export default function Index() {
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
       const modelIds = modelsInUse?.map(m => m.model_id).filter(Boolean);
+      console.log('Fetching available models with IDs:', modelIds);
       
       if (!modelIds?.length) {
+        console.log('No model IDs to fetch');
         return [];
       }
 
@@ -83,7 +88,7 @@ export default function Index() {
         const { data, error } = await supabase
           .from('available_models')
           .select('*')
-          .in('id', modelIds)
+          .in('model_id', modelIds)
           .eq('is_active', true);
         
         if (error) {
@@ -91,6 +96,7 @@ export default function Index() {
           throw error;
         }
 
+        console.log('Fetched models:', data);
         return (data || []) as Model[];
       } catch (error) {
         console.error('Failed to fetch models:', error);
@@ -101,6 +107,7 @@ export default function Index() {
   });
 
   const handleRefreshModels = () => {
+    console.log('Refreshing models...');
     refetchModelsInUse();
     refetchModels();
   };
