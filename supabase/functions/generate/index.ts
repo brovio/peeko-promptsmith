@@ -34,24 +34,36 @@ async function tryModelSequence(prompt: string, model: string) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Error with model ${model}:`, {
+      console.error('OpenRouter API error:', {
         status: response.status,
+        statusText: response.statusText,
         error: errorText
       });
-      throw new Error(`${model} failed: ${errorText}`);
+      throw new Error(`OpenRouter API error: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('OpenRouter API response:', {
+      model: model,
+      hasChoices: !!data.choices,
+      choicesLength: data.choices?.length,
+      firstChoice: data.choices?.[0]
+    });
+
     if (!data.choices?.[0]?.message?.content) {
-      console.error(`Invalid response from ${model}:`, data);
-      throw new Error(`Invalid response from ${model}`);
+      console.error('Invalid response structure:', data);
+      throw new Error('Invalid response structure from OpenRouter API');
     }
 
     console.log(`Successfully generated with model: ${model}`);
     return {
       generatedText: data.choices[0].message.content,
       model: model,
-      usage: data.usage || { prompt_tokens: 0, completion_tokens: 0 }
+      usage: data.usage || { 
+        prompt_tokens: data.usage?.prompt_tokens || 0, 
+        completion_tokens: data.usage?.completion_tokens || 0,
+        total_tokens: data.usage?.total_tokens || 0
+      }
     };
   } catch (error) {
     console.error(`Error with model ${model}:`, error);
@@ -75,7 +87,14 @@ serve(async (req) => {
       throw new Error('OpenRouter API key not configured');
     }
 
-    // Use the specified model instead of trying the sequence
+    if (!prompt?.trim()) {
+      throw new Error('Prompt is required');
+    }
+
+    if (!model?.trim()) {
+      throw new Error('Model is required');
+    }
+
     const result = await tryModelSequence(prompt, model);
 
     return new Response(
