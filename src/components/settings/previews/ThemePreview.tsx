@@ -1,10 +1,11 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { LoginPreview } from "./LoginPreview";
 import { ModelCardPreview } from "./ModelCardPreview";
 import { UseCasePreview } from "./UseCasePreview";
 import { FormPreview } from "./FormPreview";
 import { BaseColorPreview } from "./BaseColorPreview";
 import { useThemeManager } from "@/hooks/use-theme-manager";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type PreviewType = 'base' | 'buttons' | 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
 
@@ -19,14 +20,11 @@ export const ThemePreview = memo(function ThemePreview({
 }: ThemePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { currentTheme } = useThemeManager();
+  const [selectedPreview, setSelectedPreview] = useState<PreviewType>(previewType);
 
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.style.display = 'none';
-      void containerRef.current.offsetHeight;
-      containerRef.current.style.display = '';
-    }
-  }, [showAllExamples, previewType]);
+    setSelectedPreview(previewType);
+  }, [previewType]);
 
   if (showAllExamples) {
     return (
@@ -39,7 +37,7 @@ export const ThemePreview = memo(function ThemePreview({
   const renderPreview = () => {
     if (!currentTheme) return null;
 
-    switch (previewType) {
+    switch (selectedPreview) {
       case 'base':
         return (
           <BaseColorPreview 
@@ -75,9 +73,26 @@ export const ThemePreview = memo(function ThemePreview({
   return (
     <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold capitalize">
-          {previewType === 'base' ? 'Base Colors' : `${previewType} Examples`}
-        </h3>
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold capitalize">
+            {selectedPreview === 'base' ? 'Base Colors' : `${selectedPreview} Examples`}
+          </h3>
+          <Select value={selectedPreview} onValueChange={(value: PreviewType) => setSelectedPreview(value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select preview" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="base">Base Colors</SelectItem>
+              <SelectItem value="buttons">Buttons</SelectItem>
+              <SelectItem value="cards">Cards</SelectItem>
+              <SelectItem value="inputs">Input Fields</SelectItem>
+              <SelectItem value="dropdowns">Dropdowns</SelectItem>
+              <SelectItem value="search">Search</SelectItem>
+              <SelectItem value="icons">Icons</SelectItem>
+              <SelectItem value="dividers">Dividers</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         {renderPreview()}
       </div>
     </div>
