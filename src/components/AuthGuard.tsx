@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingModal } from "./LoadingModal";
-import { useToast } from "@/hooks/use-toast";
 
 const PUBLIC_ROUTES = ["/login", "/forgot-password"];
 
@@ -11,33 +10,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   useEffect(() => {
     let mounted = true;
-    let authSubscription: { data: { subscription: { unsubscribe: () => void } } };
 
     // Initial session check
     const initializeAuth = async () => {
       try {
-        console.log('Checking session...');
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Session error:', error);
-          if (mounted) {
-            toast({
-              title: "Authentication Error",
-              description: "Please try logging in again",
-              variant: "destructive",
-            });
-            setIsAuthenticated(false);
-            setIsLoading(false);
-            if (!PUBLIC_ROUTES.includes(location.pathname)) {
-              navigate('/login', { replace: true });
-            }
-          }
-          return;
+          throw error;
         }
         
         if (mounted) {
@@ -48,7 +32,6 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           setIsLoading(false);
 
           if (!isAuthed && !PUBLIC_ROUTES.includes(location.pathname)) {
-            console.log('No auth, redirecting to login');
             navigate('/login', { replace: true });
           }
         }
@@ -64,57 +47,37 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       }
     };
 
-    // Subscribe to auth changes with error handling
-    const setupAuthSubscription = async () => {
-      try {
-        authSubscription = supabase.auth.onAuthStateChange(async (event, session) => {
-          if (!mounted) return;
-
-          console.log('Auth state changed:', event, session?.user?.id);
-
-          switch (event) {
-            case 'SIGNED_IN':
-              setIsAuthenticated(true);
-              setIsLoading(false);
-              if (location.pathname === '/login') {
-                navigate('/', { replace: true });
-              }
-              break;
-            case 'SIGNED_OUT':
-              setIsAuthenticated(false);
-              setIsLoading(false);
-              if (!PUBLIC_ROUTES.includes(location.pathname)) {
-                navigate('/login', { replace: true });
-              }
-              break;
-            case 'TOKEN_REFRESHED':
-            case 'USER_UPDATED':
-              setIsAuthenticated(!!session);
-              setIsLoading(false);
-              break;
-            default:
-              break;
-          }
-        });
-      } catch (error) {
-        console.error('Error setting up auth subscription:', error);
-      }
-    };
-
     initializeAuth();
-    setupAuthSubscription();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return;
+
+      console.log('Auth state changed:', event, session?.user?.id);
+
+      if (event === 'SIGNED_IN') {
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        if (location.pathname === '/login') {
+          navigate('/', { replace: true });
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false);
+        setIsLoading(false);
+        if (!PUBLIC_ROUTES.includes(location.pathname)) {
+          navigate('/login', { replace: true });
+        }
+      } else if (event === 'TOKEN_REFRESHED') {
+        setIsAuthenticated(!!session);
+        setIsLoading(false);
+      }
+    });
 
     return () => {
       mounted = false;
-      if (authSubscription?.data?.subscription) {
-        try {
-          authSubscription.data.subscription.unsubscribe();
-        } catch (error) {
-          console.error('Error unsubscribing from auth changes:', error);
-        }
-      }
+      subscription.unsubscribe();
     };
-  }, [navigate, location.pathname, toast]);
+  }, [navigate, location.pathname]);
 
   if (isLoading) {
     return <LoadingModal 

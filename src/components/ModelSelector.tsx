@@ -9,18 +9,15 @@ interface ModelSelectorProps {
   selectedModel: string;
   models?: Model[];
   isLoading?: boolean;
+  onRefresh?: () => void;
 }
 
-export function ModelSelector({ onModelSelect, selectedModel, models, isLoading: externalLoading }: ModelSelectorProps) {
+export function ModelSelector({ onModelSelect, selectedModel, models, isLoading: externalLoading, onRefresh }: ModelSelectorProps) {
   const { data: modelsInUse = [], isLoading: isModelsInUseLoading } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
-      console.log('Fetching models in use...');
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        console.log('No user found');
-        return [];
-      }
+      if (!user) return [];
 
       const { data, error } = await supabase
         .from('models_in_use')
@@ -28,44 +25,31 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
         .eq('user_id', user.id)
         .eq('is_active', true);
 
-      if (error) {
-        console.error('Error fetching models in use:', error);
-        throw error;
-      }
-      console.log('Models in use:', data);
+      if (error) throw error;
       return data || [];
     },
     initialData: [],
     enabled: !models,
   });
 
-  const { 
-    data: fetchedModels = [], 
-    isLoading: isModelsLoading,
-    error
-  } = useQuery({
+  const { data: fetchedModels = [], isLoading: isModelsLoading, error } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
-      console.log('Fetching available models...');
       if (!modelsInUse?.length) {
-        console.log('No models in use to fetch');
         return [];
       }
 
+      // First get all active models
       const { data, error } = await supabase
         .from('available_models')
         .select('*')
         .eq('is_active', true);
 
-      if (error) {
-        console.error('Error fetching available models:', error);
-        throw error;
-      }
+      if (error) throw error;
 
+      // Then filter them client-side based on modelsInUse
       const modelIds = modelsInUse.map(m => m.model_id);
-      const filteredModels = (data || []).filter(model => modelIds.includes(model.id));
-      console.log('Filtered models:', filteredModels);
-      return filteredModels as Model[];
+      return (data || []).filter(model => modelIds.includes(model.id)) as Model[];
     },
     enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0 && !models,
     initialData: [],
@@ -78,23 +62,28 @@ export function ModelSelector({ onModelSelect, selectedModel, models, isLoading:
     return <Skeleton className="h-10 w-full" />;
   }
 
+  if (error && !models) {
+    console.error('Error in ModelSelector:', error);
+    return (
+      <Select disabled>
+        <SelectTrigger>
+          <SelectValue placeholder="Error loading models" />
+        </SelectTrigger>
+      </Select>
+    );
+  }
+
   return (
     <Select value={selectedModel} onValueChange={onModelSelect}>
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder={isLoading ? "Loading models..." : "Select a model"} />
+      <SelectTrigger>
+        <SelectValue placeholder="Select a model" />
       </SelectTrigger>
       <SelectContent>
-        {error ? (
-          <SelectItem value="error" disabled>Error loading models</SelectItem>
-        ) : displayModels.length === 0 ? (
-          <SelectItem value="empty" disabled>No models available</SelectItem>
-        ) : (
-          displayModels.map((model) => (
-            <SelectItem key={model.id} value={model.id}>
-              {model.name}
-            </SelectItem>
-          ))
-        )}
+        {displayModels.map((model) => (
+          <SelectItem key={model.id} value={model.id}>
+            {model.name}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

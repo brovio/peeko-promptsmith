@@ -18,7 +18,7 @@ export function LoginFormFields({
   return (
     <>
       <div className="space-y-2">
-        <label className="text-sm font-medium flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-900 flex items-center gap-2">
           <Mail className="h-4 w-4" />
           Email
         </label>
@@ -32,7 +32,7 @@ export function LoginFormFields({
         />
       </div>
       <div className="space-y-2">
-        <label className="text-sm font-medium flex items-center gap-2">
+        <label className="text-sm font-medium text-gray-900 flex items-center gap-2">
           <Lock className="h-4 w-4" />
           Password
         </label>

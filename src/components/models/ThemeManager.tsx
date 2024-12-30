@@ -14,11 +14,6 @@ export function ThemeManager({ onThemeChange }: ThemeManagerProps) {
     if (!isThemeLocked) {
       const newTheme = generateColorTheme();
       onThemeChange(newTheme);
-      
-      toast({
-        title: "Theme Updated",
-        description: "A new color theme has been generated.",
-      });
     }
   };
 

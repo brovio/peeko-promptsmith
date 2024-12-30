@@ -10,6 +10,7 @@ interface ModelAndCategorySelectorsProps {
   onModelSelect: (modelId: string) => void;
   onCategorySelect: (categoryId: string) => void;
   onEnhancerUpdate: (enhancer: string) => void;
+  onRefreshModels: () => void;
 }
 
 export function ModelAndCategorySelectors({
@@ -20,6 +21,7 @@ export function ModelAndCategorySelectors({
   onModelSelect,
   onCategorySelect,
   onEnhancerUpdate,
+  onRefreshModels,
 }: ModelAndCategorySelectorsProps) {
   return (
     <div className="flex gap-4 flex-col sm:flex-row">
@@ -28,6 +30,7 @@ export function ModelAndCategorySelectors({
         selectedModel={selectedModel}
         onModelSelect={onModelSelect}
         isLoading={isModelsLoading}
+        onRefresh={onRefreshModels}
       />
       <CategorySelector
         selectedCategory={selectedCategory}

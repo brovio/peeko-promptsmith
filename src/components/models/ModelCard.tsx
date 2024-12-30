@@ -4,7 +4,6 @@ import { CSSProperties, useState } from "react";
 import { ModelCardHeader } from "./ModelCardHeader";
 import { ModelDescription } from "./ModelDescription";
 import { ModelInfo } from "./ModelInfo";
-import { useToast } from "@/hooks/use-toast";
 
 interface ModelCardProps {
   model: Model;
@@ -16,8 +15,6 @@ interface ModelCardProps {
 
 export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: ModelCardProps) {
   const [isHighlighted, setIsHighlighted] = useState(false);
-  const { toast } = useToast();
-  
   const capitalizeFirstLetter = (str: string) => str?.charAt(0).toUpperCase() + str?.slice(1);
   
   const getModelSubtitle = () => {
@@ -30,15 +27,11 @@ export function ModelCard({ model, onAdd, onRemove, isInUse = false, style }: Mo
   const handleAdd = async (model: Model) => {
     setIsHighlighted(true);
     await onAdd(model);
-    toast({
-      title: "Success",
-      description: "Model added successfully",
-    });
     setTimeout(() => setIsHighlighted(false), 1000);
   };
 
   const cardClasses = `p-[3%] transition-colors duration-300 flex flex-col h-full ${
-    isInUse ? 'border-emerald-500 border-2' : 'border-border border'
+    isInUse ? 'border-emerald-500 border-2' : ''
   } ${isHighlighted ? 'bg-emerald-50 dark:bg-emerald-900' : ''}`;
   
   const dividerClasses = `border-t pt-2 ${isInUse ? 'border-emerald-500' : 'border-border'}`;

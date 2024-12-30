@@ -36,6 +36,7 @@ export default function Index() {
     data: modelsInUse = [], 
     isError: isModelsInUseError,
     isLoading: isModelsInUseLoading,
+    refetch: refetchModelsInUse
   } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
@@ -56,7 +57,7 @@ export default function Index() {
         console.error('Error fetching models in use:', error);
         throw error;
       }
-      console.log('Models in use:', data);
+      
       return data || [];
     },
   });
@@ -65,6 +66,7 @@ export default function Index() {
     data: models = [], 
     isError: isModelsError,
     isLoading: isModelsLoading,
+    refetch: refetchModels
   } = useQuery({
     queryKey: ['available-models', modelsInUse],
     queryFn: async () => {
@@ -77,6 +79,7 @@ export default function Index() {
       }
 
       try {
+        // Fetch all active models first
         const { data, error } = await supabase
           .from('available_models')
           .select('*')
@@ -87,6 +90,7 @@ export default function Index() {
           throw error;
         }
 
+        // Filter the models client-side
         const filteredModels = data?.filter(model => 
           modelIds.includes(model.model_id)
         ) || [];
@@ -100,6 +104,12 @@ export default function Index() {
     },
     enabled: Array.isArray(modelsInUse) && modelsInUse.length > 0,
   });
+
+  const handleRefreshModels = () => {
+    console.log('Refreshing models...');
+    refetchModelsInUse();
+    refetchModels();
+  };
 
   const handleModelSelect = (modelId: string) => {
     setSelectedModel(modelId);
@@ -164,6 +174,7 @@ export default function Index() {
             onCategorySelect={handleCategorySelect}
             onEnhancerUpdate={handleEnhancerUpdate}
             onPromptSubmit={handlePromptSubmit}
+            onRefreshModels={handleRefreshModels}
           />
         )}
       </div>

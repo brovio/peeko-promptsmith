@@ -474,128 +474,6 @@ export type Database = {
           },
         ]
       }
-      theme_configurations: {
-        Row: {
-          accent: string
-          accent_foreground: string
-          background: string
-          border: string
-          card: string
-          card_foreground: string
-          created_at: string | null
-          created_by: string | null
-          destructive: string
-          destructive_foreground: string
-          divider: string
-          dropdown_bg: string | null
-          dropdown_text: string | null
-          filter_bg: string | null
-          filter_text: string | null
-          foreground: string
-          icon: string
-          id: string
-          input: string
-          input_text: string | null
-          is_active: boolean | null
-          muted: string
-          muted_foreground: string
-          name: string
-          popover: string
-          popover_foreground: string
-          primary_color: string
-          primary_foreground: string
-          ring: string
-          search_bg: string | null
-          search_text: string | null
-          secondary: string
-          secondary_foreground: string
-          theme_type: Database["public"]["Enums"]["theme_type"]
-          updated_at: string | null
-        }
-        Insert: {
-          accent: string
-          accent_foreground: string
-          background: string
-          border: string
-          card: string
-          card_foreground: string
-          created_at?: string | null
-          created_by?: string | null
-          destructive: string
-          destructive_foreground: string
-          divider: string
-          dropdown_bg?: string | null
-          dropdown_text?: string | null
-          filter_bg?: string | null
-          filter_text?: string | null
-          foreground: string
-          icon: string
-          id?: string
-          input: string
-          input_text?: string | null
-          is_active?: boolean | null
-          muted: string
-          muted_foreground: string
-          name: string
-          popover: string
-          popover_foreground: string
-          primary_color: string
-          primary_foreground: string
-          ring: string
-          search_bg?: string | null
-          search_text?: string | null
-          secondary: string
-          secondary_foreground: string
-          theme_type?: Database["public"]["Enums"]["theme_type"]
-          updated_at?: string | null
-        }
-        Update: {
-          accent?: string
-          accent_foreground?: string
-          background?: string
-          border?: string
-          card?: string
-          card_foreground?: string
-          created_at?: string | null
-          created_by?: string | null
-          destructive?: string
-          destructive_foreground?: string
-          divider?: string
-          dropdown_bg?: string | null
-          dropdown_text?: string | null
-          filter_bg?: string | null
-          filter_text?: string | null
-          foreground?: string
-          icon?: string
-          id?: string
-          input?: string
-          input_text?: string | null
-          is_active?: boolean | null
-          muted?: string
-          muted_foreground?: string
-          name?: string
-          popover?: string
-          popover_foreground?: string
-          primary_color?: string
-          primary_foreground?: string
-          ring?: string
-          search_bg?: string | null
-          search_text?: string | null
-          secondary?: string
-          secondary_foreground?: string
-          theme_type?: Database["public"]["Enums"]["theme_type"]
-          updated_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "theme_configurations_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       themes: {
         Row: {
           accent_color: string
@@ -779,7 +657,6 @@ export type Database = {
       }
     }
     Enums: {
-      theme_type: "light" | "dark" | "black" | "custom" | "peeko"
       user_role: "admin" | "basic" | "premium"
     }
     CompositeTypes: {
