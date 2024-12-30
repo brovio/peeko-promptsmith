@@ -105,7 +105,9 @@ export function ComponentColorsSection({ selectedTheme, handleColorChange, type 
           label="Icons"
           description="Colors for icons"
           mainColor={selectedTheme.icon}
+          foregroundColor={selectedTheme.icon}
           onMainColorChange={(value) => handleColorChange('icon', value)}
+          onForegroundColorChange={(value) => handleColorChange('icon', value)}
           previewClassName="bg-icon text-icon-foreground"
           tooltipContent="Defines the appearance of icons"
         />
@@ -116,7 +118,9 @@ export function ComponentColorsSection({ selectedTheme, handleColorChange, type 
           label="Dividers"
           description="Colors for dividers"
           mainColor={selectedTheme.divider}
+          foregroundColor={selectedTheme.divider}
           onMainColorChange={(value) => handleColorChange('divider', value)}
+          onForegroundColorChange={(value) => handleColorChange('divider', value)}
           previewClassName="bg-divider text-divider-foreground"
           tooltipContent="Defines the appearance of dividers"
         />
