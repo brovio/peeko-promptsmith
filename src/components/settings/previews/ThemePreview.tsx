@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { LoginPreview } from "./LoginPreview";
 import { ModelCardPreview } from "./ModelCardPreview";
 import { UseCasePreview } from "./UseCasePreview";
@@ -8,7 +9,10 @@ interface ThemePreviewProps {
   previewType?: 'base' | 'buttons' | 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
 }
 
-export function ThemePreview({ showAllExamples = false, previewType = 'base' }: ThemePreviewProps) {
+export const ThemePreview = memo(function ThemePreview({ 
+  showAllExamples = false, 
+  previewType = 'base' 
+}: ThemePreviewProps) {
   const renderPreview = () => {
     switch (previewType) {
       case 'buttons':
@@ -64,18 +68,19 @@ export function ThemePreview({ showAllExamples = false, previewType = 'base' }: 
           </div>
         );
       default:
-        return showAllExamples ? (
-          <div className="space-y-8">
-            <FormPreview showAllExamples={true} />
-            <LoginPreview />
-            <div className="max-w-md">
-              <ModelCardPreview />
-              <UseCasePreview />
+        if (showAllExamples) {
+          return (
+            <div className="space-y-8">
+              <FormPreview showAllExamples={true} />
+              <LoginPreview />
+              <div className="max-w-md">
+                <ModelCardPreview />
+                <UseCasePreview />
+              </div>
             </div>
-          </div>
-        ) : (
-          <FormPreview showAllExamples={false} />
-        );
+          );
+        }
+        return <FormPreview showAllExamples={false} />;
     }
   };
 
@@ -84,4 +89,4 @@ export function ThemePreview({ showAllExamples = false, previewType = 'base' }: 
       {renderPreview()}
     </div>
   );
-}
+});
