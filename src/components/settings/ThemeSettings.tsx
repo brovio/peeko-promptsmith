@@ -1,18 +1,11 @@
 import { useState, useEffect } from "react";
 import { useThemeManager } from "@/hooks/use-theme-manager";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { ThemeConfiguration } from "@/types/theme";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ThemePreview } from "./previews/ThemePreview";
+import { ThemeSelector } from "./theme/ThemeSelector";
+import { ThemePreviewWrapper } from "./previews/ThemePreviewWrapper";
 import { BaseColorsSection } from "./theme/BaseColorsSection";
 import { ComponentColorsSection } from "./theme/ComponentColorsSection";
 import { StateColorsSection } from "./theme/StateColorsSection";
@@ -50,19 +43,15 @@ export function ThemeSettings() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching themes:', error);
-        toast({
-          title: "Error fetching themes",
-          description: error.message,
-          variant: "destructive",
-        });
-        return;
-      }
-
+      if (error) throw error;
       setThemes(data as ThemeConfiguration[]);
-    } catch (error) {
-      console.error('Error:', error);
+    } catch (error: any) {
+      console.error('Error fetching themes:', error);
+      toast({
+        title: "Error fetching themes",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -71,16 +60,8 @@ export function ThemeSettings() {
   const handleThemeChange = async (themeId: string) => {
     const theme = themes.find(t => t.id === themeId);
     if (!theme) return;
-    
     setSelectedTheme(theme);
-    
-    // Apply theme changes immediately
-    Object.entries(theme).forEach(([key, value]) => {
-      if (typeof value === 'string' && key !== 'id' && key !== 'name' && key !== 'theme_type') {
-        const cssVarName = key.replace(/_/g, '-');
-        document.documentElement.style.setProperty(`--${cssVarName}`, value);
-      }
-    });
+    applyTheme(theme);
   };
 
   const handleSaveTheme = async () => {
@@ -119,10 +100,7 @@ export function ThemeSettings() {
     };
     
     setSelectedTheme(updatedTheme);
-    
-    // Apply change immediately
-    const cssVarName = key.replace(/_/g, '-');
-    document.documentElement.style.setProperty(`--${cssVarName}`, value);
+    applyTheme(updatedTheme);
   };
 
   return (
@@ -136,29 +114,13 @@ export function ThemeSettings() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Select
-              value={selectedTheme?.id}
-              onValueChange={handleThemeChange}
-            >
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select theme" />
-              </SelectTrigger>
-              <SelectContent>
-                {themes.map((theme) => (
-                  <SelectItem key={theme.id} value={theme.id}>
-                    {theme.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {isSuperAdmin && selectedTheme && (
-              <Button onClick={handleSaveTheme}>
-                Save Changes
-              </Button>
-            )}
-          </div>
+          <ThemeSelector
+            themes={themes}
+            selectedTheme={selectedTheme}
+            onThemeChange={handleThemeChange}
+            onSaveChanges={handleSaveTheme}
+            isSuperAdmin={isSuperAdmin}
+          />
 
           {selectedTheme && (
             <Tabs defaultValue="base" className="w-full">
@@ -193,7 +155,7 @@ export function ThemeSettings() {
         </div>
 
         <div className="space-y-4">
-          <ThemePreview />
+          <ThemePreviewWrapper />
         </div>
       </div>
     </div>

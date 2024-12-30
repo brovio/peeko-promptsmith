@@ -3,10 +3,14 @@ import { ModelCardPreview } from "./ModelCardPreview";
 import { UseCasePreview } from "./UseCasePreview";
 import { FormPreview } from "./FormPreview";
 
-export function ThemePreview() {
+interface ThemePreviewProps {
+  showAllExamples?: boolean;
+}
+
+export function ThemePreview({ showAllExamples = false }: ThemePreviewProps) {
   return (
     <div className="space-y-8 p-6 border rounded-lg bg-background">
-      <FormPreview />
+      <FormPreview showAllExamples={showAllExamples} />
       
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Login Form</h3>
