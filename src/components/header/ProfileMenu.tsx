@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import { Settings, User, LogOut, Sun, Moon, CircleDot } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -18,10 +17,10 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { supabase } from "@/integrations/supabase/client";
 
 export function ProfileMenu() {
   const navigate = useNavigate();
-  const supabase = useSupabaseClient();
   const { toast } = useToast();
   const { applyTheme } = useThemeManager();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -53,13 +52,17 @@ export function ProfileMenu() {
     }
 
     getProfile();
-  }, [supabase]);
+  }, []);
 
   const handleSignOut = async () => {
-    if (isSigningOut) return; // Prevent multiple sign-out attempts
+    if (isSigningOut) return;
     
     setIsSigningOut(true);
     try {
+      if (!supabase.auth) {
+        throw new Error("Supabase client not initialized");
+      }
+
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       
