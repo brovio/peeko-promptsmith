@@ -3,6 +3,7 @@ import { useThemeManager } from "@/hooks/use-theme-manager";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { ThemeConfiguration } from "@/types/theme";
 import {
   Select,
   SelectContent,
@@ -15,7 +16,6 @@ import { ThemePreview } from "./previews/ThemePreview";
 import { BaseColorsSection } from "./theme/BaseColorsSection";
 import { ComponentColorsSection } from "./theme/ComponentColorsSection";
 import { StateColorsSection } from "./theme/StateColorsSection";
-import type { ThemeConfiguration } from "@/types/theme";
 
 export function ThemeSettings() {
   const { applyTheme } = useThemeManager();

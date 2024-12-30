@@ -486,9 +486,14 @@ export type Database = {
           created_by: string | null
           destructive: string
           destructive_foreground: string
+          dropdown_bg: string | null
+          dropdown_text: string | null
+          filter_bg: string | null
+          filter_text: string | null
           foreground: string
           id: string
           input: string
+          input_text: string | null
           is_active: boolean | null
           muted: string
           muted_foreground: string
@@ -498,6 +503,8 @@ export type Database = {
           primary_color: string
           primary_foreground: string
           ring: string
+          search_bg: string | null
+          search_text: string | null
           secondary: string
           secondary_foreground: string
           theme_type: Database["public"]["Enums"]["theme_type"]
@@ -514,9 +521,14 @@ export type Database = {
           created_by?: string | null
           destructive: string
           destructive_foreground: string
+          dropdown_bg?: string | null
+          dropdown_text?: string | null
+          filter_bg?: string | null
+          filter_text?: string | null
           foreground: string
           id?: string
           input: string
+          input_text?: string | null
           is_active?: boolean | null
           muted: string
           muted_foreground: string
@@ -526,6 +538,8 @@ export type Database = {
           primary_color: string
           primary_foreground: string
           ring: string
+          search_bg?: string | null
+          search_text?: string | null
           secondary: string
           secondary_foreground: string
           theme_type?: Database["public"]["Enums"]["theme_type"]
@@ -542,9 +556,14 @@ export type Database = {
           created_by?: string | null
           destructive?: string
           destructive_foreground?: string
+          dropdown_bg?: string | null
+          dropdown_text?: string | null
+          filter_bg?: string | null
+          filter_text?: string | null
           foreground?: string
           id?: string
           input?: string
+          input_text?: string | null
           is_active?: boolean | null
           muted?: string
           muted_foreground?: string
@@ -554,6 +573,8 @@ export type Database = {
           primary_color?: string
           primary_foreground?: string
           ring?: string
+          search_bg?: string | null
+          search_text?: string | null
           secondary?: string
           secondary_foreground?: string
           theme_type?: Database["public"]["Enums"]["theme_type"]
@@ -752,7 +773,7 @@ export type Database = {
       }
     }
     Enums: {
-      theme_type: "light" | "dark" | "black" | "custom"
+      theme_type: "light" | "dark" | "black" | "custom" | "peeko"
       user_role: "admin" | "basic" | "premium"
     }
     CompositeTypes: {
