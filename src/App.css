@@ -6,6 +6,7 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
+    --input-text: 222.2 84% 4.9%;
  
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -38,6 +39,7 @@
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
+    --input-text: 210 40% 98%;
  
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 40% 98%;
@@ -68,6 +70,7 @@
   .black {
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
+    --input-text: 0 0% 100%;
  
     --card: 0 0% 0%;
     --card-foreground: 0 0% 100%;
@@ -106,7 +109,7 @@
 
   /* Ensure proper text contrast in forms */
   input, textarea, select {
-    @apply bg-background text-foreground placeholder:text-muted-foreground;
+    @apply bg-background text-input-text placeholder:text-muted-foreground;
   }
 
   /* Ensure dialog content has proper contrast */

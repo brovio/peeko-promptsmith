@@ -11,6 +11,8 @@ interface ColorPickerGroupProps {
   onMainColorChange: (value: string) => void;
   onForegroundColorChange: (value: string) => void;
   previewClassName?: string;
+  inputTextColor?: string;
+  onInputTextColorChange?: (value: string) => void;
 }
 
 export function ColorPickerGroup({
@@ -20,7 +22,9 @@ export function ColorPickerGroup({
   foregroundColor,
   onMainColorChange,
   onForegroundColorChange,
-  previewClassName = "bg-background text-foreground"
+  previewClassName = "bg-background text-foreground",
+  inputTextColor,
+  onInputTextColorChange,
 }: ColorPickerGroupProps) {
   return (
     <div className="space-y-4 p-4 border rounded-lg">
@@ -29,13 +33,22 @@ export function ColorPickerGroup({
           <h3 className="font-medium">{label}</h3>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        <Button 
-          variant="secondary"
-          className={`${previewClassName} transition-colors duration-200`}
-          onClick={() => {}}
-        >
-          Preview Text
-        </Button>
+        <div className="space-x-2">
+          <Button 
+            variant="secondary"
+            className={`${previewClassName} transition-colors duration-200`}
+          >
+            Preview Text
+          </Button>
+          {inputTextColor && (
+            <Input
+              type="text"
+              placeholder="Type here..."
+              className={`w-32 ${previewClassName}`}
+              style={{ color: `hsl(${inputTextColor})` }}
+            />
+          )}
+        </div>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
@@ -82,6 +95,30 @@ export function ColorPickerGroup({
             }}
           />
         </div>
+
+        {inputTextColor && onInputTextColorChange && (
+          <div className="space-y-2 col-span-2">
+            <Label>Input Text Color (HSL)</Label>
+            <Input
+              type="text"
+              value={inputTextColor}
+              onChange={(e) => onInputTextColorChange(e.target.value)}
+              placeholder="0 0% 0%"
+            />
+            <Input
+              type="color"
+              value={`hsl(${inputTextColor})`}
+              onChange={(e) => {
+                const color = e.target.value;
+                const r = parseInt(color.substr(1,2), 16);
+                const g = parseInt(color.substr(3,2), 16);
+                const b = parseInt(color.substr(5,2), 16);
+                const hsl = rgbToHsl(r, g, b);
+                onInputTextColorChange(`${hsl[0]} ${hsl[1]}% ${hsl[2]}%`);
+              }}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
