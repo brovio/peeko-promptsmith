@@ -11,8 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
 import { ColorPickerGroup } from "./ColorPickerGroup";
 import { ThemePreview } from "./previews/ThemePreview";
 
@@ -93,25 +91,13 @@ export function ThemeSettings() {
     if (!theme) return;
     
     setSelectedTheme(theme);
-    document.documentElement.style.setProperty('--background', theme.background);
-    document.documentElement.style.setProperty('--foreground', theme.foreground);
-    document.documentElement.style.setProperty('--card', theme.card);
-    document.documentElement.style.setProperty('--card-foreground', theme.card_foreground);
-    document.documentElement.style.setProperty('--popover', theme.popover);
-    document.documentElement.style.setProperty('--popover-foreground', theme.popover_foreground);
-    document.documentElement.style.setProperty('--primary', theme.primary_color);
-    document.documentElement.style.setProperty('--primary-foreground', theme.primary_foreground);
-    document.documentElement.style.setProperty('--secondary', theme.secondary);
-    document.documentElement.style.setProperty('--secondary-foreground', theme.secondary_foreground);
-    document.documentElement.style.setProperty('--muted', theme.muted);
-    document.documentElement.style.setProperty('--muted-foreground', theme.muted_foreground);
-    document.documentElement.style.setProperty('--accent', theme.accent);
-    document.documentElement.style.setProperty('--accent-foreground', theme.accent_foreground);
-    document.documentElement.style.setProperty('--destructive', theme.destructive);
-    document.documentElement.style.setProperty('--destructive-foreground', theme.destructive_foreground);
-    document.documentElement.style.setProperty('--border', theme.border);
-    document.documentElement.style.setProperty('--input', theme.input);
-    document.documentElement.style.setProperty('--ring', theme.ring);
+    
+    // Apply theme changes immediately
+    Object.entries(theme).forEach(([key, value]) => {
+      if (typeof value === 'string' && key !== 'id' && key !== 'name' && key !== 'theme_type') {
+        document.documentElement.style.setProperty(`--${key.replace(/_/g, '-')}`, value);
+      }
+    });
   };
 
   const handleSaveTheme = async () => {
@@ -138,6 +124,20 @@ export function ThemeSettings() {
     });
 
     fetchThemes();
+  };
+
+  const handleColorChange = (key: keyof ThemeConfiguration, value: string) => {
+    if (!selectedTheme) return;
+    
+    const updatedTheme = {
+      ...selectedTheme,
+      [key]: value
+    };
+    
+    setSelectedTheme(updatedTheme);
+    
+    // Apply change immediately
+    document.documentElement.style.setProperty(`--${key.replace(/_/g, '-')}`, value);
   };
 
   return (
@@ -189,14 +189,8 @@ export function ThemeSettings() {
                   description="Main background and text colors"
                   mainColor={selectedTheme.background}
                   foregroundColor={selectedTheme.foreground}
-                  onMainColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    background: value
-                  })}
-                  onForegroundColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    foreground: value
-                  })}
+                  onMainColorChange={(value) => handleColorChange('background', value)}
+                  onForegroundColorChange={(value) => handleColorChange('foreground', value)}
                 />
 
                 <ColorPickerGroup
@@ -204,14 +198,8 @@ export function ThemeSettings() {
                   description="Colors for card components"
                   mainColor={selectedTheme.card}
                   foregroundColor={selectedTheme.card_foreground}
-                  onMainColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    card: value
-                  })}
-                  onForegroundColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    card_foreground: value
-                  })}
+                  onMainColorChange={(value) => handleColorChange('card', value)}
+                  onForegroundColorChange={(value) => handleColorChange('card_foreground', value)}
                   previewClassName="bg-card text-card-foreground"
                 />
               </TabsContent>
@@ -222,14 +210,8 @@ export function ThemeSettings() {
                   description="Main action colors"
                   mainColor={selectedTheme.primary_color}
                   foregroundColor={selectedTheme.primary_foreground}
-                  onMainColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    primary_color: value
-                  })}
-                  onForegroundColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    primary_foreground: value
-                  })}
+                  onMainColorChange={(value) => handleColorChange('primary_color', value)}
+                  onForegroundColorChange={(value) => handleColorChange('primary_foreground', value)}
                   previewClassName="bg-primary text-primary-foreground"
                 />
 
@@ -238,49 +220,21 @@ export function ThemeSettings() {
                   description="Secondary action colors"
                   mainColor={selectedTheme.secondary}
                   foregroundColor={selectedTheme.secondary_foreground}
-                  onMainColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    secondary: value
-                  })}
-                  onForegroundColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    secondary_foreground: value
-                  })}
+                  onMainColorChange={(value) => handleColorChange('secondary', value)}
+                  onForegroundColorChange={(value) => handleColorChange('secondary_foreground', value)}
                   previewClassName="bg-secondary text-secondary-foreground"
-                />
-
-                <ColorPickerGroup
-                  label="Accent"
-                  description="Accent colors for highlights"
-                  mainColor={selectedTheme.accent}
-                  foregroundColor={selectedTheme.accent_foreground}
-                  onMainColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    accent: value
-                  })}
-                  onForegroundColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    accent_foreground: value
-                  })}
-                  previewClassName="bg-accent text-accent-foreground"
                 />
               </TabsContent>
 
               <TabsContent value="states" className="space-y-4 mt-4">
                 <ColorPickerGroup
-                  label="Muted"
-                  description="Colors for muted elements"
-                  mainColor={selectedTheme.muted}
-                  foregroundColor={selectedTheme.muted_foreground}
-                  onMainColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    muted: value
-                  })}
-                  onForegroundColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    muted_foreground: value
-                  })}
-                  previewClassName="bg-muted text-muted-foreground"
+                  label="Accent"
+                  description="Accent colors for highlights"
+                  mainColor={selectedTheme.accent}
+                  foregroundColor={selectedTheme.accent_foreground}
+                  onMainColorChange={(value) => handleColorChange('accent', value)}
+                  onForegroundColorChange={(value) => handleColorChange('accent_foreground', value)}
+                  previewClassName="bg-accent text-accent-foreground"
                 />
 
                 <ColorPickerGroup
@@ -288,34 +242,16 @@ export function ThemeSettings() {
                   description="Colors for destructive actions"
                   mainColor={selectedTheme.destructive}
                   foregroundColor={selectedTheme.destructive_foreground}
-                  onMainColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    destructive: value
-                  })}
-                  onForegroundColorChange={(value) => setSelectedTheme({
-                    ...selectedTheme,
-                    destructive_foreground: value
-                  })}
+                  onMainColorChange={(value) => handleColorChange('destructive', value)}
+                  onForegroundColorChange={(value) => handleColorChange('destructive_foreground', value)}
                   previewClassName="bg-destructive text-destructive-foreground"
                 />
               </TabsContent>
             </Tabs>
           )}
-
-          {!isSuperAdmin && (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <AlertCircle className="h-4 w-4" />
-                  <p>Only super admins can modify themes.</p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Live Preview</h3>
           <ThemePreview />
         </div>
       </div>

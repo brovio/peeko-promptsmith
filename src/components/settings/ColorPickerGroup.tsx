@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { rgbToHsl } from "@/lib/colorUtils";
 
 interface ColorPickerGroupProps {
@@ -28,9 +29,13 @@ export function ColorPickerGroup({
           <h3 className="font-medium">{label}</h3>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        <div className={`${previewClassName} p-2 rounded border`}>
+        <Button 
+          variant="secondary"
+          className={`${previewClassName} transition-colors duration-200`}
+          onClick={() => {}}
+        >
           Preview Text
-        </div>
+        </Button>
       </div>
       
       <div className="grid grid-cols-2 gap-4">
