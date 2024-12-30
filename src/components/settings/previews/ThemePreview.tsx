@@ -40,22 +40,14 @@ export const ThemePreview = memo(function ThemePreview({
     switch (previewType) {
       case 'base':
         return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Base Color Examples</h3>
-            <BaseColorPreview 
-              background={currentTheme.background}
-              foreground={currentTheme.foreground}
-              inputText={currentTheme.input_text || currentTheme.foreground}
-            />
-          </div>
+          <BaseColorPreview 
+            background={currentTheme.background}
+            foreground={currentTheme.foreground}
+            inputText={currentTheme.input_text || currentTheme.foreground}
+          />
         );
       case 'buttons':
-        return (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Button Examples</h3>
-            <FormPreview showButtons={true} />
-          </div>
-        );
+        return <FormPreview showButtons={true} />;
       case 'cards':
         return (
           <div className="space-y-4">
