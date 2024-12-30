@@ -26,18 +26,9 @@ export const ThemePreview = memo(function ThemePreview({
     setSelectedPreview(previewType);
   }, [previewType]);
 
-  if (showAllExamples) {
-    return (
-      <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
-        <FormPreview showAllExamples={true} />
-      </div>
-    );
-  }
-
   const renderPreview = () => {
     if (!currentTheme) return null;
 
-    // Return only the selected preview component
     switch (selectedPreview) {
       case 'base':
         return (
@@ -73,29 +64,53 @@ export const ThemePreview = memo(function ThemePreview({
 
   return (
     <div ref={containerRef} className="space-y-8 p-6 border rounded-lg bg-background">
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold capitalize">
-            {selectedPreview === 'base' ? 'Base Colors' : `${selectedPreview} Examples`}
-          </h3>
-          <Select value={selectedPreview} onValueChange={(value: PreviewType) => setSelectedPreview(value)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select preview" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="base">Base Colors</SelectItem>
-              <SelectItem value="buttons">Buttons</SelectItem>
-              <SelectItem value="cards">Cards</SelectItem>
-              <SelectItem value="inputs">Input Fields</SelectItem>
-              <SelectItem value="dropdowns">Dropdowns</SelectItem>
-              <SelectItem value="search">Search</SelectItem>
-              <SelectItem value="icons">Icons</SelectItem>
-              <SelectItem value="dividers">Dividers</SelectItem>
-            </SelectContent>
-          </Select>
+      {showAllExamples ? (
+        <>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">Filter Preview Elements</h3>
+            <Select value={selectedPreview} onValueChange={(value: PreviewType) => setSelectedPreview(value)}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select elements to preview" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="base">Base Colors</SelectItem>
+                <SelectItem value="buttons">Buttons</SelectItem>
+                <SelectItem value="cards">Cards</SelectItem>
+                <SelectItem value="inputs">Input Fields</SelectItem>
+                <SelectItem value="dropdowns">Dropdowns</SelectItem>
+                <SelectItem value="search">Search</SelectItem>
+                <SelectItem value="icons">Icons</SelectItem>
+                <SelectItem value="dividers">Dividers</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <FormPreview showAllExamples={true} />
+        </>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold capitalize">
+              {selectedPreview === 'base' ? 'Base Colors' : `${selectedPreview} Examples`}
+            </h3>
+            <Select value={selectedPreview} onValueChange={(value: PreviewType) => setSelectedPreview(value)}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select preview" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="base">Base Colors</SelectItem>
+                <SelectItem value="buttons">Buttons</SelectItem>
+                <SelectItem value="cards">Cards</SelectItem>
+                <SelectItem value="inputs">Input Fields</SelectItem>
+                <SelectItem value="dropdowns">Dropdowns</SelectItem>
+                <SelectItem value="search">Search</SelectItem>
+                <SelectItem value="icons">Icons</SelectItem>
+                <SelectItem value="dividers">Dividers</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {renderPreview()}
         </div>
-        {renderPreview()}
-      </div>
+      )}
     </div>
   );
 });
