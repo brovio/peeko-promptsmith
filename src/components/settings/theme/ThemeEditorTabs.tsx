@@ -4,7 +4,6 @@ import { StateColorsSection } from "./StateColorsSection";
 import { ComponentColorsSection } from "./ComponentColorsSection";
 import { ThemeConfiguration } from "@/types/theme";
 import { ThemePreview } from "../previews/ThemePreview";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
 
@@ -36,7 +35,7 @@ export function ThemeEditorTabs({
       }}
     >
       <div className="flex justify-between items-center mb-4">
-        <TabsList className="w-auto justify-start border-b overflow-x-auto">
+        <TabsList className="flex flex-wrap gap-1 bg-background p-1">
           <TabsTrigger value="all">All Elements</TabsTrigger>
           <TabsTrigger value="base">Base Colors</TabsTrigger>
           <TabsTrigger value="buttons">Buttons</TabsTrigger>
