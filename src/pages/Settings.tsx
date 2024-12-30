@@ -4,10 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ApiKeyManager } from "@/components/settings/ApiKeyManager";
 import { ThemeSettings } from "@/components/settings/ThemeSettings";
+import { RoleManagement } from "@/components/settings/RoleManagement";
 import { Separator } from "@/components/ui/separator";
 
 export default function Settings() {
   const [apiKey, setApiKey] = useState("");
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -26,25 +28,16 @@ export default function Settings() {
 
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select()
+        .select('is_superadmin')
         .eq('id', session.user.id)
         .single();
 
-      if (profileError || !profile) {
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert([{ id: session.user.id }]);
-
-        if (insertError) {
-          console.error('Error creating profile:', insertError);
-          toast({
-            title: "Error",
-            description: "Failed to create user profile",
-            variant: "destructive",
-          });
-          return;
-        }
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        return;
       }
+
+      setIsSuperAdmin(profile?.is_superadmin || false);
     };
     checkAuth();
   }, [navigate, toast]);
@@ -68,6 +61,13 @@ export default function Settings() {
             onApiKeyDeleted={handleApiKeyDeleted}
           />
         </section>
+
+        {isSuperAdmin && (
+          <section className="py-8 border-b border-primary/20">
+            <h2 className="text-2xl font-semibold mb-6">Role Management</h2>
+            <RoleManagement />
+          </section>
+        )}
 
         <section className="pt-4">
           <ThemeSettings />

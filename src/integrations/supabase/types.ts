@@ -194,6 +194,7 @@ export type Database = {
           is_superadmin: boolean | null
           linkedin_url: string | null
           role: string | null
+          role_type: Database["public"]["Enums"]["user_role"] | null
           twitter_url: string | null
           updated_at: string | null
           username: string | null
@@ -209,6 +210,7 @@ export type Database = {
           is_superadmin?: boolean | null
           linkedin_url?: string | null
           role?: string | null
+          role_type?: Database["public"]["Enums"]["user_role"] | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
@@ -224,6 +226,7 @@ export type Database = {
           is_superadmin?: boolean | null
           linkedin_url?: string | null
           role?: string | null
+          role_type?: Database["public"]["Enums"]["user_role"] | null
           twitter_url?: string | null
           updated_at?: string | null
           username?: string | null
@@ -344,6 +347,83 @@ export type Database = {
           {
             foreignKeyName: "prompts_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_available_models: {
+        Row: {
+          created_at: string | null
+          id: string
+          model_id: string | null
+          role_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          model_id?: string | null
+          role_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          model_id?: string | null
+          role_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_available_models_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "available_models"
+            referencedColumns: ["model_id"]
+          },
+          {
+            foreignKeyName: "role_available_models_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "role_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      role_definitions: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          role_type: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          role_type?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          role_type?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_definitions_created_by_fkey"
+            columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -577,7 +657,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      user_role: "admin" | "basic" | "premium"
     }
     CompositeTypes: {
       [_ in never]: never
