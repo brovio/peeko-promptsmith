@@ -6,17 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const MODEL_SEQUENCE = [
-  "google/gemini-2.0-flash-thinking-exp:free",
-  "google/gemini-2.0-flash-exp:free",
-  "google/gemini-exp-1206:free",
-  "meta-llama/llama-3.1-405b-instruct",
-  "openai/o1-mini"
-];
-
 async function tryModelSequence(prompt: string, model: string, openRouterKey: string) {
   try {
-    console.log(`Attempting to use specified model: ${model}`);
+    console.log(`Attempting to use model: ${model}`);
     
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
@@ -44,13 +36,15 @@ async function tryModelSequence(prompt: string, model: string, openRouterKey: st
         status: response.status,
         error: errorText
       });
-      throw new Error(`${model} failed: ${errorText}`);
+      throw new Error(`API request failed: ${errorText}`);
     }
 
     const data = await response.json();
+    console.log('OpenRouter API Response:', JSON.stringify(data));
+
     if (!data.choices?.[0]?.message?.content) {
-      console.error(`Invalid response from ${model}:`, data);
-      throw new Error(`Invalid response from ${model}`);
+      console.error(`Invalid response structure from ${model}:`, data);
+      throw new Error('Invalid response structure from API');
     }
 
     console.log(`Successfully generated with model: ${model}`);
@@ -60,7 +54,7 @@ async function tryModelSequence(prompt: string, model: string, openRouterKey: st
       usage: data.usage || { prompt_tokens: 0, completion_tokens: 0 }
     };
   } catch (error) {
-    console.error(`Error with specified model ${model}:`, error);
+    console.error(`Error with model ${model}:`, error);
     throw error;
   }
 }
@@ -77,12 +71,15 @@ serve(async (req) => {
     }
 
     const { prompt, model } = await req.json();
-    console.log('Received prompt request:', { 
+    if (!prompt || !model) {
+      throw new Error('Missing required parameters: prompt and model are required');
+    }
+
+    console.log('Received request:', { 
       promptLength: prompt?.length || 0,
       requestedModel: model 
     });
 
-    // Use the specified model instead of trying the sequence
     const result = await tryModelSequence(prompt, model, openRouterKey);
 
     return new Response(
