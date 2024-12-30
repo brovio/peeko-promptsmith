@@ -12,7 +12,7 @@ export function ThemePreviewWrapper() {
   const isMountedRef = useRef(true);
   const { toast } = useToast();
 
-  // Debounced resize handler with error handling
+  // Debounced resize handler with error handling and RAF
   const handleResize = useCallback(() => {
     if (!isMountedRef.current) return;
 
@@ -20,42 +20,59 @@ export function ThemePreviewWrapper() {
       clearTimeout(resizeTimeoutRef.current);
     }
 
-    setIsResizing(true);
+    requestAnimationFrame(() => {
+      if (!isMountedRef.current) return;
+      setIsResizing(true);
 
-    resizeTimeoutRef.current = setTimeout(() => {
-      if (isMountedRef.current) {
-        setIsResizing(false);
-      }
-    }, 100); // Reduced from 150ms to 100ms for better responsiveness
+      resizeTimeoutRef.current = setTimeout(() => {
+        if (isMountedRef.current) {
+          setIsResizing(false);
+        }
+      }, 50);
+    });
   }, []);
 
   useEffect(() => {
     const currentPreviewRef = previewRef.current;
     if (!currentPreviewRef) return;
 
-    try {
-      observerRef.current = new ResizeObserver((entries) => {
-        // Skip processing if component is unmounted
-        if (!isMountedRef.current) return;
+    let isObserving = false;
 
-        // Process only the last entry to avoid unnecessary updates
-        const lastEntry = entries[entries.length - 1];
-        if (lastEntry) {
-          handleResize();
+    const setupObserver = () => {
+      try {
+        if (observerRef.current) {
+          observerRef.current.disconnect();
         }
-      });
 
-      // Start observing with error handling
-      observerRef.current.observe(currentPreviewRef);
-    } catch (error) {
-      console.error('Error setting up ResizeObserver:', error);
-      // Fallback to a basic display without resize observation
-      setIsResizing(false);
-    }
+        observerRef.current = new ResizeObserver((entries) => {
+          if (!isMountedRef.current || !isObserving) return;
+          
+          // Only process size changes above a threshold
+          const lastEntry = entries[entries.length - 1];
+          if (lastEntry && lastEntry.contentRect) {
+            handleResize();
+          }
+        });
 
-    // Cleanup function
+        // Start observing with a slight delay
+        setTimeout(() => {
+          if (isMountedRef.current && observerRef.current && currentPreviewRef) {
+            observerRef.current.observe(currentPreviewRef);
+            isObserving = true;
+          }
+        }, 100);
+
+      } catch (error) {
+        console.error('Error setting up ResizeObserver:', error);
+        setIsResizing(false);
+      }
+    };
+
+    setupObserver();
+
     return () => {
       isMountedRef.current = false;
+      isObserving = false;
       
       if (resizeTimeoutRef.current) {
         clearTimeout(resizeTimeoutRef.current);

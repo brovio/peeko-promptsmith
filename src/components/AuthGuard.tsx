@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { LoadingModal } from "./LoadingModal";
 import { useToast } from "@/hooks/use-toast";
-import { AuthError, Session, User } from "@supabase/supabase-js";
 
 const PUBLIC_ROUTES = ["/login", "/forgot-password"];
 
@@ -16,6 +15,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    let authSubscription: { data: { subscription: { unsubscribe: () => void } } };
 
     // Initial session check
     const initializeAuth = async () => {
@@ -25,12 +25,19 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
         
         if (error) {
           console.error('Session error:', error);
-          toast({
-            title: "Authentication Error",
-            description: "Please try logging in again",
-            variant: "destructive",
-          });
-          throw error;
+          if (mounted) {
+            toast({
+              title: "Authentication Error",
+              description: "Please try logging in again",
+              variant: "destructive",
+            });
+            setIsAuthenticated(false);
+            setIsLoading(false);
+            if (!PUBLIC_ROUTES.includes(location.pathname)) {
+              navigate('/login', { replace: true });
+            }
+          }
+          return;
         }
         
         if (mounted) {
@@ -57,42 +64,55 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
       }
     };
 
-    initializeAuth();
+    // Subscribe to auth changes with error handling
+    const setupAuthSubscription = async () => {
+      try {
+        authSubscription = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (!mounted) return;
 
-    // Subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!mounted) return;
+          console.log('Auth state changed:', event, session?.user?.id);
 
-      console.log('Auth state changed:', event, session?.user?.id);
-
-      switch (event) {
-        case 'SIGNED_IN':
-          setIsAuthenticated(true);
-          setIsLoading(false);
-          if (location.pathname === '/login') {
-            navigate('/', { replace: true });
+          switch (event) {
+            case 'SIGNED_IN':
+              setIsAuthenticated(true);
+              setIsLoading(false);
+              if (location.pathname === '/login') {
+                navigate('/', { replace: true });
+              }
+              break;
+            case 'SIGNED_OUT':
+              setIsAuthenticated(false);
+              setIsLoading(false);
+              if (!PUBLIC_ROUTES.includes(location.pathname)) {
+                navigate('/login', { replace: true });
+              }
+              break;
+            case 'TOKEN_REFRESHED':
+            case 'USER_UPDATED':
+              setIsAuthenticated(!!session);
+              setIsLoading(false);
+              break;
+            default:
+              break;
           }
-          break;
-        case 'SIGNED_OUT':
-          setIsAuthenticated(false);
-          setIsLoading(false);
-          if (!PUBLIC_ROUTES.includes(location.pathname)) {
-            navigate('/login', { replace: true });
-          }
-          break;
-        case 'TOKEN_REFRESHED':
-        case 'USER_UPDATED':
-          setIsAuthenticated(!!session);
-          setIsLoading(false);
-          break;
-        default:
-          break;
+        });
+      } catch (error) {
+        console.error('Error setting up auth subscription:', error);
       }
-    });
+    };
+
+    initializeAuth();
+    setupAuthSubscription();
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      if (authSubscription?.data?.subscription) {
+        try {
+          authSubscription.data.subscription.unsubscribe();
+        } catch (error) {
+          console.error('Error unsubscribing from auth changes:', error);
+        }
+      }
     };
   }, [navigate, location.pathname, toast]);
 
