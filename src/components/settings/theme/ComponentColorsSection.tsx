@@ -1,124 +1,125 @@
 import { ColorPickerGroup } from "../ColorPickerGroup";
 
+type PreviewType = "all" | "base" | "buttons" | "cards" | "inputs" | "dropdowns" | "search" | "icons" | "dividers";
+
 interface ComponentColorsSectionProps {
   selectedTheme: any;
   handleColorChange: (key: string, value: string) => void;
-  type: 'cards' | 'inputs' | 'dropdowns' | 'search' | 'icons' | 'dividers';
+  type: PreviewType;
 }
 
 export function ComponentColorsSection({ selectedTheme, handleColorChange, type }: ComponentColorsSectionProps) {
-  const getColorConfig = () => {
-    switch (type) {
-      case 'cards':
-        return [
-          {
-            label: "Model Cards",
-            description: "Colors for model listing cards",
-            mainColor: selectedTheme.model_card_bg || selectedTheme.card,
-            foregroundColor: selectedTheme.model_card_text || selectedTheme.card_foreground,
-            onMainColorChange: (value: string) => handleColorChange('model_card_bg', value),
-            onForegroundColorChange: (value: string) => handleColorChange('model_card_text', value),
-            previewClassName: "bg-card text-card-foreground",
-            tooltipContent: "Controls the appearance of cards in the models listing page"
-          },
-          {
-            label: "Content Cards",
-            description: "Colors for content cards",
-            mainColor: selectedTheme.content_card_bg || selectedTheme.card,
-            foregroundColor: selectedTheme.content_card_text || selectedTheme.card_foreground,
-            onMainColorChange: (value: string) => handleColorChange('content_card_bg', value),
-            onForegroundColorChange: (value: string) => handleColorChange('content_card_text', value),
-            previewClassName: "bg-card text-card-foreground",
-            tooltipContent: "Controls the appearance of cards in content pages"
-          }
-        ];
-      case 'dividers':
-        return [
-          {
-            label: "Menu Dividers",
-            description: "Colors for menu separators",
-            mainColor: selectedTheme.menu_divider || selectedTheme.divider,
-            foregroundColor: selectedTheme.border,
-            onMainColorChange: (value: string) => handleColorChange('menu_divider', value),
-            onForegroundColorChange: (value: string) => handleColorChange('border', value),
-            tooltipContent: "Controls the appearance of dividing lines in menus"
-          },
-          {
-            label: "Content Dividers",
-            description: "Colors for content separators",
-            mainColor: selectedTheme.content_divider || selectedTheme.divider,
-            foregroundColor: selectedTheme.border,
-            onMainColorChange: (value: string) => handleColorChange('content_divider', value),
-            onForegroundColorChange: (value: string) => handleColorChange('border', value),
-            tooltipContent: "Controls the appearance of dividing lines in content areas"
-          },
-          {
-            label: "Section Dividers",
-            description: "Colors for section separators",
-            mainColor: selectedTheme.section_divider || selectedTheme.divider,
-            foregroundColor: selectedTheme.border,
-            onMainColorChange: (value: string) => handleColorChange('section_divider', value),
-            onForegroundColorChange: (value: string) => handleColorChange('border', value),
-            tooltipContent: "Controls the appearance of dividing lines between major sections"
-          }
-        ];
-      case 'inputs':
-        return {
-          label: "Input Fields",
-          description: "Colors for input fields and text",
-          mainColor: selectedTheme.input,
-          foregroundColor: selectedTheme.input_text,
-          onMainColorChange: (value: string) => handleColorChange('input', value),
-          onForegroundColorChange: (value: string) => handleColorChange('input_text', value),
-          previewClassName: "bg-background",
-          tooltipContent: "Controls the appearance of input fields, including background and text colors"
-        };
-      case 'dropdowns':
-        return {
-          label: "Dropdowns",
-          description: "Colors for dropdown menus",
-          mainColor: selectedTheme.dropdown_bg,
-          foregroundColor: selectedTheme.dropdown_text,
-          onMainColorChange: (value: string) => handleColorChange('dropdown_bg', value),
-          onForegroundColorChange: (value: string) => handleColorChange('dropdown_text', value),
-          previewClassName: "bg-dropdown-bg text-dropdown-text",
-          tooltipContent: "Defines the colors for dropdown menus and their text"
-        };
-      case 'search':
-        return {
-          label: "Search & Filter",
-          description: "Colors for search and filter bars",
-          mainColor: selectedTheme.search_bg,
-          foregroundColor: selectedTheme.search_text,
-          onMainColorChange: (value: string) => handleColorChange('search_bg', value),
-          onForegroundColorChange: (value: string) => handleColorChange('search_text', value),
-          previewClassName: "bg-search-bg text-search-text",
-          tooltipContent: "Controls the appearance of search bars and filter components"
-        };
-      case 'icons':
-        return {
-          label: "Icons",
-          description: "Colors for icons throughout the application",
-          mainColor: selectedTheme.icon,
-          foregroundColor: selectedTheme.foreground,
-          onMainColorChange: (value: string) => handleColorChange('icon', value),
-          onForegroundColorChange: (value: string) => handleColorChange('foreground', value),
-          tooltipContent: "Sets the colors for icons throughout the application"
-        };
-    }
-  };
-
-  const configs = getColorConfig();
-  if (!configs) return null;
-
   return (
     <div className="space-y-4">
-      {Array.isArray(configs) ? (
-        configs.map((config, index) => (
-          <ColorPickerGroup key={index} {...config} />
-        ))
-      ) : (
-        <ColorPickerGroup {...configs} />
+      {type === "all" && (
+        <>
+          <ColorPickerGroup
+            label="Primary"
+            description="Main action colors"
+            mainColor={selectedTheme.primary_color}
+            foregroundColor={selectedTheme.primary_foreground}
+            onMainColorChange={(value) => handleColorChange('primary_color', value)}
+            onForegroundColorChange={(value) => handleColorChange('primary_foreground', value)}
+            previewClassName="bg-primary text-primary-foreground"
+            tooltipContent="Used for primary buttons, links, and key interactive elements"
+          />
+
+          <ColorPickerGroup
+            label="Secondary"
+            description="Secondary action colors"
+            mainColor={selectedTheme.secondary}
+            foregroundColor={selectedTheme.secondary_foreground}
+            onMainColorChange={(value) => handleColorChange('secondary', value)}
+            onForegroundColorChange={(value) => handleColorChange('secondary_foreground', value)}
+            previewClassName="bg-secondary text-secondary-foreground"
+            tooltipContent="Used for secondary buttons and less prominent interactive elements"
+          />
+
+          <ColorPickerGroup
+            label="Accent"
+            description="Accent colors for highlights"
+            mainColor={selectedTheme.accent}
+            foregroundColor={selectedTheme.accent_foreground}
+            onMainColorChange={(value) => handleColorChange('accent', value)}
+            onForegroundColorChange={(value) => handleColorChange('accent_foreground', value)}
+            previewClassName="bg-accent text-accent-foreground"
+            tooltipContent="Used for highlighting important elements and providing visual emphasis"
+          />
+        </>
+      )}
+
+      {type === "cards" && (
+        <ColorPickerGroup
+          label="Card"
+          description="Colors for card components"
+          mainColor={selectedTheme.card}
+          foregroundColor={selectedTheme.card_foreground}
+          onMainColorChange={(value) => handleColorChange('card', value)}
+          onForegroundColorChange={(value) => handleColorChange('card_foreground', value)}
+          previewClassName="bg-card text-card-foreground"
+          tooltipContent="Defines the appearance of card elements, which are used to group related content"
+        />
+      )}
+
+      {type === "inputs" && (
+        <ColorPickerGroup
+          label="Input"
+          description="Colors for input fields"
+          mainColor={selectedTheme.input}
+          foregroundColor={selectedTheme.input_text}
+          onMainColorChange={(value) => handleColorChange('input', value)}
+          onForegroundColorChange={(value) => handleColorChange('input_text', value)}
+          previewClassName="bg-input text-input-foreground"
+          tooltipContent="Defines the appearance of input fields"
+        />
+      )}
+
+      {type === "dropdowns" && (
+        <ColorPickerGroup
+          label="Dropdown"
+          description="Colors for dropdowns"
+          mainColor={selectedTheme.dropdown_bg}
+          foregroundColor={selectedTheme.dropdown_text}
+          onMainColorChange={(value) => handleColorChange('dropdown_bg', value)}
+          onForegroundColorChange={(value) => handleColorChange('dropdown_text', value)}
+          previewClassName="bg-dropdown text-dropdown-foreground"
+          tooltipContent="Defines the appearance of dropdown menus"
+        />
+      )}
+
+      {type === "search" && (
+        <ColorPickerGroup
+          label="Search"
+          description="Colors for search fields"
+          mainColor={selectedTheme.search_bg}
+          foregroundColor={selectedTheme.search_text}
+          onMainColorChange={(value) => handleColorChange('search_bg', value)}
+          onForegroundColorChange={(value) => handleColorChange('search_text', value)}
+          previewClassName="bg-search text-search-foreground"
+          tooltipContent="Defines the appearance of search fields"
+        />
+      )}
+
+      {type === "icons" && (
+        <ColorPickerGroup
+          label="Icons"
+          description="Colors for icons"
+          mainColor={selectedTheme.icon}
+          onMainColorChange={(value) => handleColorChange('icon', value)}
+          previewClassName="bg-icon text-icon-foreground"
+          tooltipContent="Defines the appearance of icons"
+        />
+      )}
+
+      {type === "dividers" && (
+        <ColorPickerGroup
+          label="Dividers"
+          description="Colors for dividers"
+          mainColor={selectedTheme.divider}
+          onMainColorChange={(value) => handleColorChange('divider', value)}
+          previewClassName="bg-divider text-divider-foreground"
+          tooltipContent="Defines the appearance of dividers"
+        />
       )}
     </div>
   );
