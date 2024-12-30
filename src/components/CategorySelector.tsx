@@ -1,83 +1,91 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Loader2 } from "lucide-react";
 
-interface UseCaseProps {
+export interface UseCase {
   id: string;
   title: string;
-  description: string;
   enhancer: string;
 }
 
 interface CategorySelectorProps {
+  selectedCategory: string;
   onCategorySelect: (categoryId: string) => void;
   onEnhancerUpdate: (enhancer: string) => void;
-  selectedCategory: string;
 }
 
 export function CategorySelector({ 
-  onCategorySelect, 
-  onEnhancerUpdate,
-  selectedCategory 
+  selectedCategory, 
+  onCategorySelect,
+  onEnhancerUpdate 
 }: CategorySelectorProps) {
-  const { data: useCases, isLoading, error } = useQuery({
+  const { data: useCases, isLoading } = useQuery({
     queryKey: ['use-cases'],
     queryFn: async () => {
       console.log('Fetching use cases...');
       const { data, error } = await supabase
         .from('use_cases')
-        .select('*')
-        .order('created_at', { ascending: false });
-
+        .select('id, title, enhancer');
+      
       if (error) {
         console.error('Error fetching use cases:', error);
         throw error;
       }
-
-      console.log('Found', data?.length, 'use cases');
-      return data as UseCaseProps[];
+      
+      console.log(`Found ${data?.length || 0} use cases`);
+      return data as UseCase[];
     },
     retry: 1,
     retryDelay: 1000,
-    initialData: [], // Show empty array initially
+    placeholderData: [], // Show empty array while loading
   });
 
   const handleUseCaseSelect = (useCaseId: string) => {
     const selectedUseCase = useCases?.find(uc => uc.id === useCaseId);
     if (selectedUseCase) {
+      console.log(`Selected Use Case: ${selectedUseCase.title}`);
+      console.log(`Selected Use Case Enhancer Text: ${selectedUseCase.enhancer}`);
       onCategorySelect(useCaseId);
       onEnhancerUpdate(selectedUseCase.enhancer);
     }
   };
 
-  if (isLoading) {
-    return <Skeleton className="h-10 w-full" />;
-  }
-
-  if (error) {
-    console.error('Error in CategorySelector:', error);
-    return (
-      <Select disabled>
-        <SelectTrigger>
-          <SelectValue placeholder="Error loading categories" />
-        </SelectTrigger>
-      </Select>
-    );
-  }
-
   return (
-    <Select value={selectedCategory} onValueChange={handleUseCaseSelect}>
-      <SelectTrigger>
-        <SelectValue placeholder="Select a category" />
-      </SelectTrigger>
-      <SelectContent>
-        {useCases?.map((useCase) => (
-          <SelectItem key={useCase.id} value={useCase.id}>
-            {useCase.title}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+    <div className="w-full">
+      <Select value={selectedCategory} onValueChange={handleUseCaseSelect}>
+        <SelectTrigger className="w-full bg-background text-foreground border-input">
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Loading use cases...</span>
+            </div>
+          ) : (
+            <SelectValue placeholder="Choose Use Case" />
+          )}
+        </SelectTrigger>
+        <SelectContent className="bg-background border-input">
+          {useCases?.map((useCase) => (
+            <SelectItem 
+              key={useCase.id} 
+              value={useCase.id}
+              className="text-foreground hover:bg-muted"
+            >
+              {useCase.title}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
+}
+
+export function getTemplateForCategory(categoryId: string, enhancer: string): string {
+  return enhancer || "{prompt}";
 }
