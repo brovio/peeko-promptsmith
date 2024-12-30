@@ -37,6 +37,7 @@ export const ThemePreview = memo(function ThemePreview({
   const renderPreview = () => {
     if (!currentTheme) return null;
 
+    // Return only the selected preview component
     switch (selectedPreview) {
       case 'base':
         return (
@@ -47,7 +48,7 @@ export const ThemePreview = memo(function ThemePreview({
           />
         );
       case 'buttons':
-        return <FormPreview showButtons={true} showInputs={false} showDropdowns={false} showSearch={false} showIcons={false} showDividers={false} />;
+        return <FormPreview showButtons={true} />;
       case 'cards':
         return (
           <div className="grid gap-4">
@@ -56,15 +57,15 @@ export const ThemePreview = memo(function ThemePreview({
           </div>
         );
       case 'inputs':
-        return <FormPreview showButtons={false} showInputs={true} showDropdowns={false} showSearch={false} showIcons={false} showDividers={false} />;
+        return <FormPreview showInputs={true} />;
       case 'dropdowns':
-        return <FormPreview showButtons={false} showInputs={false} showDropdowns={true} showSearch={false} showIcons={false} showDividers={false} />;
+        return <FormPreview showDropdowns={true} />;
       case 'search':
-        return <FormPreview showButtons={false} showInputs={false} showDropdowns={false} showSearch={true} showIcons={false} showDividers={false} />;
+        return <FormPreview showSearch={true} />;
       case 'icons':
-        return <FormPreview showButtons={false} showInputs={false} showDropdowns={false} showSearch={false} showIcons={true} showDividers={false} />;
+        return <FormPreview showIcons={true} />;
       case 'dividers':
-        return <FormPreview showButtons={false} showInputs={false} showDropdowns={false} showSearch={false} showIcons={false} showDividers={true} />;
+        return <FormPreview showDividers={true} />;
       default:
         return null;
     }

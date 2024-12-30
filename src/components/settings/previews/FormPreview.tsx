@@ -109,14 +109,13 @@ export function FormPreview({
     );
   }
 
-  return (
-    <div className="space-y-8">
-      {showButtons && renderButtons()}
-      {showInputs && renderInputs()}
-      {showDropdowns && renderDropdowns()}
-      {showSearch && renderSearch()}
-      {showIcons && renderIcons()}
-      {showDividers && renderDividers()}
-    </div>
-  );
+  // Only return the specifically requested preview
+  if (showButtons) return renderButtons();
+  if (showInputs) return renderInputs();
+  if (showDropdowns) return renderDropdowns();
+  if (showSearch) return renderSearch();
+  if (showIcons) return renderIcons();
+  if (showDividers) return renderDividers();
+
+  return null;
 }
