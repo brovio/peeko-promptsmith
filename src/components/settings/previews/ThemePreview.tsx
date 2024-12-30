@@ -30,11 +30,6 @@ export const ThemePreview = memo(function ThemePreview({
       return (
         <div className="space-y-8">
           <FormPreview showAllExamples={true} />
-          <LoginPreview />
-          <div className="max-w-md">
-            <ModelCardPreview />
-            <UseCasePreview />
-          </div>
         </div>
       );
     }
