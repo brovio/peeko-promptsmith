@@ -13,63 +13,66 @@ export function ThemePreviewWrapper() {
   const rafRef = useRef<number>();
   const { toast } = useToast();
 
-  // Debounced resize handler with RAF
+  // Debounced resize handler with throttling
   const handleResize = useCallback(() => {
     if (!isMountedRef.current) return;
 
-    // Clear any existing animation frames
+    // Clear existing RAF to prevent stacking
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
     }
 
-    // Clear any existing timeouts
+    // Clear existing timeout to prevent stacking
     if (resizeTimeoutRef.current) {
       clearTimeout(resizeTimeoutRef.current);
     }
 
-    // Use RAF for smooth handling
+    // Use RAF to batch resize updates
     rafRef.current = requestAnimationFrame(() => {
       if (!isMountedRef.current) return;
-      
       setIsResizing(true);
 
-      // Debounce the resize completion
+      // Add a small delay before allowing new observations
       resizeTimeoutRef.current = setTimeout(() => {
         if (isMountedRef.current) {
           setIsResizing(false);
         }
-      }, 150); // Reduced debounce time
+      }, 100);
     });
   }, []);
 
   useEffect(() => {
     const currentPreviewRef = previewRef.current;
     
-    // Early return if no ref
     if (!currentPreviewRef) return;
 
     try {
-      // Clean up any existing observer
+      // Cleanup existing observer
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
 
-      // Create new observer with error handling
+      // Create new observer with throttling
       observerRef.current = new ResizeObserver((entries) => {
-        // Skip if component is unmounted
-        if (!isMountedRef.current) return;
+        if (!isMountedRef.current || entries.length === 0) return;
         
-        // Process only if we have entries
-        if (entries.length > 0) {
+        // Use the last entry to avoid processing unnecessary updates
+        const lastEntry = entries[entries.length - 1];
+        if (lastEntry) {
           handleResize();
         }
       });
 
-      // Start observing
-      observerRef.current.observe(currentPreviewRef);
+      // Start observing with a small delay
+      const startObservingTimeout = setTimeout(() => {
+        if (observerRef.current && isMountedRef.current) {
+          observerRef.current.observe(currentPreviewRef);
+        }
+      }, 50);
 
-      // Cleanup function
+      // Comprehensive cleanup
       return () => {
+        clearTimeout(startObservingTimeout);
         isMountedRef.current = false;
         
         if (resizeTimeoutRef.current) {
