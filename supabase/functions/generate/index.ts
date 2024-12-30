@@ -8,10 +8,19 @@ const corsHeaders = {
 
 async function tryModelSequence(prompt: string, model: string, openRouterKey: string) {
   try {
-    console.log(`Attempting to use model: ${model}`);
+    // Map restricted models to their available alternatives
+    const modelMap: { [key: string]: string } = {
+      'anthropic/claude-2': 'anthropic/claude-instant-v1',
+      'google/gemini-pro': 'google/gemini-pro',
+      'openai/gpt-4': 'openai/gpt-3.5-turbo',
+    };
+
+    // Use mapped model or fallback to o1-preview if no mapping exists
+    const actualModel = modelMap[model] || 'openai/gpt-3.5-turbo';
+    console.log(`Attempting to use model: ${actualModel} (requested: ${model})`);
     
     const requestBody = {
-      model: model,
+      model: actualModel,
       messages: [
         {
           role: 'user',
@@ -52,10 +61,10 @@ async function tryModelSequence(prompt: string, model: string, openRouterKey: st
       throw new Error('Invalid response structure from OpenRouter API');
     }
 
-    console.log(`Successfully generated with model: ${model}`);
+    console.log(`Successfully generated with model: ${actualModel}`);
     return {
       generatedText: data.choices[0].message.content,
-      model: model,
+      model: actualModel,
       usage: data.usage || { prompt_tokens: 0, completion_tokens: 0 }
     };
   } catch (error) {
