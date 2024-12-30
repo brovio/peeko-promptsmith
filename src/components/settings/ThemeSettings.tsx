@@ -3,12 +3,9 @@ import { useThemeManager } from "@/hooks/use-theme-manager";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { ThemeConfiguration } from "@/types/theme";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeSelector } from "./theme/ThemeSelector";
 import { ThemePreviewWrapper } from "./previews/ThemePreviewWrapper";
-import { BaseColorsSection } from "./theme/BaseColorsSection";
-import { ComponentColorsSection } from "./theme/ComponentColorsSection";
-import { StateColorsSection } from "./theme/StateColorsSection";
+import { ThemeEditorTabs } from "./theme/ThemeEditorTabs";
 
 export function ThemeSettings() {
   const { applyTheme } = useThemeManager();
@@ -17,6 +14,7 @@ export function ThemeSettings() {
   const [themes, setThemes] = useState<ThemeConfiguration[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<ThemeConfiguration | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
     checkSuperAdmin();
@@ -120,43 +118,22 @@ export function ThemeSettings() {
             onThemeChange={handleThemeChange}
             onSaveChanges={handleSaveTheme}
             isSuperAdmin={isSuperAdmin}
+            onEditModeChange={setIsEditMode}
           />
 
           {selectedTheme && (
-            <Tabs defaultValue="base" className="w-full">
-              <TabsList>
-                <TabsTrigger value="base">Base Colors</TabsTrigger>
-                <TabsTrigger value="components">Component Colors</TabsTrigger>
-                <TabsTrigger value="states">State Colors</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="base" className="space-y-4 mt-4">
-                <BaseColorsSection
-                  selectedTheme={selectedTheme}
-                  handleColorChange={handleColorChange}
-                />
-              </TabsContent>
-
-              <TabsContent value="components" className="space-y-4 mt-4">
-                <ComponentColorsSection
-                  selectedTheme={selectedTheme}
-                  handleColorChange={handleColorChange}
-                />
-              </TabsContent>
-
-              <TabsContent value="states" className="space-y-4 mt-4">
-                <StateColorsSection
-                  selectedTheme={selectedTheme}
-                  handleColorChange={handleColorChange}
-                />
-              </TabsContent>
-            </Tabs>
+            <ThemeEditorTabs
+              selectedTheme={selectedTheme}
+              handleColorChange={handleColorChange}
+            />
           )}
         </div>
 
-        <div className="space-y-4">
-          <ThemePreviewWrapper />
-        </div>
+        {isEditMode && (
+          <div className="space-y-4">
+            <ThemePreviewWrapper />
+          </div>
+        )}
       </div>
     </div>
   );
