@@ -4,6 +4,7 @@ import { ModelCardPreview } from "./ModelCardPreview";
 import { UseCasePreview } from "./UseCasePreview";
 import { FormPreview } from "./FormPreview";
 import { BaseColorPreview } from "./BaseColorPreview";
+import { useThemeManager } from "@/hooks/use-theme-manager";
 
 interface ThemePreviewProps {
   showAllExamples?: boolean;
@@ -15,6 +16,7 @@ export const ThemePreview = memo(function ThemePreview({
   previewType = 'base' 
 }: ThemePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { currentTheme } = useThemeManager();
 
   useEffect(() => {
     if (containerRef.current) {
@@ -33,12 +35,18 @@ export const ThemePreview = memo(function ThemePreview({
   }
 
   const renderPreview = () => {
+    if (!currentTheme) return null;
+
     switch (previewType) {
       case 'base':
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Base Color Examples</h3>
-            <BaseColorPreview />
+            <BaseColorPreview 
+              background={currentTheme.background}
+              foreground={currentTheme.foreground}
+              inputText={currentTheme.input_text || currentTheme.foreground}
+            />
           </div>
         );
       case 'buttons':
