@@ -4,35 +4,80 @@ import { StateColorsSection } from "./StateColorsSection";
 import { ComponentColorsSection } from "./ComponentColorsSection";
 import { ThemeConfiguration } from "@/types/theme";
 import { ThemePreview } from "../previews/ThemePreview";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
 
 interface ThemeEditorTabsProps {
   selectedTheme: ThemeConfiguration;
   handleColorChange: (key: string, value: string) => void;
   showPreview: boolean;
+  onPreviewChange: (show: boolean) => void;
 }
 
-export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview }: ThemeEditorTabsProps) {
+export function ThemeEditorTabs({ 
+  selectedTheme, 
+  handleColorChange, 
+  showPreview,
+  onPreviewChange 
+}: ThemeEditorTabsProps) {
+  const [previewFilter, setPreviewFilter] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState("all");
+
   return (
-    <Tabs defaultValue="base" className="w-full">
-      <TabsList className="w-full justify-start border-b overflow-x-auto">
-        <TabsTrigger value="all">All Elements</TabsTrigger>
-        <TabsTrigger value="base">Base Colors</TabsTrigger>
-        <TabsTrigger value="buttons">Buttons</TabsTrigger>
-        <TabsTrigger value="cards">Cards</TabsTrigger>
-        <TabsTrigger value="inputs">Input Fields</TabsTrigger>
-        <TabsTrigger value="dropdowns">Dropdowns</TabsTrigger>
-        <TabsTrigger value="search">Search</TabsTrigger>
-        <TabsTrigger value="icons">Icons</TabsTrigger>
-        <TabsTrigger value="dividers">Dividers</TabsTrigger>
-      </TabsList>
+    <Tabs 
+      defaultValue="all" 
+      className="w-full"
+      onValueChange={(value) => {
+        setActiveTab(value);
+        setPreviewFilter(value);
+      }}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <TabsList className="w-auto justify-start border-b overflow-x-auto">
+          <TabsTrigger value="all">All Elements</TabsTrigger>
+          <TabsTrigger value="base">Base Colors</TabsTrigger>
+          <TabsTrigger value="buttons">Buttons</TabsTrigger>
+          <TabsTrigger value="cards">Cards</TabsTrigger>
+          <TabsTrigger value="inputs">Input Fields</TabsTrigger>
+          <TabsTrigger value="dropdowns">Dropdowns</TabsTrigger>
+          <TabsTrigger value="search">Search</TabsTrigger>
+          <TabsTrigger value="icons">Icons</TabsTrigger>
+          <TabsTrigger value="dividers">Dividers</TabsTrigger>
+        </TabsList>
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={showPreview}
+              onCheckedChange={onPreviewChange}
+              id="preview-mode"
+            />
+            <label htmlFor="preview-mode" className="text-sm">
+              Show Preview
+            </label>
+          </div>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
         <div className="space-y-4">
           <TabsContent value="all">
-            <BaseColorsSection 
-              selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange}
-            />
+            <div className="space-y-8">
+              <BaseColorsSection 
+                selectedTheme={selectedTheme} 
+                handleColorChange={handleColorChange}
+              />
+              <StateColorsSection 
+                selectedTheme={selectedTheme} 
+                handleColorChange={handleColorChange}
+              />
+              <ComponentColorsSection 
+                selectedTheme={selectedTheme} 
+                handleColorChange={handleColorChange}
+                type="all"
+              />
+            </div>
           </TabsContent>
           <TabsContent value="base">
             <BaseColorsSection 
@@ -46,53 +91,23 @@ export function ThemeEditorTabs({ selectedTheme, handleColorChange, showPreview 
               handleColorChange={handleColorChange}
             />
           </TabsContent>
-          <TabsContent value="cards">
-            <ComponentColorsSection 
-              selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange}
-              type="cards"
-            />
-          </TabsContent>
-          <TabsContent value="inputs">
-            <ComponentColorsSection 
-              selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange}
-              type="inputs"
-            />
-          </TabsContent>
-          <TabsContent value="dropdowns">
-            <ComponentColorsSection 
-              selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange}
-              type="dropdowns"
-            />
-          </TabsContent>
-          <TabsContent value="search">
-            <ComponentColorsSection 
-              selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange}
-              type="search"
-            />
-          </TabsContent>
-          <TabsContent value="icons">
-            <ComponentColorsSection 
-              selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange}
-              type="icons"
-            />
-          </TabsContent>
-          <TabsContent value="dividers">
-            <ComponentColorsSection 
-              selectedTheme={selectedTheme} 
-              handleColorChange={handleColorChange}
-              type="dividers"
-            />
-          </TabsContent>
+          {["cards", "inputs", "dropdowns", "search", "icons", "dividers"].map((type) => (
+            <TabsContent key={type} value={type}>
+              <ComponentColorsSection 
+                selectedTheme={selectedTheme} 
+                handleColorChange={handleColorChange}
+                type={type}
+              />
+            </TabsContent>
+          ))}
         </div>
 
         {showPreview && (
           <div className="space-y-4">
-            <ThemePreview showAllExamples={false} previewType="all" />
+            <ThemePreview 
+              showAllExamples={activeTab === "all"} 
+              previewType={activeTab as any}
+            />
           </div>
         )}
       </div>

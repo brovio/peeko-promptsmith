@@ -4,11 +4,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { ThemeConfiguration } from "@/types/theme";
 import { ThemeSelector } from "./theme/ThemeSelector";
-import { ThemePreviewWrapper } from "./previews/ThemePreviewWrapper";
 import { ThemeEditorTabs } from "./theme/ThemeEditorTabs";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
 
 export function ThemeSettings() {
   const { applyTheme } = useThemeManager();
@@ -125,18 +123,6 @@ export function ThemeSettings() {
               isSuperAdmin={isSuperAdmin}
               onEditModeChange={setIsEditMode}
             />
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Switch
-                  checked={showPreview}
-                  onCheckedChange={setShowPreview}
-                  id="preview-mode"
-                />
-                <label htmlFor="preview-mode" className="text-sm">
-                  Show Preview
-                </label>
-              </div>
-            </div>
           </div>
 
           {selectedTheme && (
@@ -144,6 +130,7 @@ export function ThemeSettings() {
               selectedTheme={selectedTheme}
               handleColorChange={handleColorChange}
               showPreview={showPreview}
+              onPreviewChange={setShowPreview}
             />
           )}
         </div>
