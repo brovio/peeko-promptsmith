@@ -43,7 +43,7 @@ export function ProfileMenu() {
         <Tooltip>
           <TooltipTrigger asChild>
             <Settings 
-              className="h-5 w-5 cursor-pointer hover:text-primary dark:text-primary black:text-primary" 
+              className="h-5 w-5 cursor-pointer hover:text-primary dark:text-primary black:text-primary mx-[10px]" 
               onClick={() => navigate("/settings")}
             />
           </TooltipTrigger>
