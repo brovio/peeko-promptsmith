@@ -1,6 +1,5 @@
 import { NavLink } from "./header/NavLink";
 import { ProfileMenu } from "./header/ProfileMenu";
-import { ThemeControls } from "./header/ThemeControls";
 import { Home, Database, LayoutTemplate } from "lucide-react";
 import {
   Tooltip,
@@ -50,7 +49,6 @@ export function Header() {
           </TooltipProvider>
         </div>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
-          <ThemeControls />
           <ProfileMenu />
         </div>
       </div>
