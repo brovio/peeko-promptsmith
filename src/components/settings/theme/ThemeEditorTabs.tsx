@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
 
+type PreviewType = "all" | "base" | "buttons" | "cards" | "inputs" | "dropdowns" | "search" | "icons" | "dividers";
+
 interface ThemeEditorTabsProps {
   selectedTheme: ThemeConfiguration;
   handleColorChange: (key: string, value: string) => void;
@@ -21,16 +23,16 @@ export function ThemeEditorTabs({
   showPreview,
   onPreviewChange 
 }: ThemeEditorTabsProps) {
-  const [previewFilter, setPreviewFilter] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState("all");
+  const [previewFilter, setPreviewFilter] = useState<PreviewType>("all");
+  const [activeTab, setActiveTab] = useState<PreviewType>("all");
 
   return (
     <Tabs 
       defaultValue="all" 
       className="w-full"
       onValueChange={(value) => {
-        setActiveTab(value);
-        setPreviewFilter(value);
+        setActiveTab(value as PreviewType);
+        setPreviewFilter(value as PreviewType);
       }}
     >
       <div className="flex justify-between items-center mb-4">
@@ -96,7 +98,7 @@ export function ThemeEditorTabs({
               <ComponentColorsSection 
                 selectedTheme={selectedTheme} 
                 handleColorChange={handleColorChange}
-                type={type}
+                type={type as PreviewType}
               />
             </TabsContent>
           ))}
@@ -106,7 +108,7 @@ export function ThemeEditorTabs({
           <div className="space-y-4">
             <ThemePreview 
               showAllExamples={activeTab === "all"} 
-              previewType={activeTab as any}
+              previewType={activeTab}
             />
           </div>
         )}
