@@ -47,7 +47,7 @@ export const ThemePreview = memo(function ThemePreview({
         return (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Card Examples</h3>
-            <div className="max-w-md space-y-4">
+            <div className="grid gap-4">
               <ModelCardPreview />
               <UseCasePreview />
             </div>
