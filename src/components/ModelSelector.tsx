@@ -8,9 +8,11 @@ interface ModelSelectorProps {
   onModelSelect: (modelId: string) => void;
   selectedModel: string;
   models?: Model[]; // Make models optional to maintain backward compatibility
+  isLoading?: boolean; // Add isLoading prop
+  onRefresh?: () => void; // Add onRefresh prop
 }
 
-export function ModelSelector({ onModelSelect, selectedModel, models }: ModelSelectorProps) {
+export function ModelSelector({ onModelSelect, selectedModel, models, isLoading: externalLoading, onRefresh }: ModelSelectorProps) {
   const { data: modelsInUse = [], isLoading: isModelsInUseLoading } = useQuery({
     queryKey: ['models-in-use'],
     queryFn: async () => {
@@ -52,7 +54,7 @@ export function ModelSelector({ onModelSelect, selectedModel, models }: ModelSel
     initialData: [],
   });
 
-  const isLoading = isModelsInUseLoading || isModelsLoading;
+  const isLoading = isModelsInUseLoading || isModelsLoading || externalLoading;
   const displayModels = models || fetchedModels; // Use provided models or fetched models
 
   if (isLoading && !models) {
