@@ -4,6 +4,8 @@ import { StateColorsSection } from "./StateColorsSection";
 import { ComponentColorsSection } from "./ComponentColorsSection";
 import { ThemeConfiguration } from "@/types/theme";
 import { ThemePreview } from "../previews/ThemePreview";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { useState } from "react";
 
 type PreviewType = "all" | "base" | "buttons" | "cards" | "inputs" | "dropdowns" | "search" | "icons" | "dividers";
@@ -34,7 +36,7 @@ export function ThemeEditorTabs({
       }}
     >
       <div className="flex justify-between items-center mb-4">
-        <TabsList className="w-auto justify-start border-b flex-wrap">
+        <TabsList className="w-auto justify-start border-b overflow-x-auto">
           <TabsTrigger value="all">All Elements</TabsTrigger>
           <TabsTrigger value="base">Base Colors</TabsTrigger>
           <TabsTrigger value="buttons">Buttons</TabsTrigger>
@@ -45,6 +47,19 @@ export function ThemeEditorTabs({
           <TabsTrigger value="icons">Icons</TabsTrigger>
           <TabsTrigger value="dividers">Dividers</TabsTrigger>
         </TabsList>
+
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Switch
+              checked={showPreview}
+              onCheckedChange={onPreviewChange}
+              id="preview-mode"
+            />
+            <label htmlFor="preview-mode" className="text-sm">
+              Show Preview
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
