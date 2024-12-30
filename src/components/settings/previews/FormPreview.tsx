@@ -28,71 +28,95 @@ export function FormPreview({
   showIcons = false,
   showDividers = false,
 }: FormPreviewProps) {
+  const renderButtons = () => (
+    <div className="flex gap-4">
+      <Button>Primary Button</Button>
+      <Button variant="secondary">Secondary Button</Button>
+      <Button variant="outline">Outline Button</Button>
+      <Button variant="ghost">Ghost Button</Button>
+    </div>
+  );
+
+  const renderInputs = () => (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <span className="text-sm font-medium">Email</span>
+        <Input type="email" placeholder="Enter your email" />
+      </div>
+      <div className="space-y-2">
+        <span className="text-sm font-medium">Password</span>
+        <Input type="password" placeholder="Enter your password" />
+      </div>
+    </div>
+  );
+
+  const renderDropdowns = () => (
+    <div className="space-y-4">
+      <Select>
+        <SelectTrigger className="w-[200px]">
+          <SelectValue placeholder="Select an option" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="1">Option 1</SelectItem>
+          <SelectItem value="2">Option 2</SelectItem>
+          <SelectItem value="3">Option 3</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
+
+  const renderSearch = () => (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
+      <Input
+        type="search"
+        placeholder="Search..."
+        className="pl-10"
+      />
+    </div>
+  );
+
+  const renderIcons = () => (
+    <div className="flex gap-4">
+      <Mail className="h-6 w-6" />
+      <Lock className="h-6 w-6" />
+      <Search className="h-6 w-6" />
+      <SlidersHorizontal className="h-6 w-6" />
+    </div>
+  );
+
+  const renderDividers = () => (
+    <div className="space-y-4">
+      <div className="border-t" />
+      <div className="flex items-center">
+        <div className="flex-1 border-t" />
+        <span className="px-4 text-sm text-muted-foreground">OR</span>
+        <div className="flex-1 border-t" />
+      </div>
+    </div>
+  );
+
+  if (showAllExamples) {
+    return (
+      <div className="space-y-8">
+        {renderButtons()}
+        {renderInputs()}
+        {renderDropdowns()}
+        {renderSearch()}
+        {renderIcons()}
+        {renderDividers()}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Search and Filter Bar */}
-      {(showAllExamples || showSearch) && (
-        <div className="flex gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" size={20} />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="pl-10"
-            />
-          </div>
-          {showDropdowns && (
-            <Select>
-              <SelectTrigger className="w-[140px]">
-                <SelectValue placeholder="Filter" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Items</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-          {showButtons && (
-            <Button variant="outline" size="icon">
-              <SlidersHorizontal className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      )}
-
-      {/* Input Fields */}
-      {(showAllExamples || showInputs) && (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              {showIcons && <Mail className="h-4 w-4 text-foreground" />}
-              <span className="text-sm font-medium">Email</span>
-            </div>
-            <Input type="email" placeholder="Enter your email" />
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              {showIcons && <Lock className="h-4 w-4 text-foreground" />}
-              <span className="text-sm font-medium">Password</span>
-            </div>
-            <Input type="password" placeholder="Enter your password" />
-          </div>
-          {showButtons && <Button className="w-full">Sign In</Button>}
-        </div>
-      )}
-
-      {/* Divider Example */}
-      {(showAllExamples || showDividers) && (
-        <div className="space-y-2">
-          <div className="border-t border-border" />
-          <div className="flex items-center">
-            <div className="flex-1 border-t border-border" />
-            <span className="px-4 text-sm text-muted-foreground">OR</span>
-            <div className="flex-1 border-t border-border" />
-          </div>
-        </div>
-      )}
+    <div className="space-y-8">
+      {showButtons && renderButtons()}
+      {showInputs && renderInputs()}
+      {showDropdowns && renderDropdowns()}
+      {showSearch && renderSearch()}
+      {showIcons && renderIcons()}
+      {showDividers && renderDividers()}
     </div>
   );
 }

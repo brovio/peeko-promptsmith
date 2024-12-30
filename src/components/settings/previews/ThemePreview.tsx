@@ -16,25 +16,14 @@ export const ThemePreview = memo(function ThemePreview({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Force a reflow when the component mounts or updates
     if (containerRef.current) {
       containerRef.current.style.display = 'none';
-      void containerRef.current.offsetHeight; // Trigger reflow
+      void containerRef.current.offsetHeight;
       containerRef.current.style.display = '';
     }
   }, [showAllExamples, previewType]);
 
   const renderPreview = () => {
-    // If showAllExamples is true and we're on the base tab, show everything
-    if (showAllExamples && previewType === 'base') {
-      return (
-        <div className="space-y-8">
-          <FormPreview showAllExamples={true} />
-        </div>
-      );
-    }
-
-    // Otherwise, show only the relevant preview for each tab
     switch (previewType) {
       case 'buttons':
         return (
@@ -89,7 +78,11 @@ export const ThemePreview = memo(function ThemePreview({
           </div>
         );
       default:
-        return <FormPreview showAllExamples={false} />;
+        return (
+          <div className="space-y-4">
+            <FormPreview showAllExamples={showAllExamples} />
+          </div>
+        );
     }
   };
 
