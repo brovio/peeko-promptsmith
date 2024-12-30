@@ -1,7 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import type { ThemeConfiguration } from "@/types/theme";
 
 interface ThemeSelectorProps {
@@ -18,8 +16,7 @@ export function ThemeSelector({
   selectedTheme, 
   onThemeChange, 
   onSaveChanges,
-  isSuperAdmin,
-  onEditModeChange
+  isSuperAdmin
 }: ThemeSelectorProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -40,21 +37,11 @@ export function ThemeSelector({
           </SelectContent>
         </Select>
 
-        <div className="flex items-center gap-4">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="edit-mode"
-              onCheckedChange={onEditModeChange}
-            />
-            <Label htmlFor="edit-mode">Show Preview</Label>
-          </div>
-
-          {isSuperAdmin && selectedTheme && (
-            <Button onClick={onSaveChanges}>
-              Save Changes
-            </Button>
-          )}
-        </div>
+        {isSuperAdmin && selectedTheme && (
+          <Button onClick={onSaveChanges}>
+            Save Changes
+          </Button>
+        )}
       </div>
     </div>
   );
