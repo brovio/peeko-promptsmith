@@ -2,6 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { rgbToHsl } from "@/lib/colorUtils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoIcon } from "lucide-react";
 
 interface ColorPickerGroupProps {
   label: string;
@@ -13,6 +15,7 @@ interface ColorPickerGroupProps {
   previewClassName?: string;
   inputTextColor?: string;
   onInputTextColorChange?: (value: string) => void;
+  tooltipContent?: string;
 }
 
 export function ColorPickerGroup({
@@ -25,21 +28,33 @@ export function ColorPickerGroup({
   previewClassName = "bg-background text-foreground",
   inputTextColor,
   onInputTextColorChange,
+  tooltipContent,
 }: ColorPickerGroupProps) {
   return (
     <div className="space-y-4 p-4 border rounded-lg">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-medium">{label}</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-medium">{label}</h3>
+            {tooltipContent && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <InfoIcon className="h-4 w-4 text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs">{tooltipContent}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
         <div className="space-x-2">
-          <Button 
-            variant="secondary"
-            className={`${previewClassName} transition-colors duration-200`}
-          >
-            Preview Text
-          </Button>
+          <div className={`${previewClassName} p-2 rounded-md border`}>
+            Style Example
+          </div>
           {inputTextColor && (
             <Input
               type="text"
